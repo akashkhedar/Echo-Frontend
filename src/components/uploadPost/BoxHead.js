@@ -1,0 +1,41 @@
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import { IconButton } from "@mui/material";
+import { Box } from "@mui/system";
+import React from "react";
+import { useSelector } from "react-redux";
+
+const BoxHead = ({ handleClose }) => {
+  const prevURL = useSelector((state) => state.upload);
+  return (
+    <Box
+      sx={{
+        width: "100%",
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "end",
+        mb: 1.5,
+      }}
+    >
+      <IconButton
+        sx={{
+          backgroundColor: "rgb(25, 25, 23)",
+          height: "3rem",
+          width: "3rem",
+          marginTop: 1,
+          color: "rgb(100, 100, 107)",
+          "&:hover": {
+            backgroundColor: "rgb(21, 21, 24)",
+          },
+        }}
+        onClick={() => {
+          URL.revokeObjectURL(prevURL);
+          handleClose();
+        }}
+      >
+        <CloseRoundedIcon />
+      </IconButton>
+    </Box>
+  );
+};
+
+export default BoxHead;
