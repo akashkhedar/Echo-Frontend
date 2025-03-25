@@ -23,7 +23,9 @@ const MessageSection = () => {
       dispatch(setChat(msg));
     };
 
-    socket.on("receiveMsg", receiveMessageHandler);
+    socket.on("receiveMsg", (msg) => {
+      console.log(msg);
+    });
 
     return () => {
       socket.off("receiveMsg", receiveMessageHandler); // Cleanup on unmount

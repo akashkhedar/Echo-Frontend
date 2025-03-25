@@ -23,6 +23,8 @@ const ChatPage = () => {
       try {
         const res = await axiosInstance.get("/chat/list");
         setConversations(res.data);
+        const rooms = res.data.map((convo) => convo.roomId);
+        socket.emit("joinAllRooms", rooms);
       } catch (error) {
         console.log(error);
       }

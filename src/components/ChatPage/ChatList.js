@@ -1,6 +1,6 @@
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import { Box, IconButton, List, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../axiosInstance";
@@ -9,27 +9,20 @@ import {
   setChatId,
   setChatName,
   setChatProfileImage,
-  setChatUserName,
   setChatUserId,
+  setChatUserName,
 } from "../../redux/slices/ChatSlice/ChatSlice";
 import ConversationsList from "./ConversationsList";
 import ListSearch from "./ListSearch";
-import io from "socket.io-client";
-
-const socket = io("http://localhost:5000");
 
 const ChatList = ({ conversations }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const userId = useSelector((state) => state.user._id);
   const selectedChat = useSelector((state) => state.chat.chatId);
 
   const handleClick = async (convo) => {
     try {
-      console.log(userId, convo.user._id);
-
-      socket.emit("openChat", { senderId: userId, receiverId: convo.user._id });
       dispatch(setChatId(convo._id));
       dispatch(setChatUserId(convo.user._id));
       dispatch(setChatName(convo.user.fullname));
