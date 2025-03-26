@@ -1,11 +1,8 @@
 import React, { useState } from "react";
 import { Box, IconButton, InputBase } from "@mui/material";
 import { AttachFile, Send } from "@mui/icons-material";
-import axiosInstance from "../../axiosInstance";
 import { useSelector } from "react-redux";
-import io from "socket.io-client";
-
-const socket = io("http://localhost:5000");
+import socket from "../../utils/socket";
 
 const ChatInput = () => {
   const selectedUser = useSelector((state) => state.chat.chatUserId);
@@ -22,7 +19,8 @@ const ChatInput = () => {
     }
   };
 
-  const handleSend = () => {
+  const handleSend = (e) => {
+    e.preventDefault();
     try {
       const trimmedMessage = inputMessage.trim().replace(/\s+/g, " ");
       console.log(trimmedMessage);

@@ -7,9 +7,7 @@ import ChatSection from "./ChatSection";
 import axiosInstance from "../../axiosInstance";
 import { useDispatch, useSelector } from "react-redux";
 import { clearChat } from "../../redux/slices/ChatSlice/ChatSlice";
-const io = require("socket.io-client");
-
-const socket = io("http://localhost:5000");
+import socket from "../../utils/socket";
 
 const ChatPage = () => {
   const [conversations, setConversations] = useState([]);
@@ -29,7 +27,6 @@ const ChatPage = () => {
         console.log(error);
       }
     };
-
     socket.emit("joinChat", userId);
     socket.on("joinedChat", (data) => {
       console.log(data);

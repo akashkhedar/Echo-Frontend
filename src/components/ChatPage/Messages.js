@@ -2,7 +2,7 @@ import { Box, styled } from "@mui/material";
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import Message from "./Message";
-import io from "socket.io-client";
+import socket from "../../utils/socket";
 import { setChat } from "../../redux/slices/ChatSlice/ChatSlice";
 import { useDispatch } from "react-redux";
 
@@ -17,15 +17,11 @@ const MessageSection = () => {
   const chats = useSelector((state) => state.chat.chat);
   const userId = useSelector((state) => state.user._id);
   useEffect(() => {
-    const socket = io("http://localhost:5000");
-
     const receiveMessageHandler = (msg) => {
       dispatch(setChat(msg));
     };
 
-    socket.on("receiveMsg", (msg) => {
-      console.log(msg);
-    });
+    socket.on("receiveMsg", (msg) => receiveMessageHandler(msg));
 
     return () => {
       socket.off("receiveMsg", receiveMessageHandler); // Cleanup on unmount
