@@ -15,7 +15,8 @@ import {
 import ConversationsList from "./ConversationsList";
 import ListSearch from "./ListSearch";
 
-const ChatList = ({ conversations }) => {
+const ChatList = () => {
+  const conversations = useSelector((state) => state.convo);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

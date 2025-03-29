@@ -18,7 +18,6 @@ export default function ResponsiveCard() {
       }
     };
     getPost();
-    console.log(posts);
 
     // eslint-disable-next-line
   }, []);

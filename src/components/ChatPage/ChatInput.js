@@ -23,7 +23,6 @@ const ChatInput = () => {
     e.preventDefault();
     try {
       const trimmedMessage = inputMessage.trim().replace(/\s+/g, " ");
-      console.log(trimmedMessage);
 
       if (trimmedMessage) {
         socket.emit("sendMessage", {

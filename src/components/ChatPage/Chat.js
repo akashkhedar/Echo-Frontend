@@ -1,44 +1,24 @@
 import { Box } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
 import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
 import ChatList from "./ChatList";
 import ChatSection from "./ChatSection";
-import axiosInstance from "../../axiosInstance";
-import { useDispatch, useSelector } from "react-redux";
 import { clearChat } from "../../redux/slices/ChatSlice/ChatSlice";
-import socket from "../../utils/socket";
+import { useDispatch } from "react-redux";
 
 const ChatPage = () => {
-  const [conversations, setConversations] = useState([]);
-  const dispatch = useDispatch();
   const selectedChat = useSelector((state) => state.chat.chat);
-  const userId = useSelector((state) => state.user._id);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const fetchData = async () => {
+    dispatch(clearChat());
+    return () => {
       dispatch(clearChat());
-      try {
-        const res = await axiosInstance.get("/chat/list");
-        setConversations(res.data);
-        const rooms = res.data.map((convo) => convo.roomId);
-        socket.emit("joinAllRooms", rooms);
-      } catch (error) {
-        console.log(error);
-      }
     };
-    socket.emit("joinChat", userId);
-    socket.on("joinedChat", (data) => {
-      console.log(data);
-    });
-    socket.on("leftChat", (data) => {
-      console.log(data);
-    });
-
-    fetchData();
     // eslint-disable-next-line
   }, []);
-
   return (
     <Box
       sx={{
@@ -48,7 +28,7 @@ const ChatPage = () => {
       }}
     >
       {/* Sidebar */}
-      <ChatList conversations={conversations} />
+      <ChatList />
       {/* Chat Window */}
       <Box
         sx={{

@@ -1,24 +1,62 @@
 import Box from "@mui/material/Box";
-import React from "react";
+import React, { useEffect } from "react";
 import LGSidebar from "./LeftSidebar/LGSidebar";
 import MDSidebar from "./LeftSidebar/MDSidebar";
 import Navbar from "./Navbar/Navbar";
 import LGQuickChat from "./RightSidebar/LGQuickChat";
 import MDQuickChat from "./RightSidebar/MDQuickChat";
 import { useLocation } from "react-router-dom";
+import socket from "../utils/socket";
+import { useDispatch, useSelector } from "react-redux";
+import { clearChat } from "../redux/slices/ChatSlice/ChatSlice";
+import axiosInstance from "../axiosInstance";
+import { setConversations } from "../redux/slices/ConversationSlice/ConversationSlice";
 
 const HomeLayout = ({ children }) => {
   const location = useLocation();
   const isChatPage = location.pathname === "/chat";
 
+  const dispatch = useDispatch();
+
+  const userId = useSelector((state) => state.user._id);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axiosInstance.get("/chat/list");
+        dispatch(setConversations(res.data));
+        const rooms = res.data.map((convo) => convo.roomId);
+        socket.emit("joinAllRooms", rooms);
+        socket.emit("joinChat", userId);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const handleConnect = async () => {
+      await fetchData();
+    };
+
+    socket.on("connect", handleConnect);
+    socket.on("leftChat", (data) => console.log(data));
+
+    fetchData();
+
+    return () => {
+      socket.off("connect", handleConnect);
+      socket.off("leftChat");
+      clearChat();
+    };
+  }, [dispatch, userId]);
+
   return (
     <Box
       sx={{
         display: "grid",
-        gridTemplateRows: "4rem auto", // Navbar height and remaining vertical space
-        gridTemplateColumns: "auto", // Columns are controlled inside the second row
-        height: "100vh", // Full viewport height
-        width: "100vw", // Full viewport width
+        gridTemplateRows: "4rem auto",
+        gridTemplateColumns: "auto",
+        height: "100vh",
+        width: "100vw",
         "&::-webkit-scrollbar": {
           display: "none",
         },
@@ -30,8 +68,8 @@ const HomeLayout = ({ children }) => {
       {/* Navbar */}
       <Box
         sx={{
-          gridRow: "1 / 2", // Occupies the first row
-          gridColumn: "1 / 2", // Full width
+          gridRow: "1 / 2",
+          gridColumn: "1 / 2",
           background: "#181818",
           display: "flex",
           alignItems: "center",
@@ -44,17 +82,17 @@ const HomeLayout = ({ children }) => {
       {/* Sidebar and Post Section */}
       <Box
         sx={{
-          gridRow: "2 / 3", // Occupies the second row
-          gridColumn: "1 / 2", // Full width
+          gridRow: "2 / 3",
+          gridColumn: "1 / 2",
           display: "flex",
-          flexDirection: "row", // Sidebar on the left, content on the right
-          height: "100%", // Occupy remaining vertical space
+          flexDirection: "row",
+          height: "100%",
         }}
       >
         {/* Sidebar */}
         <Box
           sx={{
-            width: { md: "4rem", lg: "13rem" }, // Sidebar width for different breakpoints
+            width: { md: "4rem", lg: "13rem" },
             background: "#181818",
           }}
         >
@@ -71,7 +109,7 @@ const HomeLayout = ({ children }) => {
         <Box
           component="main"
           sx={{
-            flex: 1, // Occupy remaining horizontal space
+            flex: 1,
             paddingRight: { md: "1rem", lg: "2rem" },
             paddingLeft: { md: "1rem", lg: "1rem" },
             background: "#181818",
@@ -83,10 +121,10 @@ const HomeLayout = ({ children }) => {
         {!isChatPage && (
           <Box
             sx={{
-              width: { md: "4rem", lg: "13rem" }, // QuickChat drawer width for different breakpoints
+              width: { md: "4rem", lg: "13rem" },
               background: "#181818",
               display: "flex",
-              flexDirection: "column", // Ensures proper layout within QuickChat
+              flexDirection: "column",
             }}
           >
             <Box sx={{ display: { xs: "none", md: "block", lg: "none" } }}>
