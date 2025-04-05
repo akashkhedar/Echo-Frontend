@@ -8,6 +8,8 @@ import {
 } from "@mui/material";
 import React from "react";
 import DoneIcon from "@mui/icons-material/Done";
+import DoneAllIcon from "@mui/icons-material/DoneAll";
+import ScheduleIcon from "@mui/icons-material/Schedule";
 
 const ChatBubble = styled(Card)(({ align }) => ({
   maxWidth: "60%",
@@ -71,7 +73,15 @@ const Message = ({ msg, userId }) => {
           </Typography>
           {isSent ? (
             <IconButton>
-              <DoneIcon sx={{ fontSize: 12 }} color="success" />
+              {msg.read ? (
+                <DoneAllIcon sx={{ fontSize: 10, color: "blue" }} />
+              ) : msg.delivered ? (
+                <DoneAllIcon sx={{ fontSize: 10, color: "grey" }} />
+              ) : msg.sent ? (
+                <DoneIcon sx={{ fontSize: 10, color: "grey" }} />
+              ) : (
+                <ScheduleIcon sx={{ fontSize: 10, color: "grey" }} />
+              )}
             </IconButton>
           ) : null}
         </Box>

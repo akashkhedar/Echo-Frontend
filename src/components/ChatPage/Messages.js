@@ -20,7 +20,6 @@ const StyledBox = styled(Box)({
 const MessageContainer = styled(Box)({
   display: "flex",
   flexDirection: "column",
-  paddingBottom: "20px", // Added padding to ensure last message is fully visible
 });
 
 const MessageSection = () => {
@@ -54,10 +53,10 @@ const MessageSection = () => {
 
     if (
       !prevInnerDivHeight.current ||
-      outerDivScrollTop >= prevInnerDivHeight.current - outerDivHeight - 10
+      outerDivScrollTop >= prevInnerDivHeight.current - outerDivHeight - 20
     ) {
       outerDiv.current.scrollTo({
-        top: innerDivHeight - outerDivHeight + 40, // Increased padding
+        top: innerDivHeight - outerDivHeight + 30, // Increased padding
         left: 0,
         behavior: prevInnerDivHeight.current ? "smooth" : "auto",
       });

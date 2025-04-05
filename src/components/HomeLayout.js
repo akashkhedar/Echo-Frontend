@@ -23,11 +23,11 @@ const HomeLayout = ({ children }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        socket.emit("joinChat", userId);
         const res = await axiosInstance.get("/chat/list");
         dispatch(setConversations(res.data));
         const rooms = res.data.map((convo) => convo.roomId);
         socket.emit("joinAllRooms", rooms);
-        socket.emit("joinChat", userId);
       } catch (error) {
         console.log(error);
       }
@@ -37,15 +37,19 @@ const HomeLayout = ({ children }) => {
       await fetchData();
     };
 
-    socket.on("connect", handleConnect);
-    socket.on("leftChat", (data) => console.log(data));
+    const handleBeforeUnload = () => {
+      socket.emit("leaveChat", userId);
+    };
 
-    fetchData();
+    socket.on("connect", handleConnect);
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
     return () => {
+      dispatch(clearChat());
       socket.off("connect", handleConnect);
-      socket.off("leftChat");
-      clearChat();
+      socket.off("leaveChat");
+      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [dispatch, userId]);
 
