@@ -21,6 +21,7 @@ const ChatInput = () => {
 
   const handleSend = (e) => {
     e.preventDefault();
+
     try {
       const trimmedMessage = inputMessage.trim().replace(/\s+/g, " ");
 

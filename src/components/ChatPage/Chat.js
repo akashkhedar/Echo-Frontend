@@ -7,23 +7,23 @@ import ChatList from "./ChatList";
 import ChatSection from "./ChatSection";
 import { clearChat } from "../../redux/slices/ChatSlice/ChatSlice";
 import { useDispatch } from "react-redux";
+import ChatBG from "../../assets/ChatBG.jpeg";
 
 const ChatPage = () => {
-  const selectedChat = useSelector((state) => state.chat.chat);
+  const selectedChat = useSelector((state) => state.chat.chatId);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(clearChat());
-    return () => {
-      dispatch(clearChat());
-    };
     // eslint-disable-next-line
   }, []);
   return (
     <Box
       sx={{
         display: "flex",
-        backgroundColor: "#1e1e1f",
+        // backgroundColor: "#1e1e1f",
+        background: `url(${ChatBG}) no-repeat center center/cover`,
+        backgroundSize: "cover",
         height: "90.8vh",
       }}
     >
@@ -40,12 +40,9 @@ const ChatPage = () => {
           overflow: "auto",
         }}
       >
-        {/* Chat Header */}
-        {selectedChat ? selectedChat.length > 0 ? <ChatHeader /> : null : null}
-        {/* Chat Messages */}
+        {selectedChat === null ? null : <ChatHeader />}
         <ChatSection />
-        {/* Message Input */}
-        {selectedChat ? selectedChat.length > 0 ? <ChatInput /> : null : null}
+        {selectedChat === null ? null : <ChatInput />}
       </Box>
     </Box>
   );

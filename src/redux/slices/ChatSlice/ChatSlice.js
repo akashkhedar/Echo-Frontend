@@ -5,6 +5,7 @@ const ChatSlice = createSlice({
   initialState: {
     chat: [],
     chatId: null,
+    roomId: null,
     chatUserId: null,
     chatName: null,
     chatUserName: null,
@@ -16,6 +17,15 @@ const ChatSlice = createSlice({
     },
     setChatId: (state, action) => {
       state.chatId = action.payload;
+    },
+    markMessageRead: (state, action) => {
+      const messageId = action.payload;
+      state.chat = state.chat.map((msg) =>
+        msg._id === messageId ? { ...msg, read: true } : msg
+      );
+    },
+    setRoomId: (state, action) => {
+      state.roomId = action.payload;
     },
     setChatUserId: (state, action) => {
       state.chatUserId = action.payload;
@@ -42,10 +52,12 @@ const ChatSlice = createSlice({
 export const {
   setChat,
   setChatId,
+  setRoomId,
   setChatUserId,
   setChatName,
   setChatUserName,
   setChatProfileImage,
   clearChat,
+  markMessageRead,
 } = ChatSlice.actions;
 export default ChatSlice.reducer;

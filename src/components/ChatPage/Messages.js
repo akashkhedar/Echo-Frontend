@@ -3,7 +3,11 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Message from "./Message";
 import socket from "../../utils/socket";
-import { setChat } from "../../redux/slices/ChatSlice/ChatSlice";
+import NewMessage from "./NewMessage";
+import {
+  setChat,
+  markMessageRead,
+} from "../../redux/slices/ChatSlice/ChatSlice";
 
 const StyledBox = styled(Box)({
   padding: "16px",
@@ -82,15 +86,26 @@ const MessageSection = () => {
     setShowScrollButton(false);
   }, []);
 
+  useEffect(() => {
+    const handleMessageRead = (messageId) => {
+      dispatch(markMessageRead(messageId));
+    };
+
+    socket.on("receiverRead", handleMessageRead);
+    return () => socket.off("receiverRead", handleMessageRead);
+  }, [dispatch]);
+
   return (
     <div style={{ position: "relative", height: "100%" }}>
       <StyledBox ref={outerDiv}>
         <MessageContainer ref={innerDiv}>
-          {chats.length > 0
-            ? chats.map((msg) => (
-                <Message msg={msg} userId={userId} key={msg._id} />
-              ))
-            : null}
+          {chats.length > 0 ? (
+            chats.map((msg) => (
+              <Message msg={msg} userId={userId} key={msg._id} />
+            ))
+          ) : (
+            <NewMessage />
+          )}
         </MessageContainer>
       </StyledBox>
       {showScrollButton && (

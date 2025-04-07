@@ -6,10 +6,12 @@ import {
   styled,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import DoneIcon from "@mui/icons-material/Done";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import ScheduleIcon from "@mui/icons-material/Schedule";
+import socket from "../../utils/socket";
+import { useSelector } from "react-redux";
 
 const ChatBubble = styled(Card)(({ align }) => ({
   maxWidth: "60%",
@@ -39,9 +41,35 @@ const formatTime = (timestamp) => {
 
 const Message = ({ msg, userId }) => {
   const isSent = msg.sender === userId;
+  const conversationId = useSelector((state) => state.chat.chatId);
+  const roomId = useSelector((state) => state.chat.roomId);
+  const messageRef = useRef(null);
+
+  useEffect(() => {
+    if (msg.sender === userId) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          socket.emit("readMsg", {
+            msgId: msg._id,
+            chatId: conversationId,
+            roomId: roomId,
+          });
+          observer.disconnect();
+        }
+      },
+      { threshold: 1 }
+    );
+
+    if (messageRef.current) {
+      observer.observe(messageRef.current);
+    }
+    return () => observer.disconnect();
+  }, [msg, userId, roomId, conversationId]); // add conversationId for safety
 
   return (
-    <ChatBubble align={isSent ? "right" : "left"}>
+    <ChatBubble ref={messageRef} align={isSent ? "right" : "left"}>
       <CardContent
         sx={{
           padding: "6px 10px",

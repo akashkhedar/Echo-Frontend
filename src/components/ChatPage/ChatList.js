@@ -11,6 +11,7 @@ import {
   setChatProfileImage,
   setChatUserId,
   setChatUserName,
+  setRoomId,
 } from "../../redux/slices/ChatSlice/ChatSlice";
 import ConversationsList from "./ConversationsList";
 import ListSearch from "./ListSearch";
@@ -25,6 +26,7 @@ const ChatList = () => {
   const handleClick = async (convo) => {
     try {
       dispatch(setChatId(convo._id));
+      dispatch(setRoomId(convo.roomId));
       dispatch(setChatUserId(convo.user._id));
       dispatch(setChatName(convo.user.fullname));
       dispatch(setChatUserName(convo.user.username));
