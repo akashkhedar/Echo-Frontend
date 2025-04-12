@@ -7,6 +7,7 @@ import socket from "../../utils/socket";
 const ChatInput = () => {
   const selectedUser = useSelector((state) => state.chat.chatUserId);
   const userId = useSelector((state) => state.user._id);
+  const username = useSelector((state) => state.user.username);
 
   const [inputMessage, setInputMessage] = useState("");
   const wordLimit = 250;
@@ -30,6 +31,7 @@ const ChatInput = () => {
           senderId: userId,
           receiverId: selectedUser,
           message: inputMessage,
+          username: username,
         });
         setInputMessage("");
       }

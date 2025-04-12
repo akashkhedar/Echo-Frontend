@@ -8,6 +8,7 @@ import {
   setChat,
   markMessageRead,
 } from "../../redux/slices/ChatSlice/ChatSlice";
+import { Flip, ToastContainer, toast } from "react-toastify";
 
 const StyledBox = styled(Box)({
   padding: "16px",
@@ -36,9 +37,12 @@ const MessageSection = () => {
   const prevInnerDivHeight = useRef(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
 
+  const notify = (sender) => toast(`Message from ${sender}`);
+
   useEffect(() => {
-    const handleReceiveMsg = (msg) => {
-      dispatch(setChat([...chats, msg.message]));
+    const handleReceiveMsg = ({ msg, sender }) => {
+      dispatch(setChat([...chats, msg]));
+      notify(sender);
     };
 
     socket.on("receiveMsg", handleReceiveMsg);
@@ -107,6 +111,19 @@ const MessageSection = () => {
             <NewMessage />
           )}
         </MessageContainer>
+        <ToastContainer
+          position="bottom-left"
+          autoClose={1500}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick={false}
+          rtl={false}
+          pauseOnFocusLoss
+          draggable={false}
+          pauseOnHover
+          theme="light"
+          transition={Flip}
+        />
       </StyledBox>
       {showScrollButton && (
         <button
