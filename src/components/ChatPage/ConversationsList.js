@@ -1,6 +1,7 @@
 import {
   Avatar,
   Badge,
+  Box,
   ListItem,
   ListItemAvatar,
   ListItemText,
@@ -21,28 +22,43 @@ const ConversationsList = ({ conversation, selectedChat, handleClick }) => {
         backgroundColor:
           selectedChat === conversation._id ? "#2E2E48" : "transparent",
         cursor: "pointer",
+        justifyContent: "space-between",
         "&:hover": {
           backgroundColor: "rgba(255, 255, 255, 0.1)",
         },
       }}
     >
-      <ListItemAvatar>
-        <Badge color="success" variant="dot">
-          <Avatar
-            src={`${conversation.user.profileImage}`}
-            alt={`${conversation.user.fullname}`}
-          />
-        </Badge>
-      </ListItemAvatar>
-      <ListItemText
-        primary={`${conversation.user.fullname}`}
-        secondary={
-          <Typography variant="body2" color="rgba(255, 255, 255, 0.6)">
-            {conversation._id === 0 ? "Are you here?" : "Last message..."}
-          </Typography>
-        }
-        sx={{ color: "whitesmoke" }}
-      />
+      <Box sx={{ display: "flex", alignItems: "center" }}>
+        <ListItemAvatar>
+          <Badge color="success" variant="dot">
+            <Avatar
+              src={`${conversation.user.profileImage}`}
+              alt={`${conversation.user.fullname}`}
+            />
+          </Badge>
+        </ListItemAvatar>
+        <ListItemText
+          primary={`${conversation.user.fullname}`}
+          secondary={
+            <Typography variant="body2" color="rgba(255, 255, 255, 0.6)">
+              {conversation._id === 0 ? "Are you here?" : "Last message..."}
+            </Typography>
+          }
+          sx={{ color: "whitesmoke" }}
+        />
+      </Box>
+
+      {conversation.unread && (
+        <Box
+          sx={{
+            width: 10,
+            height: 10,
+            borderRadius: "50%",
+            backgroundColor: "rgb(99, 31, 108)",
+            marginLeft: "8px",
+          }}
+        />
+      )}
     </ListItem>
   );
 };

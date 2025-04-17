@@ -1,5 +1,5 @@
 import { Box, styled } from "@mui/material";
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Message from "./Message";
 import socket from "../../utils/socket";
@@ -9,6 +9,7 @@ import {
   markMessageRead,
 } from "../../redux/slices/ChatSlice/ChatSlice";
 import { Flip, ToastContainer, toast } from "react-toastify";
+import { markConversationUnread } from "../../redux/slices/ConversationSlice/ConversationSlice";
 
 const StyledBox = styled(Box)({
   padding: "16px",
@@ -31,27 +32,56 @@ const MessageSection = () => {
   const dispatch = useDispatch();
   const chats = useSelector((state) => state.chat.chat);
   const userId = useSelector((state) => state.user._id);
+  const currentOpenedChat = useSelector((state) => state.chat.chatId);
 
   const outerDiv = useRef(null);
   const innerDiv = useRef(null);
-  const prevInnerDivHeight = useRef(null);
+  const isUserAtBottom = useRef(true);
+
   const [showScrollButton, setShowScrollButton] = useState(false);
 
   const notify = (sender) => toast(`Message from ${sender}`);
 
+  // 📦 Scroll to bottom when component first mounts (like WhatsApp)
   useEffect(() => {
-    const handleReceiveMsg = ({ msg, sender }) => {
-      dispatch(setChat([...chats, msg]));
-      notify(sender);
-    };
+    setTimeout(() => {
+      if (outerDiv.current && innerDiv.current) {
+        outerDiv.current.scrollTo({
+          top: innerDiv.current.scrollHeight,
+          left: 0,
+          behavior: "auto",
+        });
+        isUserAtBottom.current = true;
+        setShowScrollButton(false);
+      }
+    }, 0); // Ensure DOM is ready
+  }, [currentOpenedChat]);
 
-    socket.on("receiveMsg", handleReceiveMsg);
+  useEffect(() => {
+    socket.on("receiveMsg", (message, username) => {
+      if (message.conversationId === currentOpenedChat) {
+        dispatch(setChat([...chats, message]));
+        return;
+      }
+      if (
+        message.conversationId !== currentOpenedChat &&
+        message.sender !== userId
+      ) {
+        dispatch(markConversationUnread(message.conversationId));
+        notify(username);
+      }
+    });
+
+    socket.on("notify", (sender) => {
+      notify(sender);
+    });
 
     return () => {
-      socket.off("receiveMsg", handleReceiveMsg);
+      socket.off("receiveMsg");
     };
-  }, [dispatch, chats]);
+  });
 
+  // 📦 Scroll on new message if at bottom
   useEffect(() => {
     if (!outerDiv.current || !innerDiv.current) return;
 
@@ -59,35 +89,43 @@ const MessageSection = () => {
     const innerDivHeight = innerDiv.current.scrollHeight;
     const outerDivScrollTop = outerDiv.current.scrollTop;
 
-    if (
-      !prevInnerDivHeight.current ||
-      outerDivScrollTop >= prevInnerDivHeight.current - outerDivHeight - 20
-    ) {
-      outerDiv.current.scrollTo({
-        top: innerDivHeight - outerDivHeight + 30, // Increased padding
-        left: 0,
-        behavior: prevInnerDivHeight.current ? "smooth" : "auto",
-      });
+    const nearBottom =
+      outerDivScrollTop >= innerDivHeight - outerDivHeight - 100;
+
+    isUserAtBottom.current = nearBottom;
+
+    if (nearBottom) {
       setShowScrollButton(false);
+      outerDiv.current.scrollTo({
+        top: innerDivHeight - outerDivHeight + 30,
+        left: 0,
+        behavior: "smooth",
+      });
     } else {
       setShowScrollButton(true);
     }
-
-    prevInnerDivHeight.current = innerDivHeight;
   }, [chats]);
 
-  const handleScrollButtonClick = useCallback(() => {
-    if (!outerDiv.current || !innerDiv.current) return;
-    const outerDivHeight = outerDiv.current.clientHeight;
-    const innerDivHeight = innerDiv.current.scrollHeight;
+  // 📦 Track scroll to toggle "new message" button
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!outerDiv.current || !innerDiv.current) return;
 
-    outerDiv.current.scrollTo({
-      top: innerDivHeight - outerDivHeight + 40, // Ensuring last message is fully visible
-      left: 0,
-      behavior: "smooth",
-    });
+      const outerDivHeight = outerDiv.current.clientHeight;
+      const innerDivHeight = innerDiv.current.scrollHeight;
+      const outerDivScrollTop = outerDiv.current.scrollTop;
 
-    setShowScrollButton(false);
+      const nearBottom =
+        outerDivScrollTop >= innerDivHeight - outerDivHeight - 100;
+
+      isUserAtBottom.current = nearBottom;
+
+      if (nearBottom) setShowScrollButton(false);
+    };
+
+    const scrollBox = outerDiv.current;
+    scrollBox?.addEventListener("scroll", handleScroll);
+    return () => scrollBox?.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
@@ -98,6 +136,17 @@ const MessageSection = () => {
     socket.on("receiverRead", handleMessageRead);
     return () => socket.off("receiverRead", handleMessageRead);
   }, [dispatch]);
+
+  const handleScrollToBottom = () => {
+    if (outerDiv.current && innerDiv.current) {
+      outerDiv.current.scrollTo({
+        top: innerDiv.current.scrollHeight,
+        left: 0,
+        behavior: "smooth",
+      });
+      setShowScrollButton(false);
+    }
+  };
 
   return (
     <div style={{ position: "relative", height: "100%" }}>
@@ -111,6 +160,7 @@ const MessageSection = () => {
             <NewMessage />
           )}
         </MessageContainer>
+
         <ToastContainer
           position="bottom-left"
           autoClose={1500}
@@ -125,24 +175,32 @@ const MessageSection = () => {
           transition={Flip}
         />
       </StyledBox>
+
       {showScrollButton && (
-        <button
-          style={{
+        <Box
+          onClick={handleScrollToBottom}
+          sx={{
             position: "absolute",
-            backgroundColor: "red",
-            color: "white",
+            bottom: 90,
             left: "50%",
-            bottom: "10px",
             transform: "translateX(-50%)",
-            padding: "8px 16px",
-            borderRadius: "8px",
+            backgroundColor: "#2e2e48",
+            color: "white",
+            px: 2,
+            py: 1,
+            borderRadius: 5,
+            boxShadow: 3,
             cursor: "pointer",
-            opacity: 1,
+            fontSize: "0.9rem",
+            transition: "all 0.3s ease-in-out",
+            zIndex: 10,
+            "&:hover": {
+              backgroundColor: "#3b3b59",
+            },
           }}
-          onClick={handleScrollButtonClick}
         >
-          New message!
-        </button>
+          New Message
+        </Box>
       )}
     </div>
   );

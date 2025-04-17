@@ -15,6 +15,7 @@ import {
 } from "../../redux/slices/ChatSlice/ChatSlice";
 import ConversationsList from "./ConversationsList";
 import ListSearch from "./ListSearch";
+import { markConversationRead } from "../../redux/slices/ConversationSlice/ConversationSlice";
 
 const ChatList = () => {
   const conversations = useSelector((state) => state.convo);
@@ -25,6 +26,7 @@ const ChatList = () => {
 
   const handleClick = async (convo) => {
     try {
+      dispatch(markConversationRead(convo._id));
       dispatch(setChatId(convo._id));
       dispatch(setRoomId(convo.roomId));
       dispatch(setChatUserId(convo.user._id));
