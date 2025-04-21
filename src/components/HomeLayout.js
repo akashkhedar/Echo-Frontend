@@ -34,6 +34,7 @@ const HomeLayout = ({ children }) => {
         socket.emit("joinChat", userId);
         const res = await axiosInstance.get("/chat/list");
         dispatch(setConversations(res.data));
+        console.log(res.data);
         const rooms = res.data.map((convo) => convo.roomId);
         socket.emit("joinAllRooms", rooms);
       } catch (error) {
@@ -63,7 +64,7 @@ const HomeLayout = ({ children }) => {
 
   useEffect(() => {
     socket.on("receiveMsg", (message, username) => {
-      console.log("outside if");
+      console.log(message);
       if (message.conversationId === currentOpenedChat) {
         dispatch(setChat([...chats, message]));
         return;
@@ -74,7 +75,7 @@ const HomeLayout = ({ children }) => {
       ) {
         dispatch(markConversationUnread(message.conversationId));
         notify(username);
-        console.log("inside if");
+        socket.emit("offlineMessage", message.receiver, message.conversationId);
         return;
       }
     });

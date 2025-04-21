@@ -7,7 +7,6 @@ const ConversationSlice = createSlice({
     setConversations: (state, action) => {
       return action.payload.map((convo) => ({
         ...convo,
-        unread: false, // initialize unread to false
       }));
     },
     markConversationUnread: (state, action) => {

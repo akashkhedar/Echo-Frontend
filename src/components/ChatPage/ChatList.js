@@ -18,6 +18,7 @@ import {
   setUserOnline,
 } from "../../redux/slices/ConversationSlice/ConversationSlice";
 import socket from "../../utils/socket";
+import EmptyChatList from "./EmptyChatList";
 
 const ChatList = () => {
   const conversations = useSelector((state) => state.convo);
@@ -25,9 +26,11 @@ const ChatList = () => {
   const navigate = useNavigate();
 
   const selectedChat = useSelector((state) => state.chat.chatId);
+  const { _id } = useSelector((state) => state.user);
 
   const handleClick = async (convo) => {
     try {
+      socket.emit("rmOfflineMsg", _id, convo._id);
       dispatch(markConversationRead(convo._id));
       dispatch(setChatId(convo._id));
       dispatch(setRoomId(convo.roomId));
@@ -102,6 +105,9 @@ const ChatList = () => {
       <Box
         sx={{
           flexGrow: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           overflowY: "auto",
           "&::-webkit-scrollbar": {
             display: "none",
@@ -111,13 +117,17 @@ const ChatList = () => {
         }}
       >
         <List>
-          {conversations.map((conversation) => (
-            <ConversationsList
-              conversation={conversation}
-              selectedChat={selectedChat}
-              handleClick={handleClick}
-            />
-          ))}
+          {conversations && conversations.length > 0 ? (
+            conversations.map((conversation) => (
+              <ConversationsList
+                conversation={conversation}
+                selectedChat={selectedChat}
+                handleClick={handleClick}
+              />
+            ))
+          ) : (
+            <EmptyChatList />
+          )}
         </List>
       </Box>
     </Box>
