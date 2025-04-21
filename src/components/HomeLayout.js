@@ -8,9 +8,13 @@ import MDQuickChat from "./RightSidebar/MDQuickChat";
 import { useLocation } from "react-router-dom";
 import socket from "../utils/socket";
 import { useDispatch, useSelector } from "react-redux";
-import { clearChat } from "../redux/slices/ChatSlice/ChatSlice";
+import { clearChat, setChat } from "../redux/slices/ChatSlice/ChatSlice";
 import axiosInstance from "../axiosInstance";
-import { setConversations } from "../redux/slices/ConversationSlice/ConversationSlice";
+import {
+  markConversationUnread,
+  setConversations,
+} from "../redux/slices/ConversationSlice/ConversationSlice";
+import { Flip, toast, ToastContainer } from "react-toastify";
 
 const HomeLayout = ({ children }) => {
   const location = useLocation();
@@ -18,7 +22,11 @@ const HomeLayout = ({ children }) => {
 
   const dispatch = useDispatch();
 
+  const chats = useSelector((state) => state.chat.chat);
   const userId = useSelector((state) => state.user._id);
+  const currentOpenedChat = useSelector((state) => state.chat.chatId);
+
+  const notify = (sender) => toast(`Message from ${sender}`);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,6 +60,34 @@ const HomeLayout = ({ children }) => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [dispatch, userId]);
+
+  useEffect(() => {
+    socket.on("receiveMsg", (message, username) => {
+      console.log("outside if");
+      if (message.conversationId === currentOpenedChat) {
+        dispatch(setChat([...chats, message]));
+        return;
+      }
+      if (
+        message.conversationId !== currentOpenedChat &&
+        message.sender !== userId
+      ) {
+        dispatch(markConversationUnread(message.conversationId));
+        notify(username);
+        console.log("inside if");
+        return;
+      }
+    });
+
+    socket.on("notify", (sender) => {
+      notify(sender);
+    });
+
+    return () => {
+      socket.off("receiveMsg");
+      socket.off("notify");
+    };
+  });
 
   return (
     <Box
@@ -140,6 +176,19 @@ const HomeLayout = ({ children }) => {
           </Box>
         )}
       </Box>
+      <ToastContainer
+        position="bottom-left"
+        autoClose={1500}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable={false}
+        pauseOnHover
+        theme="light"
+        transition={Flip}
+      />
     </Box>
   );
 };

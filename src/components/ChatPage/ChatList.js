@@ -1,21 +1,23 @@
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import { Box, IconButton, List, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../axiosInstance";
 import {
   setChat,
   setChatId,
-  setChatName,
-  setChatProfileImage,
-  setChatUserId,
-  setChatUserName,
   setRoomId,
+  setChatUserId,
 } from "../../redux/slices/ChatSlice/ChatSlice";
 import ConversationsList from "./ConversationsList";
 import ListSearch from "./ListSearch";
-import { markConversationRead } from "../../redux/slices/ConversationSlice/ConversationSlice";
+import {
+  markConversationRead,
+  setUserOffline,
+  setUserOnline,
+} from "../../redux/slices/ConversationSlice/ConversationSlice";
+import socket from "../../utils/socket";
 
 const ChatList = () => {
   const conversations = useSelector((state) => state.convo);
@@ -30,15 +32,27 @@ const ChatList = () => {
       dispatch(setChatId(convo._id));
       dispatch(setRoomId(convo.roomId));
       dispatch(setChatUserId(convo.user._id));
-      dispatch(setChatName(convo.user.fullname));
-      dispatch(setChatUserName(convo.user.username));
-      dispatch(setChatProfileImage(convo.user.profileImage));
       const res = await axiosInstance(`/fetch/chats/${convo._id}`);
       dispatch(setChat(res.data));
     } catch (error) {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    socket.on("userOnline", (userId) => {
+      dispatch(setUserOnline(userId)); // Update Redux/chatList
+    });
+
+    socket.on("userOffline", (userId) => {
+      dispatch(setUserOffline(userId)); // Update Redux/chatList
+    });
+
+    return () => {
+      socket.off("userOnline");
+      socket.off("userOffline");
+    };
+  });
 
   return (
     <Box

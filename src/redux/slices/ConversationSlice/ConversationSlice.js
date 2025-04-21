@@ -22,6 +22,20 @@ const ConversationSlice = createSlice({
         convo.unread = false;
       }
     },
+    setUserOnline: (state, action) => {
+      state.forEach((convo) => {
+        if (convo.user._id === action.payload) {
+          convo.user.isOnline = true;
+        }
+      });
+    },
+    setUserOffline: (state, action) => {
+      state.forEach((convo) => {
+        if (convo.user._id === action.payload) {
+          convo.user.isOnline = false;
+        }
+      });
+    },
   },
 });
 
@@ -29,5 +43,7 @@ export const {
   setConversations,
   markConversationUnread,
   markConversationRead,
+  setUserOnline,
+  setUserOffline,
 } = ConversationSlice.actions;
 export default ConversationSlice.reducer;

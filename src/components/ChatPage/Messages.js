@@ -1,15 +1,10 @@
 import { Box, styled } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import Message from "./Message";
+import { useDispatch, useSelector } from "react-redux";
+import { markMessageRead } from "../../redux/slices/ChatSlice/ChatSlice";
 import socket from "../../utils/socket";
+import Message from "./Message";
 import NewMessage from "./NewMessage";
-import {
-  setChat,
-  markMessageRead,
-} from "../../redux/slices/ChatSlice/ChatSlice";
-import { Flip, ToastContainer, toast } from "react-toastify";
-import { markConversationUnread } from "../../redux/slices/ConversationSlice/ConversationSlice";
 
 const StyledBox = styled(Box)({
   padding: "16px",
@@ -40,8 +35,6 @@ const MessageSection = () => {
 
   const [showScrollButton, setShowScrollButton] = useState(false);
 
-  const notify = (sender) => toast(`Message from ${sender}`);
-
   // 📦 Scroll to bottom when component first mounts (like WhatsApp)
   useEffect(() => {
     setTimeout(() => {
@@ -56,30 +49,6 @@ const MessageSection = () => {
       }
     }, 0); // Ensure DOM is ready
   }, [currentOpenedChat]);
-
-  useEffect(() => {
-    socket.on("receiveMsg", (message, username) => {
-      if (message.conversationId === currentOpenedChat) {
-        dispatch(setChat([...chats, message]));
-        return;
-      }
-      if (
-        message.conversationId !== currentOpenedChat &&
-        message.sender !== userId
-      ) {
-        dispatch(markConversationUnread(message.conversationId));
-        notify(username);
-      }
-    });
-
-    socket.on("notify", (sender) => {
-      notify(sender);
-    });
-
-    return () => {
-      socket.off("receiveMsg");
-    };
-  });
 
   // 📦 Scroll on new message if at bottom
   useEffect(() => {
@@ -160,20 +129,6 @@ const MessageSection = () => {
             <NewMessage />
           )}
         </MessageContainer>
-
-        <ToastContainer
-          position="bottom-left"
-          autoClose={1500}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick={false}
-          rtl={false}
-          pauseOnFocusLoss
-          draggable={false}
-          pauseOnHover
-          theme="light"
-          transition={Flip}
-        />
       </StyledBox>
 
       {showScrollButton && (

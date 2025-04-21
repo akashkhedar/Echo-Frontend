@@ -8,7 +8,6 @@ import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import Icon from "../../assets/Icon.png";
 import Logo from "../../assets/Logo.png";
-import NotificationsBar from "./NotificationBar";
 import { useSelector } from "react-redux";
 
 const Search = styled("div")(({ theme }) => ({
@@ -147,52 +146,6 @@ const Navbar = () => {
             alignItems: "center",
           }}
         >
-          <IconButton
-            size="large"
-            aria-label="show notifications"
-            color="inherit"
-            aria-controls={"basic-menu"}
-            aria-haspopup="true"
-            aria-expanded={"true"}
-            onClick={toggleDrawer}
-            sx={{
-              "&:hover": {
-                backgroundColor: "rgba(255, 255, 255, 0.1)",
-                borderRadius: "50%", // Ensure circular shape
-              },
-              marginRight: { xs: "-1.3rem", sm: "0.6rem" },
-            }}
-          >
-            <Badge
-              badgeContent={5}
-              color="error"
-              overlap="circular"
-              sx={{
-                "& .MuiBadge-badge": {
-                  fontSize: "0.71rem", // Adjust font size
-                  width: "16px", // Set badge width
-                  height: { xs: "16px", sm: "18px", md: "19px", lg: "20px" }, // Set badge height
-                  borderRadius: "50%", // Ensure it remains circular
-                  minWidth: { xs: "16px", sm: "18px", md: "20px", lg: "20px" }, // Set minimum width
-                  padding: "0", // Remove any default padding
-                },
-              }}
-              max={99}
-            >
-              <NotificationsNoneIcon
-                sx={{
-                  fontSize: {
-                    xs: "2.1rem",
-                    sm: "2.1rem",
-                    md: "2.1rem",
-                    lg: "2.2rem",
-                  },
-                  color: "white",
-                }}
-              />
-            </Badge>
-          </IconButton>
-          <NotificationsBar isOpen={isOpen} toggleDrawer={toggleDrawer} />
           <IconButton size="large" aria-label="show avatar" color="inherit">
             <Avatar
               alt="Avatar"

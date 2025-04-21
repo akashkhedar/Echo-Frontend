@@ -15,6 +15,10 @@ const ChatPage = () => {
 
   useEffect(() => {
     dispatch(clearChat());
+
+    return () => {
+      dispatch(clearChat());
+    };
     // eslint-disable-next-line
   }, []);
   return (

@@ -7,9 +7,6 @@ const ChatSlice = createSlice({
     chatId: null,
     roomId: null,
     chatUserId: null,
-    chatName: null,
-    chatUserName: null,
-    chatProfileImage: null,
   },
   reducers: {
     setChat: (state, action) => {
@@ -30,21 +27,11 @@ const ChatSlice = createSlice({
     setChatUserId: (state, action) => {
       state.chatUserId = action.payload;
     },
-    setChatName: (state, action) => {
-      state.chatName = action.payload;
-    },
-    setChatUserName: (state, action) => {
-      state.chatUserName = action.payload;
-    },
-    setChatProfileImage: (state, action) => {
-      state.chatProfileImage = action.payload;
-    },
     clearChat: (state, action) => {
       state.chat = [];
       state.chatId = null;
-      state.chatName = null;
-      state.chatUserName = null;
-      state.chatProfileImage = null;
+      state.chatUserId = null;
+      state.roomId = null;
     },
   },
 });
@@ -54,9 +41,6 @@ export const {
   setChatId,
   setRoomId,
   setChatUserId,
-  setChatName,
-  setChatUserName,
-  setChatProfileImage,
   clearChat,
   markMessageRead,
 } = ChatSlice.actions;

@@ -10,8 +10,10 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../axiosInstance";
 import UploadPost from "../uploadPost/UploadPost";
+import { selectHasUnreadMessages } from "../../redux/selectors/unreadSelector";
 
 const LGSidebar = () => {
+  const hasUnread = useSelector(selectHasUnreadMessages);
   const navigate = useNavigate();
 
   const Item = styled(Box)(({ theme }) => ({
@@ -46,6 +48,7 @@ const LGSidebar = () => {
       }
     } catch (error) {}
   };
+
   return (
     <Drawer
       variant="permanent"
@@ -143,7 +146,7 @@ const LGSidebar = () => {
                 },
               }}
             >
-              <Badge badgeContent={2} color="error">
+              <Badge color={hasUnread ? "error" : "default"} variant="dot">
                 <ForumOutlinedIcon sx={{ color: "whitesmoke" }} />
               </Badge>
               <Typography variant="body1" flex={1} sx={{ color: "whitesmoke" }}>

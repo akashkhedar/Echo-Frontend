@@ -1,10 +1,12 @@
 import { Info, Phone, Videocam } from "@mui/icons-material";
 import { Avatar, Box, IconButton, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
+import { selectChatUser } from "../../redux/selectors/statusSelector";
+import useEnhancedEffect from "@mui/material/utils/useEnhancedEffect";
 
 const ChatHeader = () => {
-  const user = useSelector((state) => state.chat);
+  const user = useSelector(selectChatUser);
   return (
     <Box
       sx={{
@@ -21,8 +23,8 @@ const ChatHeader = () => {
       {/* User Info */}
       <Box sx={{ display: "flex", alignItems: "center" }}>
         <Avatar
-          src={user.chatProfileImage}
-          alt={user.chatUserName}
+          src={user.profileImage}
+          alt={user.username}
           sx={{ border: "2px solid rgba(255, 255, 255, 0.1)" }}
         />
         <Box sx={{ marginLeft: 2 }}>
@@ -30,11 +32,17 @@ const ChatHeader = () => {
             variant="h6"
             sx={{ fontWeight: "bold", color: "whitesmoke" }}
           >
-            {user.chatName}
+            {user.fullname}
           </Typography>
-          <Typography variant="body2" sx={{ color: "rgb(82, 203, 71)" }}>
-            Online now
-          </Typography>
+          {user.isOnline ? (
+            <Typography variant="body2" sx={{ color: "rgb(82, 203, 71)" }}>
+              Online
+            </Typography>
+          ) : (
+            <Typography variant="body2" sx={{ color: "rgb(92, 105, 91)" }}>
+              Offline
+            </Typography>
+          )}
         </Box>
       </Box>
 

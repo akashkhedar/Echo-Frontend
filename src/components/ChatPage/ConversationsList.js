@@ -30,11 +30,11 @@ const ConversationsList = ({ conversation, selectedChat, handleClick }) => {
     >
       <Box sx={{ display: "flex", alignItems: "center" }}>
         <ListItemAvatar>
-          <Badge color="success" variant="dot">
-            <Avatar
-              src={`${conversation.user.profileImage}`}
-              alt={`${conversation.user.fullname}`}
-            />
+          <Badge
+            color={conversation.user.isOnline ? "success" : "default"}
+            variant="dot"
+          >
+            <Avatar src={`${conversation.user.profileImage}`} alt={`user`} />
           </Badge>
         </ListItemAvatar>
         <ListItemText
