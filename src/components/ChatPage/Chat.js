@@ -31,9 +31,7 @@ const ChatPage = () => {
         height: "90.8vh",
       }}
     >
-      {/* Sidebar */}
       <ChatList />
-      {/* Chat Window */}
       <Box
         sx={{
           flex: 1,
