@@ -14,14 +14,12 @@ const ChatPage = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log(selectedChat);
-    console.log("entry");
     return () => {
-      console.log("leave");
       dispatch(clearChat());
     };
     // eslint-disable-next-line
   }, []);
+
   return (
     <Box
       sx={{

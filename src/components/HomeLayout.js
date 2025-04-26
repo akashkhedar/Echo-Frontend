@@ -88,14 +88,13 @@ const HomeLayout = ({ children }) => {
       notify(sender);
     });
 
-    socket.on("redirectConvo", (convo) => {
-      console.log(convo);
-      selectConversation(convo, userId);
+    socket.on("redirectConvo", (id) => {
+      const selectedConvo = convo.find((c) => c._id === id);
+      selectConversation(selectedConvo, userId);
       navigate("/chat");
     });
 
     socket.on("newConvo", (newConvo) => {
-      console.log(newConvo);
       dispatch(setConversations([...convo, newConvo]));
       selectConversation(newConvo, userId);
       navigate("/chat");
