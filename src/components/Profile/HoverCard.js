@@ -8,8 +8,11 @@ import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
+import socket from "../../utils/socket";
+import { useSelector } from "react-redux";
 
-export default function MediaControlCard({
+export default function HoverCard({
+  id,
   username,
   post,
   profilePhoto,
@@ -17,6 +20,14 @@ export default function MediaControlCard({
   following,
 }) {
   const navigate = useNavigate();
+  const userId = useSelector((state) => state.user._id);
+
+  const handleClick = (id) => {
+    socket.emit("newConvo", {
+      sender: userId,
+      receiver: id,
+    });
+  };
   return (
     <Card
       sx={{
@@ -97,6 +108,7 @@ export default function MediaControlCard({
                   borderColor: "blue",
                 },
               }}
+              onClick={handleClick(id)}
             >
               <Typography variant="body2">Message</Typography>
             </Button>

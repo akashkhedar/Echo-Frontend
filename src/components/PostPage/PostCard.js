@@ -168,6 +168,7 @@ const PostCard = ({ post }) => {
                 }}
               >
                 <HoverCard
+                  id={post.userId._id}
                   username={post.userId.username}
                   profilePhoto={post.userId.profileImage}
                   follower={post.userId.follower.length}

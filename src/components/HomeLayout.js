@@ -64,7 +64,6 @@ const HomeLayout = ({ children }) => {
 
   useEffect(() => {
     socket.on("receiveMsg", (message, username) => {
-      console.log(message);
       if (message.conversationId === currentOpenedChat) {
         dispatch(setChat([...chats, message]));
         return;
@@ -82,6 +81,10 @@ const HomeLayout = ({ children }) => {
 
     socket.on("notify", (sender) => {
       notify(sender);
+    });
+
+    socket.on("redirectConvo", (convo) => {
+      console.log(convo);
     });
 
     return () => {

@@ -106,8 +106,6 @@ const ChatList = () => {
         sx={{
           flexGrow: 1,
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
           overflowY: "auto",
           "&::-webkit-scrollbar": {
             display: "none",
