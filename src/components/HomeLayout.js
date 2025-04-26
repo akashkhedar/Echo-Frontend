@@ -5,7 +5,7 @@ import MDSidebar from "./LeftSidebar/MDSidebar";
 import Navbar from "./Navbar/Navbar";
 import LGQuickChat from "./RightSidebar/LGQuickChat";
 import MDQuickChat from "./RightSidebar/MDQuickChat";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import socket from "../utils/socket";
 import { useDispatch, useSelector } from "react-redux";
 import { clearChat, setChat } from "../redux/slices/ChatSlice/ChatSlice";
@@ -15,16 +15,21 @@ import {
   setConversations,
 } from "../redux/slices/ConversationSlice/ConversationSlice";
 import { Flip, toast, ToastContainer } from "react-toastify";
+import useConversationSelection from "../hooks/useConversationSelection";
 
 const HomeLayout = ({ children }) => {
   const location = useLocation();
   const isChatPage = location.pathname === "/chat";
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const selectConversation = useConversationSelection();
 
   const chats = useSelector((state) => state.chat.chat);
   const userId = useSelector((state) => state.user._id);
   const currentOpenedChat = useSelector((state) => state.chat.chatId);
+  const convo = useSelector((state) => state.convo);
 
   const notify = (sender) => toast(`Message from ${sender}`);
 
@@ -85,11 +90,22 @@ const HomeLayout = ({ children }) => {
 
     socket.on("redirectConvo", (convo) => {
       console.log(convo);
+      selectConversation(convo, userId);
+      navigate("/chat");
+    });
+
+    socket.on("newConvo", (newConvo) => {
+      console.log(newConvo);
+      dispatch(setConversations([...convo, newConvo]));
+      selectConversation(newConvo, userId);
+      navigate("/chat");
     });
 
     return () => {
       socket.off("receiveMsg");
       socket.off("notify");
+      socket.off("newConvo");
+      socket.off("redirectConvo");
     };
   });
 

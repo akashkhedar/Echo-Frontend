@@ -22,12 +22,6 @@ export default function HoverCard({
   const navigate = useNavigate();
   const userId = useSelector((state) => state.user._id);
 
-  const handleClick = (id) => {
-    socket.emit("newConvo", {
-      sender: userId,
-      receiver: id,
-    });
-  };
   return (
     <Card
       sx={{
@@ -108,7 +102,12 @@ export default function HoverCard({
                   borderColor: "blue",
                 },
               }}
-              onClick={handleClick(id)}
+              onClick={() => {
+                socket.emit("redirectConvo", {
+                  sender: userId,
+                  receiver: id,
+                });
+              }}
             >
               <Typography variant="body2">Message</Typography>
             </Button>

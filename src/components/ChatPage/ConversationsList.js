@@ -8,12 +8,16 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
+import useConversationSelection from "../../hooks/useConversationSelection";
+import { useSelector } from "react-redux";
 
 const ConversationsList = ({ conversation, selectedChat, handleClick }) => {
+  const { _id } = useSelector((state) => state.user);
+  const selectConversation = useConversationSelection();
   return (
     <ListItem
       key={conversation._id}
-      onClick={() => handleClick(conversation)}
+      onClick={() => selectConversation(conversation, _id)}
       sx={{
         display: "flex",
         alignItems: "center",

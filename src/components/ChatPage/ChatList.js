@@ -3,22 +3,14 @@ import { Box, IconButton, List, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../../axiosInstance";
 import {
-  setChat,
-  setChatId,
-  setRoomId,
-  setChatUserId,
-} from "../../redux/slices/ChatSlice/ChatSlice";
-import ConversationsList from "./ConversationsList";
-import ListSearch from "./ListSearch";
-import {
-  markConversationRead,
   setUserOffline,
   setUserOnline,
 } from "../../redux/slices/ConversationSlice/ConversationSlice";
 import socket from "../../utils/socket";
+import ConversationsList from "./ConversationsList";
 import EmptyChatList from "./EmptyChatList";
+import ListSearch from "./ListSearch";
 
 const ChatList = () => {
   const conversations = useSelector((state) => state.convo);
@@ -26,22 +18,6 @@ const ChatList = () => {
   const navigate = useNavigate();
 
   const selectedChat = useSelector((state) => state.chat.chatId);
-  const { _id } = useSelector((state) => state.user);
-
-  const handleClick = async (convo) => {
-    try {
-      socket.emit("rmOfflineMsg", _id, convo._id);
-      dispatch(markConversationRead(convo._id));
-      dispatch(setChatId(convo._id));
-      dispatch(setRoomId(convo.roomId));
-      dispatch(setChatUserId(convo.user._id));
-      const res = await axiosInstance(`/fetch/chats/${convo._id}`);
-      dispatch(setChat(res.data));
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
     socket.on("userOnline", (userId) => {
       dispatch(setUserOnline(userId)); // Update Redux/chatList
@@ -120,7 +96,6 @@ const ChatList = () => {
               <ConversationsList
                 conversation={conversation}
                 selectedChat={selectedChat}
-                handleClick={handleClick}
               />
             ))
           ) : (
