@@ -1,14 +1,14 @@
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import SearchIcon from "@mui/icons-material/Search";
-import { AppBar, Avatar, Badge, IconButton } from "@mui/material";
+import { AppBar, Avatar, IconButton } from "@mui/material";
 import Box from "@mui/material/Box";
 import InputBase from "@mui/material/InputBase";
 import { styled } from "@mui/material/styles";
 import * as React from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Icon from "../../assets/Icon.png";
 import Logo from "../../assets/Logo.png";
-import { useSelector } from "react-redux";
+import axiosInstance from "../../axiosInstance";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -55,15 +55,32 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const [isOpen, setOpen] = React.useState(false);
+  const [search, setSearch] = React.useState("");
   const user = useSelector((state) => state.user);
-  const toggleDrawer = () => {
-    if (!isOpen) {
-      setOpen(true);
-    } else {
-      setOpen(false);
+
+  function debounce(func, delay) {
+    let timer;
+    return function (...args) {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        func.apply(this, args);
+      }, delay);
+    };
+  }
+
+  const handleSearch = async (e) => {
+    try {
+      const value = e.target.value;
+      if (value.length > 0) {
+        const res = await axiosInstance.get(`/search?q=${value}`);
+        console.log(res);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
+
+  const debouncedSearch = debounce(handleSearch, 200);
 
   return (
     <AppBar position="fixed">
@@ -132,6 +149,7 @@ const Navbar = () => {
             </SearchIconWrapper>
             <StyledInputBase
               sx={{ color: "white", width: "100%" }}
+              onChange={debouncedSearch}
               placeholder="Search…"
               inputProps={{ "aria-label": "search" }}
             />
