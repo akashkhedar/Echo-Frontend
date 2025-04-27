@@ -1,7 +1,13 @@
 import { Box, Typography, Avatar } from "@mui/material";
 import socket from "../../utils/socket";
 
-const ChatSearchDropdown = ({ results, navigate, isOpen, selector }) => {
+const ChatSearchDropdown = ({
+  results,
+  navigate,
+  isOpen,
+  selector,
+  setOpenDropdown,
+}) => {
   if (!isOpen) return null;
 
   const userId = selector((state) => state.user._id);
@@ -35,6 +41,7 @@ const ChatSearchDropdown = ({ results, navigate, isOpen, selector }) => {
                 sender: userId,
                 receiver: user._id,
               });
+              setOpenDropdown(false);
             }}
             key={user._id}
             sx={{
