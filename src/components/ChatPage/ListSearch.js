@@ -1,35 +1,44 @@
-import { Search } from "@mui/icons-material";
-import { Box, InputAdornment, styled, TextField } from "@mui/material";
+import {
+  Box,
+  InputAdornment,
+  InputBase,
+  styled,
+  TextField,
+} from "@mui/material";
 import React, { useEffect, useRef } from "react";
-import axiosInstance from "../../axiosInstance";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../axiosInstance";
 import ChatSearchDropdown from "./ChatSearchDropdown";
+import SearchIcon from "@mui/icons-material/Search";
+import { useSelector } from "react-redux";
+
+const SearchInput = styled(TextField)(({ theme }) => ({
+  "& .MuiOutlinedInput-root": {
+    borderRadius: 25,
+    backgroundColor: "#2E2E48",
+    color: "whitesmoke",
+    height: "3rem",
+    border: "1px solid #323232",
+    "&:hover": {
+      borderColor: "rgb(125, 52, 143)",
+    },
+    "&.Mui-focused": {
+      borderColor: "rgb(110, 46, 130)",
+    },
+    "& input": {
+      color: "whitesmoke",
+    },
+    "& fieldset": {
+      border: "none", // Remove default outline
+    },
+  },
+  "& .MuiInputAdornment-root": {
+    marginLeft: 0,
+    color: "rgba(255, 255, 255, 0.5)",
+  },
+}));
 
 const ListSearch = () => {
-  const SearchInput = styled(TextField)(({ theme }) => ({
-    "& .MuiOutlinedInput-root": {
-      backgroundColor: "#2E2E48",
-      borderRadius: theme.spacing(2),
-      color: "whitesmoke",
-      height: "3rem",
-      "& fieldset": {
-        borderColor: "transparent",
-      },
-      "&:hover fieldset": {
-        borderColor: "rgb(125, 52, 143)",
-      },
-      "&.Mui-focused fieldset": {
-        borderColor: "rgb(110, 46, 130)",
-      },
-      "& input": {
-        color: "whitesmoke",
-      },
-    },
-    "& .MuiInputLabel-root": {
-      color: "rgba(255, 255, 255, 0.89)",
-    },
-  }));
-
   const [searchResults, setSearchResults] = React.useState([]);
   const [openDropdown, setOpenDropdown] = React.useState(false);
   const [searchInput, setSearchInput] = React.useState("");
@@ -81,6 +90,7 @@ const ListSearch = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   const handleSearchChange = (e) => {
     setSearchInput(e.target.value);
   };
@@ -96,18 +106,21 @@ const ListSearch = () => {
       }}
       ref={searchRef}
     >
-      <TextField
+      <SearchInput
         ref={searchRef}
         placeholder="Search Chat"
         variant="outlined"
         size="small"
-        onChange={handleSearchChange}
+        onChange={(e) => {
+          handleSearchChange(e);
+          debouncedSearch();
+        }}
         value={searchInput}
         sx={{ width: "100%" }}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
-              <Search sx={{ color: "rgba(255, 255, 255, 0.5)" }} />
+              <SearchIcon />
             </InputAdornment>
           ),
         }}
@@ -116,6 +129,7 @@ const ListSearch = () => {
         results={searchResults}
         navigate={navigate}
         isOpen={openDropdown}
+        selector={useSelector}
       />
     </Box>
   );

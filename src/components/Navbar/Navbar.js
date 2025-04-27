@@ -89,6 +89,7 @@ const Navbar = () => {
       setOpenDropdown(false);
     }
   };
+
   const debouncedSearch = debounce(handleSearch, 200);
 
   React.useEffect(() => {

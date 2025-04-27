@@ -1,7 +1,10 @@
 import { Box, Typography, Avatar } from "@mui/material";
+import socket from "../../utils/socket";
 
-const ChatSearchDropdown = ({ results, navigate, isOpen }) => {
+const ChatSearchDropdown = ({ results, navigate, isOpen, selector }) => {
   if (!isOpen) return null;
+
+  const userId = selector((state) => state.user._id);
 
   return (
     <Box
@@ -28,7 +31,10 @@ const ChatSearchDropdown = ({ results, navigate, isOpen }) => {
         results.map((user) => (
           <Box
             onClick={() => {
-              navigate(`/profile/${user.username}`);
+              socket.emit("redirectConvo", {
+                sender: userId,
+                receiver: user._id,
+              });
             }}
             key={user._id}
             sx={{
