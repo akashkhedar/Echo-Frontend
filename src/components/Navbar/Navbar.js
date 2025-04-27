@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import Icon from "../../assets/Icon.png";
 import Logo from "../../assets/Logo.png";
 import axiosInstance from "../../axiosInstance";
+import SearchDropdown from "./SearchDropdown";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -16,8 +17,8 @@ const Search = styled("div")(({ theme }) => ({
   backgroundColor: "rgb(18, 18, 18)",
   margin: "0 16px",
   height: "2.4rem",
-  width: "100%", // Occupy full width in flex container
-  maxWidth: "45rem", // Limit to 60% of viewport width
+  width: "100%",
+  maxWidth: "45rem",
   border: "1px solid #323232 ",
   "&:hover": {
     border: "1px solid rgb(41, 63, 89)",
@@ -55,8 +56,12 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const [search, setSearch] = React.useState("");
+  const [searchResults, setSearchResults] = React.useState([]);
+  const [openDropdown, setOpenDropdown] = React.useState(false);
+  const [searchInput, setSearchInput] = React.useState("");
   const user = useSelector((state) => state.user);
+
+  const searchRef = React.useRef(null);
 
   function debounce(func, delay) {
     let timer;
@@ -70,17 +75,37 @@ const Navbar = () => {
 
   const handleSearch = async (e) => {
     try {
-      const value = e.target.value;
-      if (value.length > 0) {
-        const res = await axiosInstance.get(`/search?q=${value}`);
-        console.log(res);
+      if (searchInput.length > 0) {
+        const res = await axiosInstance.get(`/search?q=${searchInput}`);
+        console.log(res.data);
+        setSearchResults(res.data);
+        setOpenDropdown(true);
+      } else {
+        setOpenDropdown(false);
+        setSearchResults([]);
       }
     } catch (error) {
       console.log(error);
+      setOpenDropdown(false);
     }
   };
-
   const debouncedSearch = debounce(handleSearch, 200);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setOpenDropdown(false);
+        setSearchInput("");
+        setSearchResults([]);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <AppBar position="fixed">
@@ -142,6 +167,7 @@ const Navbar = () => {
             justifyContent: "center",
             alignItems: "center",
           }}
+          ref={searchRef}
         >
           <Search>
             <SearchIconWrapper>
@@ -149,11 +175,23 @@ const Navbar = () => {
             </SearchIconWrapper>
             <StyledInputBase
               sx={{ color: "white", width: "100%" }}
-              onChange={debouncedSearch}
+              onChange={(e) => {
+                setSearchInput(e.target.value);
+                debouncedSearch();
+              }}
+              value={searchInput}
+              onFocus={() => setOpenDropdown(true)}
               placeholder="Search…"
               inputProps={{ "aria-label": "search" }}
             />
           </Search>
+
+          {/* DROPDOWN BELOW */}
+          <SearchDropdown
+            results={searchResults}
+            navigate={navigate}
+            isOpen={openDropdown}
+          />
         </Box>
 
         {/* Notifications and Avatar */}
