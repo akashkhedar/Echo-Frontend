@@ -16,6 +16,13 @@ import {
 } from "../redux/slices/ConversationSlice/ConversationSlice";
 import { Flip, toast, ToastContainer } from "react-toastify";
 import useConversationSelection from "../hooks/useConversationSelection";
+import {
+  acceptCall,
+  getIceCandidate,
+  iceCandidate,
+  setRemoteDsp,
+} from "../utils/peerOffer";
+import notify from "./notify";
 
 const HomeLayout = ({ children }) => {
   const location = useLocation();
@@ -30,8 +37,6 @@ const HomeLayout = ({ children }) => {
   const userId = useSelector((state) => state.user._id);
   const currentOpenedChat = useSelector((state) => state.chat.chatId);
   const convo = useSelector((state) => state.convo);
-
-  const notify = (sender) => toast(`Message from ${sender}`);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -85,7 +90,7 @@ const HomeLayout = ({ children }) => {
     });
 
     socket.on("notify", (sender) => {
-      notify(sender);
+      notify(sender, "message");
     });
 
     socket.on("redirectConvo", (id) => {
@@ -100,11 +105,41 @@ const HomeLayout = ({ children }) => {
       navigate("/chat");
     });
 
+    const handleAcceptCall = async (sender, offer) => {
+      await acceptCall(userId, sender, offer);
+    };
+
+    const handleDeclineCall = (sender) => {
+      socket.emit("declinedCall", {
+        sender: userId,
+        receiver: sender,
+      });
+    };
+
+    socket.on("getOffer", async ({ sender, offer }) => {
+      notify(
+        sender,
+        "call",
+        () => handleAcceptCall(sender, offer),
+        () => handleDeclineCall(sender)
+      );
+    });
+
+    socket.on("getAnswer", async ({ sender, answer }) => {
+      await setRemoteDsp(answer);
+    });
+
+    socket.on("getIceCandidate", async (sender, candidate) => {
+      await getIceCandidate(candidate);
+    });
+
     return () => {
       socket.off("receiveMsg");
       socket.off("notify");
       socket.off("newConvo");
       socket.off("redirectConvo");
+      socket.off("incomingVideoCall");
+      socket.off("acceptedVideoCall");
     };
   });
 

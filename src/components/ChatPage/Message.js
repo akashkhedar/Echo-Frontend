@@ -46,11 +46,12 @@ const Message = ({ msg, userId }) => {
   const messageRef = useRef(null);
 
   useEffect(() => {
-    if (msg.sender === userId) return;
+    if (msg.sender === userId && msg.read) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
+          console.log(msg._id);
           socket.emit("readMsg", {
             msgId: msg._id,
             chatId: conversationId,

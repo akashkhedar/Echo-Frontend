@@ -1,12 +1,16 @@
-import { Info, Phone, Videocam } from "@mui/icons-material";
+import { Phone, Videocam } from "@mui/icons-material";
 import { Avatar, Box, IconButton, Typography } from "@mui/material";
-import React, { useEffect } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 import { selectChatUser } from "../../redux/selectors/statusSelector";
-import useEnhancedEffect from "@mui/material/utils/useEnhancedEffect";
+import { makeCall } from "../../utils/peerOffer";
 
 const ChatHeader = () => {
   const user = useSelector(selectChatUser);
+  const userId = useSelector((state) => state.user._id);
+  const handleVideoCall = async () => {
+    await makeCall(userId, user._id);
+  };
   return (
     <Box
       sx={{
@@ -49,13 +53,7 @@ const ChatHeader = () => {
       {/* Action Buttons */}
       <Box>
         <IconButton
-          sx={{
-            color: "whitesmoke",
-          }}
-        >
-          <Phone sx={{ fontSize: 30 }} />
-        </IconButton>
-        <IconButton
+          onClick={handleVideoCall}
           sx={{
             color: "whitesmoke",
           }}
@@ -67,7 +65,7 @@ const ChatHeader = () => {
             color: "whitesmoke",
           }}
         >
-          <Info sx={{ fontSize: 30 }} />
+          <Phone sx={{ fontSize: 27 }} />
         </IconButton>
       </Box>
     </Box>
