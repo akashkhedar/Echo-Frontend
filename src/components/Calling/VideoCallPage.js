@@ -2,7 +2,13 @@ import { Box, Grid, Paper } from "@mui/material";
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { makeCall } from "../../utils/webRTC";
+import {
+  acceptCall,
+  getIceCandidate,
+  makeCall,
+  setRemoteDsp,
+} from "../../utils/webRTC";
+import socket from "../../utils/socket";
 
 const VideoCallPage = () => {
   const localVideoRef = useRef();
@@ -10,19 +16,53 @@ const VideoCallPage = () => {
   const userId = useSelector((state) => state.user._id);
 
   const { state } = useLocation();
-  const { callerId, calleeId } = state || {};
+  const { callerId, calleeId, offer } = state || {};
 
   useEffect(() => {
+    socket.on("getAnswer", async ({ callerId, calleeId, answer }) => {
+      console.log("Received answer from callee");
+      await setRemoteDsp(answer);
+    });
+
+    socket.on("getIceCandidate", async ({ candidate }) => {
+      console.log("Received ice candidate");
+      await getIceCandidate(candidate);
+    });
+
     const initPeerConnection = async () => {
-      if (userId === callerId) {
-        let { localStream, remoteStream } = await makeCall(callerId, calleeId);
-        localVideoRef.current.srcObject = localStream;
-        remoteVideoRef.current.srcObject = remoteStream;
+      try {
+        if (userId === callerId) {
+          const { localStream, remoteStream } = await makeCall(
+            callerId,
+            calleeId
+          );
+          if (localStream && remoteStream) {
+            localVideoRef.current.srcObject = localStream;
+            remoteVideoRef.current.srcObject = remoteStream;
+          }
+        } else {
+          const { localStream, remoteStream } = await acceptCall(
+            calleeId,
+            callerId,
+            offer
+          );
+          if (localStream && remoteStream) {
+            localVideoRef.current.srcObject = localStream;
+            remoteVideoRef.current.srcObject = remoteStream;
+          }
+        }
+      } catch (error) {
+        console.error("Error initializing peer connection:", error);
       }
     };
 
     initPeerConnection();
-  });
+
+    return () => {
+      socket.off("getAnswer");
+      socket.off("getIceCandidate");
+    };
+  }, [callerId, calleeId, offer, userId]);
 
   return (
     <Box

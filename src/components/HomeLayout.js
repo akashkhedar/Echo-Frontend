@@ -10,7 +10,6 @@ import {
   markConversationUnread,
   setConversations,
 } from "../redux/slices/ConversationSlice/ConversationSlice";
-import { acceptCall, getIceCandidate, setRemoteDsp } from "../utils/webRTC";
 import socket from "../utils/socket";
 import LGSidebar from "./LeftSidebar/LGSidebar";
 import MDSidebar from "./LeftSidebar/MDSidebar";
@@ -127,16 +126,9 @@ const HomeLayout = ({ children }) => {
     };
 
     socket.on("getOffer", async ({ callerId, calleeId, offer }) => {
-      await acceptCall(callerId, calleeId, offer);
-      navigate("/call", { state: { callerId: callerId, calleeId: calleeId } });
-    });
-
-    socket.on("getAnswer", async ({ callerId, calleeId, answer }) => {
-      await setRemoteDsp(answer);
-    });
-
-    socket.on("getIceCandidate", async (sender, candidate) => {
-      await getIceCandidate(candidate);
+      navigate("/call", {
+        state: { callerId: callerId, calleeId: calleeId, offer: offer },
+      });
     });
 
     return () => {
@@ -145,8 +137,6 @@ const HomeLayout = ({ children }) => {
       socket.off("newConvo");
       socket.off("redirectConvo");
       socket.off("getOffer");
-      socket.off("getAnswer");
-      socket.off("getIceCandidate");
       socket.off("receiveCall");
       socket.off("onCallAccept");
     };
