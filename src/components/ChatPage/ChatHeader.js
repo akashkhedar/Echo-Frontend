@@ -3,14 +3,17 @@ import { Avatar, Box, IconButton, Typography } from "@mui/material";
 import React from "react";
 import { useSelector } from "react-redux";
 import { selectChatUser } from "../../redux/selectors/statusSelector";
-import { makeCall } from "../../utils/peerOffer";
+import socket from "../../utils/socket";
 
-const ChatHeader = () => {
+const ChatHeader = ({ navigate }) => {
   const user = useSelector(selectChatUser);
-  const userId = useSelector((state) => state.user._id);
+  let callerId = useSelector((state) => state.user._id);
+  let calleeId = user._id;
+
   const handleVideoCall = async () => {
-    await makeCall(userId, user._id);
+    socket.emit("callUser", { callerId, calleeId });
   };
+
   return (
     <Box
       sx={{

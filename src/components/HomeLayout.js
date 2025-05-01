@@ -1,28 +1,23 @@
 import Box from "@mui/material/Box";
 import React, { useEffect } from "react";
-import LGSidebar from "./LeftSidebar/LGSidebar";
-import MDSidebar from "./LeftSidebar/MDSidebar";
-import Navbar from "./Navbar/Navbar";
-import LGQuickChat from "./RightSidebar/LGQuickChat";
-import MDQuickChat from "./RightSidebar/MDQuickChat";
-import { useLocation, useNavigate } from "react-router-dom";
-import socket from "../utils/socket";
 import { useDispatch, useSelector } from "react-redux";
-import { clearChat, setChat } from "../redux/slices/ChatSlice/ChatSlice";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Flip, ToastContainer } from "react-toastify";
 import axiosInstance from "../axiosInstance";
+import useConversationSelection from "../hooks/useConversationSelection";
+import { clearChat, setChat } from "../redux/slices/ChatSlice/ChatSlice";
 import {
   markConversationUnread,
   setConversations,
 } from "../redux/slices/ConversationSlice/ConversationSlice";
-import { Flip, toast, ToastContainer } from "react-toastify";
-import useConversationSelection from "../hooks/useConversationSelection";
-import {
-  acceptCall,
-  getIceCandidate,
-  iceCandidate,
-  setRemoteDsp,
-} from "../utils/peerOffer";
+import { acceptCall, getIceCandidate, setRemoteDsp } from "../utils/webRTC";
+import socket from "../utils/socket";
+import LGSidebar from "./LeftSidebar/LGSidebar";
+import MDSidebar from "./LeftSidebar/MDSidebar";
+import Navbar from "./Navbar/Navbar";
 import notify from "./notify";
+import LGQuickChat from "./RightSidebar/LGQuickChat";
+import MDQuickChat from "./RightSidebar/MDQuickChat";
 
 const HomeLayout = ({ children }) => {
   const location = useLocation();
@@ -44,7 +39,6 @@ const HomeLayout = ({ children }) => {
         socket.emit("joinChat", userId);
         const res = await axiosInstance.get("/chat/list");
         dispatch(setConversations(res.data));
-        console.log(res.data);
         const rooms = res.data.map((convo) => convo.roomId);
         socket.emit("joinAllRooms", rooms);
       } catch (error) {
@@ -105,9 +99,25 @@ const HomeLayout = ({ children }) => {
       navigate("/chat");
     });
 
-    const handleAcceptCall = async (sender, offer) => {
-      await acceptCall(userId, sender, offer);
+    socket.on("receiveCall", ({ callerId, calleeId }) => {
+      notify(
+        callerId,
+        "call",
+        () => handleAcceptCall(callerId, calleeId),
+        () => handleDeclineCall(calleeId, callerId)
+      );
+    });
+
+    const handleAcceptCall = async (callerId, calleeId) => {
+      socket.emit("acceptedCall", {
+        callerId,
+        calleeId,
+      });
     };
+
+    socket.on("onCallAccept", ({ callerId, calleeId }) => {
+      navigate("/call", { state: { callerId: callerId, calleeId: calleeId } });
+    });
 
     const handleDeclineCall = (sender) => {
       socket.emit("declinedCall", {
@@ -116,16 +126,12 @@ const HomeLayout = ({ children }) => {
       });
     };
 
-    socket.on("getOffer", async ({ sender, offer }) => {
-      notify(
-        sender,
-        "call",
-        () => handleAcceptCall(sender, offer),
-        () => handleDeclineCall(sender)
-      );
+    socket.on("getOffer", async ({ callerId, calleeId, offer }) => {
+      await acceptCall(callerId, calleeId, offer);
+      navigate("/call", { state: { callerId: callerId, calleeId: calleeId } });
     });
 
-    socket.on("getAnswer", async ({ sender, answer }) => {
+    socket.on("getAnswer", async ({ callerId, calleeId, answer }) => {
       await setRemoteDsp(answer);
     });
 
@@ -138,8 +144,11 @@ const HomeLayout = ({ children }) => {
       socket.off("notify");
       socket.off("newConvo");
       socket.off("redirectConvo");
-      socket.off("incomingVideoCall");
-      socket.off("acceptedVideoCall");
+      socket.off("getOffer");
+      socket.off("getAnswer");
+      socket.off("getIceCandidate");
+      socket.off("receiveCall");
+      socket.off("onCallAccept");
     };
   });
 

@@ -8,10 +8,12 @@ import ChatSection from "./ChatSection";
 import { clearChat } from "../../redux/slices/ChatSlice/ChatSlice";
 import { useDispatch } from "react-redux";
 import ChatBG from "../../assets/ChatBG.jpeg";
+import { useNavigate } from "react-router-dom";
 
 const ChatPage = () => {
   const selectedChat = useSelector((state) => state.chat.chatId);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     return () => {
@@ -41,7 +43,7 @@ const ChatPage = () => {
           overflow: "auto",
         }}
       >
-        {selectedChat === null ? null : <ChatHeader />}
+        {selectedChat === null ? null : <ChatHeader navigate={navigate} />}
         <ChatSection />
         {selectedChat === null ? null : <ChatInput />}
       </Box>

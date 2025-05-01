@@ -7,6 +7,7 @@ import LogInPage from "./components/Login/Login";
 import Post from "./components/PostPage/Post";
 import Profile from "./components/Profile/Profile";
 import SignupPage from "./components/Signup/Signup";
+import VideoCallPage from "./components/Calling/VideoCallPage";
 
 function App() {
   return (
@@ -62,6 +63,7 @@ function App() {
             </HomeLayout>
           }
         />
+        <Route path="/call" element={<VideoCallPage />} />
       </Routes>
     </Router>
   );
