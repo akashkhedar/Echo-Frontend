@@ -1,6 +1,5 @@
 import { Phone, Videocam } from "@mui/icons-material";
 import { Avatar, Box, IconButton, Typography } from "@mui/material";
-import React from "react";
 import { useSelector } from "react-redux";
 import { selectChatUser } from "../../redux/selectors/statusSelector";
 import socket from "../../utils/socket";

@@ -9,6 +9,8 @@ import {
   setRemoteDsp,
   toggleMic,
   toggleCamera,
+  closeConnection,
+  connectionClosed,
 } from "../../utils/webRTC";
 import socket from "../../utils/socket";
 import { IconButton, Stack } from "@mui/material";
@@ -18,6 +20,7 @@ import VideocamIcon from "@mui/icons-material/Videocam";
 import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 import CallEndIcon from "@mui/icons-material/CallEnd";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const VideoCallPage = () => {
   const localVideoRef = useRef();
@@ -29,6 +32,8 @@ const VideoCallPage = () => {
 
   const [micOn, setMicOn] = useState(true);
   const [cameraOn, setCameraOn] = useState(true);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     socket.on("getAnswer", async ({ callerId, calleeId, answer }) => {
@@ -70,14 +75,22 @@ const VideoCallPage = () => {
 
     initPeerConnection();
 
+    socket.on("callEnded", () => {
+      connectionClosed();
+      navigate("/chat");
+    });
+
     return () => {
       socket.off("getAnswer");
       socket.off("getIceCandidate");
+      closeConnection(calleeId);
+      navigate("/chat");
     };
-  }, [callerId, calleeId, offer, userId]);
+  }, [callerId, calleeId, offer, userId, navigate]);
 
-  const onEndCall = () => {
-    // socket.emit("endCall", { callerId, calleeId });
+  const endCall = () => {
+    closeConnection(calleeId);
+    navigate("/chat");
   };
 
   const handleMic = async () => {
@@ -88,10 +101,6 @@ const VideoCallPage = () => {
   const handleCamera = async () => {
     setCameraOn((prev) => !prev);
     await toggleCamera();
-  };
-
-  const endCall = () => {
-    onEndCall?.(); // Trigger end call logic if passed
   };
 
   return (

@@ -6,23 +6,30 @@ const configuration = {
 
 let localStream;
 let remoteStream;
+let videoStream = true;
+let audioStream = true;
 
 let peerConnection;
 
 let candidateQueue = [];
 let isRemoteDescriptionSet = false;
 
-let constraints = {
-  video: {
-    width: { min: 640, ideal: 1920, max: 1920 },
-    height: { min: 480, ideal: 1080, max: 1080 },
-  },
+let videoCall = {
+  video: true,
   audio: true,
 };
 
-const initPeerConnection = async (callerId, calleeId) => {
-  localStream = await navigator.mediaDevices.getUserMedia(constraints);
+let audioCall = {
+  video: true,
+  audio: true,
+};
 
+const initPeerConnection = async (callerId, calleeId, type) => {
+  if (type === "videoCall") {
+    localStream = await navigator.mediaDevices.getUserMedia(videoCall);
+  } else {
+    localStream = await navigator.mediaDevices.getUserMedia(audioCall);
+  }
   peerConnection = new RTCPeerConnection(configuration);
   remoteStream = new MediaStream();
 
@@ -52,9 +59,9 @@ const initPeerConnection = async (callerId, calleeId) => {
   };
 };
 
-export const makeCall = async (callerId, calleeId) => {
+export const makeCall = async (callerId, calleeId, type) => {
   try {
-    await initPeerConnection(callerId, calleeId);
+    await initPeerConnection(callerId, calleeId, type);
     const offer = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(offer); // This must happen after initializing peer connection
 
@@ -122,21 +129,39 @@ export const setRemoteDsp = async (answer) => {
 
 export const toggleMic = async () => {
   if ((localStream != null) & (localStream.getAudioTracks().length > 0)) {
-    localStream.getAudioTracks()[0].enabled = false;
+    audioStream = !audioStream;
+    localStream.getAudioTracks()[0].enabled = audioStream;
   }
 };
 
 export const toggleCamera = async () => {
   if ((localStream != null) & (localStream.getVideoTracks().length > 0)) {
-    localStream.getVideoTracks()[0].enabled = false;
+    videoStream = !videoStream;
+    localStream.getVideoTracks()[0].enabled = videoStream;
   }
 };
 
-export const closeConnection = () => {
+export const closeConnection = (callee) => {
   if (peerConnection && peerConnection.connectionState !== "closed") {
-    peerConnection.close();
-    peerConnection = null;
+    socket.emit("endCall", callee);
     peerConnection.onicecandidate = null;
     peerConnection.onconnectionstatechange = null;
+    if (localStream) {
+      localStream.getTracks().forEach((track) => track.stop());
+    }
+    peerConnection.close();
+    peerConnection = null;
+  }
+};
+
+export const connectionClosed = () => {
+  if (peerConnection && peerConnection.connectionState !== "closed") {
+    peerConnection.onicecandidate = null;
+    peerConnection.onconnectionstatechange = null;
+    if (localStream) {
+      localStream.getTracks().forEach((track) => track.stop());
+    }
+    peerConnection.close();
+    peerConnection = null;
   }
 };
