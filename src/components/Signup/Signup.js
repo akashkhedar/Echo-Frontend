@@ -140,17 +140,14 @@ const SignUpPage = () => {
           }
         );
 
-        const res = await axiosInstance.post(
-          "http://localhost:5000/user/profile",
-          {
-            password: values.password,
-            username: values.username,
-            fullname: values.fullname,
-            dob: values.dob,
-            gender: values.gender,
-            pic_url: response.data.secure_url,
-          }
-        );
+        const res = await axiosInstance.post("/user/profile", {
+          password: values.password,
+          username: values.username,
+          fullname: values.fullname,
+          dob: values.dob,
+          gender: values.gender,
+          pic_url: response.data.secure_url,
+        });
         if (res.status === 200) {
           dispatch(setUser(res.data));
           navigate("/");

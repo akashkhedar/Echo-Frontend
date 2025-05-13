@@ -7,8 +7,17 @@ import {
   getIceCandidate,
   makeCall,
   setRemoteDsp,
+  toggleMic,
+  toggleCamera,
 } from "../../utils/webRTC";
 import socket from "../../utils/socket";
+import { IconButton, Stack } from "@mui/material";
+import MicIcon from "@mui/icons-material/Mic";
+import MicOffIcon from "@mui/icons-material/MicOff";
+import VideocamIcon from "@mui/icons-material/Videocam";
+import VideocamOffIcon from "@mui/icons-material/VideocamOff";
+import CallEndIcon from "@mui/icons-material/CallEnd";
+import { useState } from "react";
 
 const VideoCallPage = () => {
   const localVideoRef = useRef();
@@ -17,6 +26,9 @@ const VideoCallPage = () => {
 
   const { state } = useLocation();
   const { callerId, calleeId, offer } = state || {};
+
+  const [micOn, setMicOn] = useState(true);
+  const [cameraOn, setCameraOn] = useState(true);
 
   useEffect(() => {
     socket.on("getAnswer", async ({ callerId, calleeId, answer }) => {
@@ -64,10 +76,28 @@ const VideoCallPage = () => {
     };
   }, [callerId, calleeId, offer, userId]);
 
+  const onEndCall = () => {
+    // socket.emit("endCall", { callerId, calleeId });
+  };
+
+  const handleMic = async () => {
+    setMicOn((prev) => !prev);
+    await toggleMic();
+  };
+
+  const handleCamera = async () => {
+    setCameraOn((prev) => !prev);
+    await toggleCamera();
+  };
+
+  const endCall = () => {
+    onEndCall?.(); // Trigger end call logic if passed
+  };
+
   return (
     <Box
       sx={{
-        width: "100%%",
+        width: "100%",
         height: "99.999vh",
         backgroundColor: "#000",
         overflow: "hidden",
@@ -123,6 +153,53 @@ const VideoCallPage = () => {
               }}
             />
           </Paper>
+
+          {/* --- Controls --- */}
+          <Stack
+            direction="row"
+            spacing={3}
+            sx={{
+              position: "absolute",
+              bottom: 20,
+              left: "50%",
+              transform: "translateX(-50%)",
+              backgroundColor: "rgba(0,0,0,0.5)",
+              borderRadius: 4,
+              px: 3,
+              py: 1,
+            }}
+          >
+            <IconButton
+              onClick={handleMic}
+              sx={{
+                color: micOn ? "#fff" : "#f44336",
+              }}
+            >
+              {micOn ? <MicIcon /> : <MicOffIcon />}
+            </IconButton>
+
+            <IconButton
+              onClick={handleCamera}
+              sx={{
+                color: cameraOn ? "#fff" : "#f44336",
+              }}
+            >
+              {cameraOn ? <VideocamIcon /> : <VideocamOffIcon />}
+            </IconButton>
+
+            <IconButton
+              onClick={endCall}
+              sx={{
+                color: "#fff",
+                backgroundColor: "#f44336",
+                "&:hover": {
+                  backgroundColor: "#d32f2f",
+                },
+              }}
+            >
+              <CallEndIcon />
+            </IconButton>
+          </Stack>
         </Grid>
       </Grid>
     </Box>

@@ -35,13 +35,10 @@ const LogInPage = () => {
       validationSchema: validationSchema,
       onSubmit: async (values) => {
         try {
-          const res = await axiosInstance.post(
-            "http://localhost:5000/user/login",
-            {
-              user: values.user,
-              userPassword: values.password,
-            }
-          );
+          const res = await axiosInstance.post("/user/login", {
+            user: values.user,
+            userPassword: values.password,
+          });
           if (res.status === 200) {
             dispatch(setUser(res.data.user));
             navigate("/");

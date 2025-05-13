@@ -120,6 +120,18 @@ export const setRemoteDsp = async (answer) => {
   candidateQueue = []; // Clear queue
 };
 
+export const toggleMic = async () => {
+  if ((localStream != null) & (localStream.getAudioTracks().length > 0)) {
+    localStream.getAudioTracks()[0].enabled = false;
+  }
+};
+
+export const toggleCamera = async () => {
+  if ((localStream != null) & (localStream.getVideoTracks().length > 0)) {
+    localStream.getVideoTracks()[0].enabled = false;
+  }
+};
+
 export const closeConnection = () => {
   if (peerConnection && peerConnection.connectionState !== "closed") {
     peerConnection.close();
