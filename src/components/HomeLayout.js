@@ -98,24 +98,27 @@ const HomeLayout = ({ children }) => {
       navigate("/chat");
     });
 
-    socket.on("receiveCall", ({ callerId, calleeId }) => {
+    socket.on("receiveCall", ({ callerId, calleeId, type }) => {
       notify(
         callerId,
         "call",
-        () => handleAcceptCall(callerId, calleeId),
+        () => handleAcceptCall(callerId, calleeId, type),
         () => handleDeclineCall(calleeId, callerId)
       );
     });
 
-    const handleAcceptCall = async (callerId, calleeId) => {
+    const handleAcceptCall = async (callerId, calleeId, type) => {
       socket.emit("acceptedCall", {
         callerId,
         calleeId,
+        type,
       });
     };
 
-    socket.on("onCallAccept", ({ callerId, calleeId }) => {
-      navigate("/call", { state: { callerId: callerId, calleeId: calleeId } });
+    socket.on("onCallAccept", ({ callerId, calleeId, type }) => {
+      navigate("/call", {
+        state: { callerId: callerId, calleeId: calleeId, type: type },
+      });
     });
 
     const handleDeclineCall = (sender) => {
@@ -125,9 +128,14 @@ const HomeLayout = ({ children }) => {
       });
     };
 
-    socket.on("getOffer", async ({ callerId, calleeId, offer }) => {
+    socket.on("getOffer", async ({ callerId, calleeId, offer, type }) => {
       navigate("/call", {
-        state: { callerId: callerId, calleeId: calleeId, offer: offer },
+        state: {
+          callerId: callerId,
+          calleeId: calleeId,
+          offer: offer,
+          type: type,
+        },
       });
     });
 

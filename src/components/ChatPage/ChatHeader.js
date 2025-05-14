@@ -4,13 +4,17 @@ import { useSelector } from "react-redux";
 import { selectChatUser } from "../../redux/selectors/statusSelector";
 import socket from "../../utils/socket";
 
-const ChatHeader = ({ navigate }) => {
+const ChatHeader = () => {
   const user = useSelector(selectChatUser);
   let callerId = useSelector((state) => state.user._id);
   let calleeId = user._id;
 
   const handleVideoCall = async () => {
-    socket.emit("callUser", { callerId, calleeId });
+    socket.emit("callUser", { callerId, calleeId, type: "video" });
+  };
+
+  const handleVoiceCall = async () => {
+    socket.emit("callUser", { callerId, calleeId, type: "audio" });
   };
 
   return (
@@ -63,6 +67,7 @@ const ChatHeader = ({ navigate }) => {
           <Videocam sx={{ fontSize: 30 }} />
         </IconButton>
         <IconButton
+          onClick={handleVoiceCall}
           sx={{
             color: "whitesmoke",
           }}

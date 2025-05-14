@@ -20,16 +20,18 @@ let videoCall = {
 };
 
 let audioCall = {
-  video: true,
+  video: false,
   audio: true,
 };
 
 const initPeerConnection = async (callerId, calleeId, type) => {
-  if (type === "videoCall") {
+  if (type === "video") {
     localStream = await navigator.mediaDevices.getUserMedia(videoCall);
   } else {
     localStream = await navigator.mediaDevices.getUserMedia(audioCall);
+    videoStream = false;
   }
+
   peerConnection = new RTCPeerConnection(configuration);
   remoteStream = new MediaStream();
 
@@ -61,6 +63,8 @@ const initPeerConnection = async (callerId, calleeId, type) => {
 
 export const makeCall = async (callerId, calleeId, type) => {
   try {
+    caller = callerId;
+    callee = calleeId;
     await initPeerConnection(callerId, calleeId, type);
     const offer = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(offer); // This must happen after initializing peer connection
@@ -69,6 +73,7 @@ export const makeCall = async (callerId, calleeId, type) => {
       callerId,
       calleeId,
       offer,
+      type,
     });
 
     return { localStream, remoteStream };
@@ -78,9 +83,9 @@ export const makeCall = async (callerId, calleeId, type) => {
   }
 };
 
-export const acceptCall = async (callerId, calleeId, offer) => {
+export const acceptCall = async (callerId, calleeId, offer, type) => {
   try {
-    await initPeerConnection(callerId, calleeId);
+    await initPeerConnection(callerId, calleeId, type);
     // Set remote description only when an offer is received
     await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
 
@@ -137,9 +142,42 @@ export const toggleMic = async () => {
 export const toggleCamera = async () => {
   if ((localStream != null) & (localStream.getVideoTracks().length > 0)) {
     videoStream = !videoStream;
+
     localStream.getVideoTracks()[0].enabled = videoStream;
+    return;
+  }
+  if ((localStream != null) & (localStream.getVideoTracks().length === 0)) {
+    const videoTrack = await navigator.mediaDevices.getUserMedia({
+      video: true,
+    });
+    videoTrack.getTracks().forEach((track) => {
+      peerConnection.addTrack(track, localStream);
+      localStream.addTrack(track);
+    });
+    const newOffer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(newOffer);
+    socket.emit("sendNewOffer", {
+      callerId: caller,
+      calleeId: callee,
+      offer: newOffer,
+    });
+    return;
   }
 };
+
+export const newOffer = async (callerId, calleeId, offer) => {
+  await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+  const newAnswer = await peerConnection.createAnswer();
+  await peerConnection.setLocalDescription(newAnswer);
+
+  socket.emit("sendNewAnswer", {
+    callerId,
+    calleeId,
+    answer: newAnswer,
+  });
+};
+
+export const newAnswer = (answer) => {};
 
 export const closeConnection = (callee) => {
   if (peerConnection && peerConnection.connectionState !== "closed") {

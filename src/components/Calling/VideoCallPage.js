@@ -11,6 +11,8 @@ import {
   toggleCamera,
   closeConnection,
   connectionClosed,
+  newOffer,
+  newAnswer,
 } from "../../utils/webRTC";
 import socket from "../../utils/socket";
 import { IconButton, Stack } from "@mui/material";
@@ -28,7 +30,7 @@ const VideoCallPage = () => {
   const userId = useSelector((state) => state.user._id);
 
   const { state } = useLocation();
-  const { callerId, calleeId, offer } = state || {};
+  const { callerId, calleeId, offer, type } = state || {};
 
   const [micOn, setMicOn] = useState(true);
   const [cameraOn, setCameraOn] = useState(true);
@@ -47,11 +49,15 @@ const VideoCallPage = () => {
     });
 
     const initPeerConnection = async () => {
+      if (type === "audio") {
+        setCameraOn(false);
+      }
       try {
         if (userId === callerId) {
           const { localStream, remoteStream } = await makeCall(
             callerId,
-            calleeId
+            calleeId,
+            type
           );
           if (localStream && remoteStream) {
             localVideoRef.current.srcObject = localStream;
@@ -61,7 +67,8 @@ const VideoCallPage = () => {
           const { localStream, remoteStream } = await acceptCall(
             calleeId,
             callerId,
-            offer
+            offer,
+            type
           );
           if (localStream && remoteStream) {
             localVideoRef.current.srcObject = localStream;
@@ -80,13 +87,23 @@ const VideoCallPage = () => {
       navigate("/chat");
     });
 
+    socket.on("getNewOffer", (callerId, calleeID,offer)=>{
+      newOffer(callerId, calleeId, offer)
+    })
+
+    socket.on("getNewAnswer", (answer) => {
+      newAnswer(answer);
+    });
+
     return () => {
       socket.off("getAnswer");
       socket.off("getIceCandidate");
+      socket.off("getNewOffer");
+      socket.off("getNewAnswer")
       closeConnection(calleeId);
       navigate("/chat");
     };
-  }, [callerId, calleeId, offer, userId, navigate]);
+  }, [callerId, calleeId, offer, userId, type, navigate]);
 
   const endCall = () => {
     closeConnection(calleeId);
@@ -100,7 +117,7 @@ const VideoCallPage = () => {
 
   const handleCamera = async () => {
     setCameraOn((prev) => !prev);
-    await toggleCamera();
+    await toggleCamera({callerId:userId,calleeId: });
   };
 
   return (
