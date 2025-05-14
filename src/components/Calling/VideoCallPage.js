@@ -1,28 +1,25 @@
-import { Box, Grid, Paper } from "@mui/material";
-import React, { useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
-import {
-  acceptCall,
-  getIceCandidate,
-  makeCall,
-  setRemoteDsp,
-  toggleMic,
-  toggleCamera,
-  closeConnection,
-  connectionClosed,
-  newOffer,
-  newAnswer,
-} from "../../utils/webRTC";
-import socket from "../../utils/socket";
-import { IconButton, Stack } from "@mui/material";
+import CallEndIcon from "@mui/icons-material/CallEnd";
 import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import VideocamOffIcon from "@mui/icons-material/VideocamOff";
-import CallEndIcon from "@mui/icons-material/CallEnd";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Box, Grid, IconButton, Paper, Stack } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import socket from "../../utils/socket";
+import {
+  acceptCall,
+  closeConnection,
+  connectionClosed,
+  getIceCandidate,
+  getNewAnswer,
+  getNewOffer,
+  makeCall,
+  setRemoteDsp,
+  toggleCamera,
+  toggleMic,
+} from "../../utils/webRTC";
 
 const VideoCallPage = () => {
   const localVideoRef = useRef();
@@ -39,12 +36,10 @@ const VideoCallPage = () => {
 
   useEffect(() => {
     socket.on("getAnswer", async ({ callerId, calleeId, answer }) => {
-      console.log("Received answer from callee");
       await setRemoteDsp(answer);
     });
 
     socket.on("getIceCandidate", async ({ candidate }) => {
-      console.log("Received ice candidate");
       await getIceCandidate(candidate);
     });
 
@@ -87,19 +82,19 @@ const VideoCallPage = () => {
       navigate("/chat");
     });
 
-    socket.on("getNewOffer", (callerId, calleeID,offer)=>{
-      newOffer(callerId, calleeId, offer)
-    })
+    socket.on("getNewOffer", ({ sender, receiver, newOffer }) => {
+      getNewOffer(sender, receiver, newOffer);
+    });
 
     socket.on("getNewAnswer", (answer) => {
-      newAnswer(answer);
+      getNewAnswer(answer);
     });
 
     return () => {
       socket.off("getAnswer");
       socket.off("getIceCandidate");
       socket.off("getNewOffer");
-      socket.off("getNewAnswer")
+      socket.off("getNewAnswer");
       closeConnection(calleeId);
       navigate("/chat");
     };
@@ -116,8 +111,14 @@ const VideoCallPage = () => {
   };
 
   const handleCamera = async () => {
+    let receiver;
     setCameraOn((prev) => !prev);
-    await toggleCamera({callerId:userId,calleeId: });
+    if (userId !== calleeId) {
+      receiver = calleeId;
+    } else {
+      receiver = callerId;
+    }
+    await toggleCamera({ sender: userId, receiver: receiver });
   };
 
   return (

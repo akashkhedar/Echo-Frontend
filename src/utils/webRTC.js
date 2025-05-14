@@ -35,21 +35,16 @@ const initPeerConnection = async (callerId, calleeId, type) => {
   peerConnection = new RTCPeerConnection(configuration);
   remoteStream = new MediaStream();
 
-  // Add local stream tracks to the peer connection
   localStream.getTracks().forEach((track) => {
-    console.log("Added local track");
     peerConnection.addTrack(track, localStream);
   });
 
-  // When remote tracks are received, add them to the remote stream
   peerConnection.ontrack = (event) => {
-    console.log("📡 Remote track received:", event.track);
     event.streams[0].getTracks().forEach((track) => {
       remoteStream.addTrack(track);
     });
   };
 
-  // Handle ICE candidates
   peerConnection.onicecandidate = (event) => {
     if (event.candidate) {
       socket.emit("sendIceCandidate", {
@@ -63,11 +58,9 @@ const initPeerConnection = async (callerId, calleeId, type) => {
 
 export const makeCall = async (callerId, calleeId, type) => {
   try {
-    caller = callerId;
-    callee = calleeId;
     await initPeerConnection(callerId, calleeId, type);
     const offer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offer); // This must happen after initializing peer connection
+    await peerConnection.setLocalDescription(offer);
 
     socket.emit("sendOffer", {
       callerId,
@@ -79,18 +72,18 @@ export const makeCall = async (callerId, calleeId, type) => {
     return { localStream, remoteStream };
   } catch (error) {
     console.error("Error in makeCall:", error);
-    return { localStream: null, remoteStream: null }; // Return null if error occurs
+    return { localStream: null, remoteStream: null };
   }
 };
 
 export const acceptCall = async (callerId, calleeId, offer, type) => {
   try {
     await initPeerConnection(callerId, calleeId, type);
-    // Set remote description only when an offer is received
+
     await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
 
     const answer = await peerConnection.createAnswer();
-    await peerConnection.setLocalDescription(answer); // After setting remote description
+    await peerConnection.setLocalDescription(answer);
 
     socket.emit("sendAnswer", {
       callerId,
@@ -101,7 +94,7 @@ export const acceptCall = async (callerId, calleeId, offer, type) => {
     return { localStream, remoteStream };
   } catch (error) {
     console.error("Error in acceptCall:", error);
-    return { localStream: null, remoteStream: null }; // Return null if error occurs
+    return { localStream: null, remoteStream: null };
   }
 };
 
@@ -111,7 +104,6 @@ export const getIceCandidate = async (candidate) => {
       if (isRemoteDescriptionSet) {
         await peerConnection.addIceCandidate(candidate);
       } else {
-        console.log("Queuing ICE candidate");
         candidateQueue.push(candidate);
       }
     }
@@ -121,15 +113,30 @@ export const getIceCandidate = async (candidate) => {
 };
 
 export const setRemoteDsp = async (answer) => {
-  console.log("setting remote dsp");
   await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
   isRemoteDescriptionSet = true;
 
-  // Add any buffered ICE candidates
   for (const candidate of candidateQueue) {
     await peerConnection.addIceCandidate(candidate);
   }
-  candidateQueue = []; // Clear queue
+  candidateQueue = [];
+};
+
+export const peerNegotiation = async (sender, receiver) => {
+  peerConnection.onnegotiationneeded = async () => {
+    try {
+      const newOffer = await peerConnection.createOffer();
+      await peerConnection.setLocalDescription(newOffer);
+
+      socket.emit("sendNewOffer", {
+        sender,
+        receiver,
+        newOffer,
+      });
+    } catch (e) {
+      console.error("Renegotiation failed:", e);
+    }
+  };
 };
 
 export const toggleMic = async () => {
@@ -139,14 +146,23 @@ export const toggleMic = async () => {
   }
 };
 
-export const toggleCamera = async () => {
+export const toggleCamera = async ({ sender, receiver }) => {
   if ((localStream != null) & (localStream.getVideoTracks().length > 0)) {
-    videoStream = !videoStream;
-
+    console.log("disabled");
+    const videoTrack = localStream.getVideoTracks()[0];
+    peerConnection.getSenders().forEach((sender) => {
+      if (sender.track === videoTrack) {
+        peerConnection.removeTrack(sender);
+      }
+    });
     localStream.getVideoTracks()[0].enabled = videoStream;
+    localStream.removeTrack(videoTrack);
+    videoTrack.stop();
+    await peerNegotiation(sender, receiver);
     return;
   }
   if ((localStream != null) & (localStream.getVideoTracks().length === 0)) {
+    console.log("enabled");
     const videoTrack = await navigator.mediaDevices.getUserMedia({
       video: true,
     });
@@ -154,30 +170,34 @@ export const toggleCamera = async () => {
       peerConnection.addTrack(track, localStream);
       localStream.addTrack(track);
     });
-    const newOffer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(newOffer);
-    socket.emit("sendNewOffer", {
-      callerId: caller,
-      calleeId: callee,
-      offer: newOffer,
-    });
+    await peerNegotiation(sender, receiver);
+    videoStream = !videoStream;
     return;
   }
 };
 
-export const newOffer = async (callerId, calleeId, offer) => {
-  await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+export const getNewOffer = async (sender, receiver, newOffer) => {
+  await peerConnection.setRemoteDescription(
+    new RTCSessionDescription(newOffer)
+  );
   const newAnswer = await peerConnection.createAnswer();
   await peerConnection.setLocalDescription(newAnswer);
-
   socket.emit("sendNewAnswer", {
-    callerId,
-    calleeId,
+    sender: receiver,
+    receiver: sender,
     answer: newAnswer,
   });
 };
 
-export const newAnswer = (answer) => {};
+export const getNewAnswer = async (answer) => {
+  await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+  isRemoteDescriptionSet = true;
+
+  for (const candidate of candidateQueue) {
+    await peerConnection.addIceCandidate(candidate);
+  }
+  candidateQueue = [];
+};
 
 export const closeConnection = (callee) => {
   if (peerConnection && peerConnection.connectionState !== "closed") {
