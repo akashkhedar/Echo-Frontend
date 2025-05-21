@@ -41,6 +41,7 @@ const initPeerConnection = async (callerId, calleeId, type) => {
 
   peerConnection.ontrack = (event) => {
     event.streams[0].getTracks().forEach((track) => {
+      console.log(track);
       remoteStream.addTrack(track);
     });
   };
@@ -149,17 +150,10 @@ export const toggleMic = async () => {
 export const toggleCamera = async ({ sender, receiver }) => {
   if ((localStream != null) & (localStream.getVideoTracks().length > 0)) {
     console.log("disabled");
-    const videoTrack = localStream.getVideoTracks()[0];
-    peerConnection.getSenders().forEach((sender) => {
-      if (sender.track === videoTrack) {
-        peerConnection.removeTrack(sender);
-      }
-    });
-    localStream.getVideoTracks()[0].enabled = videoStream;
-    localStream.removeTrack(videoTrack);
-    videoTrack.stop();
-    await peerNegotiation(sender, receiver);
-    return;
+    localStream.getVideoTracks()[0] = false;
+    // videoTrack = false;
+    // videoStream = !videoStream;
+    return { localStream };
   }
   if ((localStream != null) & (localStream.getVideoTracks().length === 0)) {
     console.log("enabled");
@@ -172,7 +166,8 @@ export const toggleCamera = async ({ sender, receiver }) => {
     });
     await peerNegotiation(sender, receiver);
     videoStream = !videoStream;
-    return;
+    localStream.getVideoTracks()[0] = true;
+    return { localStream };
   }
 };
 
@@ -187,6 +182,7 @@ export const getNewOffer = async (sender, receiver, newOffer) => {
     receiver: sender,
     answer: newAnswer,
   });
+  return { remoteStream };
 };
 
 export const getNewAnswer = async (answer) => {

@@ -83,7 +83,8 @@ const VideoCallPage = () => {
     });
 
     socket.on("getNewOffer", ({ sender, receiver, newOffer }) => {
-      getNewOffer(sender, receiver, newOffer);
+      const { remoteStream } = getNewOffer(sender, receiver, newOffer);
+      remoteVideoRef.current.srcObject = remoteStream;
     });
 
     socket.on("getNewAnswer", (answer) => {
@@ -118,7 +119,10 @@ const VideoCallPage = () => {
     } else {
       receiver = callerId;
     }
-    await toggleCamera({ sender: userId, receiver: receiver });
+    await toggleCamera({
+      sender: userId,
+      receiver: receiver,
+    });
   };
 
   return (
