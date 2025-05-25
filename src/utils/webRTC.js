@@ -41,8 +41,8 @@ const initPeerConnection = async (callerId, calleeId, type) => {
 
   peerConnection.ontrack = (event) => {
     event.streams[0].getTracks().forEach((track) => {
-      console.log(track);
       remoteStream.addTrack(track);
+      console.log(remoteStream);
     });
   };
 
