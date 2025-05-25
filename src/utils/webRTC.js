@@ -150,9 +150,16 @@ export const toggleMic = async () => {
 export const toggleCamera = async ({ sender, receiver }) => {
   if ((localStream != null) & (localStream.getVideoTracks().length > 0)) {
     console.log("disabled");
-    localStream.getVideoTracks()[0] = false;
-    // videoTrack = false;
-    // videoStream = !videoStream;
+    const videoTrack = await localStream.getVideoTracks()[0];
+    peerConnection.getSenders().forEach((sender) => {
+      if (sender.track === videoTrack) {
+        videoTrack.stop();
+        peerConnection.removeTrack(sender, videoTrack);
+        localStream.removeTrack(videoTrack);
+      }
+    });
+    await peerNegotiation(sender, receiver);
+    videoStream = !videoStream;
     return { localStream };
   }
   if ((localStream != null) & (localStream.getVideoTracks().length === 0)) {
