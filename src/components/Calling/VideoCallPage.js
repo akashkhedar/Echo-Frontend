@@ -24,6 +24,7 @@ import {
 const VideoCallPage = () => {
   const localVideoRef = useRef();
   const remoteVideoRef = useRef();
+  const hasCalledRef = useRef(false);
   const userId = useSelector((state) => state.user._id);
 
   const { state } = useLocation();
@@ -35,7 +36,7 @@ const VideoCallPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    socket.on("getAnswer", async ({ callerId, calleeId, answer }) => {
+    socket.on("getAnswer", async (answer) => {
       await setRemoteDsp(answer);
     });
 
@@ -47,24 +48,29 @@ const VideoCallPage = () => {
       if (type === "audio") {
         setCameraOn(false);
       }
+
       try {
-        if (userId === callerId) {
-          await makeCall(
-            callerId,
-            calleeId,
-            type,
-            localVideoRef,
-            remoteVideoRef
-          );
-        } else {
-          await acceptCall(
-            calleeId,
-            callerId,
-            offer,
-            type,
-            localVideoRef,
-            remoteVideoRef
-          );
+        if (!hasCalledRef.current) {
+          hasCalledRef.current = true;
+          console.log(socket.id);
+          if (userId === callerId) {
+            await makeCall(
+              callerId,
+              calleeId,
+              type,
+              localVideoRef,
+              remoteVideoRef
+            );
+          } else {
+            await acceptCall(
+              calleeId,
+              callerId,
+              offer,
+              type,
+              localVideoRef,
+              remoteVideoRef
+            );
+          }
         }
       } catch (error) {
         console.error("Error initializing peer connection:", error);
@@ -92,9 +98,8 @@ const VideoCallPage = () => {
       socket.off("getNewOffer");
       socket.off("getNewAnswer");
       closeConnection(calleeId);
-      navigate("/chat");
     };
-  });
+  }, []);
 
   const endCall = () => {
     closeConnection(calleeId);
