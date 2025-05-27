@@ -49,26 +49,22 @@ const VideoCallPage = () => {
       }
       try {
         if (userId === callerId) {
-          const { localStream, remoteStream } = await makeCall(
+          await makeCall(
             callerId,
             calleeId,
-            type
+            type,
+            localVideoRef,
+            remoteVideoRef
           );
-          if (localStream && remoteStream) {
-            localVideoRef.current.srcObject = localStream;
-            remoteVideoRef.current.srcObject = remoteStream;
-          }
         } else {
-          const { localStream, remoteStream } = await acceptCall(
+          await acceptCall(
             calleeId,
             callerId,
             offer,
-            type
+            type,
+            localVideoRef,
+            remoteVideoRef
           );
-          if (localStream && remoteStream) {
-            localVideoRef.current.srcObject = localStream;
-            remoteVideoRef.current.srcObject = remoteStream;
-          }
         }
       } catch (error) {
         console.error("Error initializing peer connection:", error);
@@ -82,13 +78,12 @@ const VideoCallPage = () => {
       navigate("/chat");
     });
 
-    socket.on("getNewOffer", ({ sender, receiver, newOffer }) => {
-      const { remoteStream } = getNewOffer(sender, receiver, newOffer);
-      remoteVideoRef.current.srcObject = remoteStream;
+    socket.on("getNewOffer", async ({ sender, receiver, newOffer }) => {
+      await getNewOffer(sender, receiver, newOffer);
     });
 
-    socket.on("getNewAnswer", (answer) => {
-      getNewAnswer(answer);
+    socket.on("getNewAnswer", async (answer) => {
+      await getNewAnswer(answer);
     });
 
     return () => {
@@ -99,7 +94,7 @@ const VideoCallPage = () => {
       closeConnection(calleeId);
       navigate("/chat");
     };
-  }, [callerId, calleeId, offer, userId, type, navigate]);
+  });
 
   const endCall = () => {
     closeConnection(calleeId);

@@ -13,6 +13,7 @@ let peerConnection;
 
 let candidateQueue = [];
 let isRemoteDescriptionSet = false;
+let isLocalDescriptionSet = false;
 
 let videoCall = {
   video: true,
@@ -24,7 +25,13 @@ let audioCall = {
   audio: true,
 };
 
-const initPeerConnection = async (callerId, calleeId, type) => {
+const initPeerConnection = async (
+  callerId,
+  calleeId,
+  type,
+  localVideoRef,
+  remoteVideoRef
+) => {
   if (type === "video") {
     localStream = await navigator.mediaDevices.getUserMedia(videoCall);
   } else {
@@ -38,14 +45,18 @@ const initPeerConnection = async (callerId, calleeId, type) => {
   localStream.getTracks().forEach((track) => {
     peerConnection.addTrack(track, localStream);
   });
-
+  if (localVideoRef?.current) {
+    localVideoRef.current.srcObject = localStream;
+  }
   peerConnection.ontrack = (event) => {
     event.streams[0].getTracks().forEach((track) => {
       remoteStream.addTrack(track);
-      console.log(remoteStream);
     });
   };
 
+  if (remoteVideoRef?.current) {
+    remoteVideoRef.current.srcObject = remoteStream;
+  }
   peerConnection.onicecandidate = (event) => {
     if (event.candidate) {
       socket.emit("sendIceCandidate", {
@@ -57,12 +68,33 @@ const initPeerConnection = async (callerId, calleeId, type) => {
   };
 };
 
-export const makeCall = async (callerId, calleeId, type) => {
+export const makeCall = async (
+  callerId,
+  calleeId,
+  type,
+  localVideoRef,
+  remoteVideoRef
+) => {
   try {
-    await initPeerConnection(callerId, calleeId, type);
+    if (isLocalDescriptionSet) {
+      console.log("already set");
+      return;
+    }
+    await initPeerConnection(
+      callerId,
+      calleeId,
+      type,
+      localVideoRef,
+      remoteVideoRef
+    );
+    if (peerConnection.signalingState !== "stable") {
+      console.warn("Signaling state not stable, skipping new offer.");
+      return;
+    }
     const offer = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(offer);
-
+    isLocalDescriptionSet = true;
+    console.log(offer);
     socket.emit("sendOffer", {
       callerId,
       calleeId,
@@ -70,32 +102,43 @@ export const makeCall = async (callerId, calleeId, type) => {
       type,
     });
 
-    return { localStream, remoteStream };
+    return;
   } catch (error) {
     console.error("Error in makeCall:", error);
-    return { localStream: null, remoteStream: null };
   }
 };
 
-export const acceptCall = async (callerId, calleeId, offer, type) => {
+export const acceptCall = async (
+  callerId,
+  calleeId,
+  offer,
+  type,
+  localVideoRef,
+  remoteVideoRef
+) => {
   try {
-    await initPeerConnection(callerId, calleeId, type);
+    await initPeerConnection(
+      callerId,
+      calleeId,
+      type,
+      localVideoRef,
+      remoteVideoRef
+    );
 
     await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-
+    isRemoteDescriptionSet = true;
     const answer = await peerConnection.createAnswer();
-    await peerConnection.setLocalDescription(answer);
-
+    await peerConnection.setLocalDescription(new RTCSessionDescription(answer));
+    isLocalDescriptionSet = true;
     socket.emit("sendAnswer", {
       callerId,
       calleeId,
       answer,
     });
-
-    return { localStream, remoteStream };
+    return;
   } catch (error) {
     console.error("Error in acceptCall:", error);
-    return { localStream: null, remoteStream: null };
+    return;
   }
 };
 
@@ -114,6 +157,7 @@ export const getIceCandidate = async (candidate) => {
 };
 
 export const setRemoteDsp = async (answer) => {
+  console.log(answer);
   await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
   isRemoteDescriptionSet = true;
 
@@ -124,20 +168,18 @@ export const setRemoteDsp = async (answer) => {
 };
 
 export const peerNegotiation = async (sender, receiver) => {
-  peerConnection.onnegotiationneeded = async () => {
-    try {
-      const newOffer = await peerConnection.createOffer();
-      await peerConnection.setLocalDescription(newOffer);
+  try {
+    const newOffer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(newOffer);
 
-      socket.emit("sendNewOffer", {
-        sender,
-        receiver,
-        newOffer,
-      });
-    } catch (e) {
-      console.error("Renegotiation failed:", e);
-    }
-  };
+    socket.emit("sendNewOffer", {
+      sender,
+      receiver,
+      newOffer,
+    });
+  } catch (e) {
+    console.error("Renegotiation failed:", e);
+  }
 };
 
 export const toggleMic = async () => {
@@ -151,34 +193,36 @@ export const toggleCamera = async ({ sender, receiver }) => {
   if ((localStream != null) & (localStream.getVideoTracks().length > 0)) {
     console.log("disabled");
     const videoTrack = await localStream.getVideoTracks()[0];
-    peerConnection.getSenders().forEach((sender) => {
-      if (sender.track === videoTrack) {
-        videoTrack.stop();
-        peerConnection.removeTrack(sender, videoTrack);
-        localStream.removeTrack(videoTrack);
-      }
-    });
+    videoTrack.stop();
+    localStream.removeTrack(videoTrack);
+    const senderToRemove = peerConnection
+      .getSenders()
+      .find((s) => s.track === videoTrack);
+    if (senderToRemove) {
+      peerConnection.removeTrack(senderToRemove);
+    }
     await peerNegotiation(sender, receiver);
     videoStream = !videoStream;
-    return { localStream };
+    return;
   }
   if ((localStream != null) & (localStream.getVideoTracks().length === 0)) {
     console.log("enabled");
-    const videoTrack = await navigator.mediaDevices.getUserMedia({
+    const newStream = await navigator.mediaDevices.getUserMedia({
       video: true,
     });
-    videoTrack.getTracks().forEach((track) => {
-      peerConnection.addTrack(track, localStream);
-      localStream.addTrack(track);
-    });
+    const videoTrack = newStream.getVideoTracks()[0];
+    localStream.addTrack(videoTrack);
+
+    // Add to peerConnection
+    peerConnection.addTrack(videoTrack, localStream);
     await peerNegotiation(sender, receiver);
     videoStream = !videoStream;
-    localStream.getVideoTracks()[0] = true;
-    return { localStream };
+    return;
   }
 };
 
 export const getNewOffer = async (sender, receiver, newOffer) => {
+  console.log(newOffer);
   await peerConnection.setRemoteDescription(
     new RTCSessionDescription(newOffer)
   );
@@ -189,10 +233,19 @@ export const getNewOffer = async (sender, receiver, newOffer) => {
     receiver: sender,
     answer: newAnswer,
   });
-  return { remoteStream };
+
+  const remoteStream = new MediaStream();
+  peerConnection.getReceivers().forEach((receiver) => {
+    if (receiver.track) {
+      remoteStream.addTrack(receiver.track);
+    }
+  });
+
+  return;
 };
 
 export const getNewAnswer = async (answer) => {
+  console.log(answer);
   await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
   isRemoteDescriptionSet = true;
 
@@ -210,6 +263,9 @@ export const closeConnection = (callee) => {
     if (localStream) {
       localStream.getTracks().forEach((track) => track.stop());
     }
+    isLocalDescriptionSet = false;
+    isRemoteDescriptionSet = false;
+    candidateQueue = [];
     peerConnection.close();
     peerConnection = null;
   }
