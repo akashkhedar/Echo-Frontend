@@ -98,12 +98,15 @@ const HomeLayout = ({ children }) => {
       navigate("/chat");
     });
 
-    socket.on("receiveCall", ({ callerId, calleeId, type }) => {
+    socket.on("receiveCall", ({ callerName, callerId, calleeId, type }) => {
       notify(
-        callerId,
+        callerName,
+
         "call",
         () => handleAcceptCall(callerId, calleeId, type),
-        () => handleDeclineCall(calleeId, callerId)
+        () => handleDeclineCall(calleeId, callerId),
+        type,
+        callerName
       );
     });
 

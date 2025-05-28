@@ -6,14 +6,7 @@ const configuration = {
 
 let localStream;
 let remoteStream;
-// eslint-disable-next-line no-unused-vars
-let videoStream = true;
-let audioStream = true;
-
-// eslint-disable-next-line no-unused-vars
-let currentVideoTrack = null;
 let globalRemote;
-let globalLocal;
 
 let peerConnection;
 
@@ -38,13 +31,11 @@ const initPeerConnection = async (
   localVideoRef,
   remoteVideoRef
 ) => {
-  globalLocal = localVideoRef;
   globalRemote = remoteVideoRef;
   if (type === "video") {
     localStream = await navigator.mediaDevices.getUserMedia(videoCall);
   } else {
     localStream = await navigator.mediaDevices.getUserMedia(audioCall);
-    videoStream = false;
   }
 
   peerConnection = new RTCPeerConnection(configuration);
@@ -230,7 +221,6 @@ export const toggleMic = async ({ sender, receiver }) => {
 
     await peerNegotiation(sender, receiver);
 
-    audioStream = false;
     return;
   }
 
@@ -245,8 +235,6 @@ export const toggleMic = async ({ sender, receiver }) => {
     peerConnection.addTrack(newAudioTrack, localStream);
 
     await peerNegotiation(sender, receiver);
-
-    videoStream = true;
   } catch (err) {
     console.error("Error turning on camera:", err);
   }
@@ -273,7 +261,6 @@ export const toggleCamera = async ({ sender, receiver }) => {
       await peerNegotiation(sender, receiver);
     }, 200); // 200ms delay before renegotiation
 
-    videoStream = false;
     console.log("Camera turned off");
     return;
   }
@@ -289,7 +276,6 @@ export const toggleCamera = async ({ sender, receiver }) => {
 
     await peerNegotiation(sender, receiver);
 
-    videoStream = true;
     console.log("Camera turned on");
   } catch (err) {
     console.error("Error turning on camera:", err);
@@ -323,7 +309,6 @@ export const getNewAnswer = async (answer) => {
 
 export const closeConnection = (callee) => {
   if (peerConnection && peerConnection.connectionState !== "closed") {
-    socket.emit("endCall", callee);
     peerConnection.onicecandidate = null;
     peerConnection.onconnectionstatechange = null;
     if (localStream) {
@@ -334,5 +319,6 @@ export const closeConnection = (callee) => {
     candidateQueue = [];
     peerConnection.close();
     peerConnection = null;
+    socket.emit("endCall", callee);
   }
 };

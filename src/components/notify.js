@@ -2,9 +2,12 @@ import { toast } from "react-toastify";
 
 const notify = (
   sender,
+
   type = "message",
   handleAcceptCall,
-  handleDeclineCall
+  handleDeclineCall,
+  callType,
+  username
 ) => {
   if (type === "message") {
     toast(`Message from ${sender}`);
@@ -14,7 +17,9 @@ const notify = (
     toast.info(
       ({ closeToast }) => (
         <div>
-          <strong>📞 Incoming call from {sender}</strong>
+          <strong>
+            📞 Incoming {callType} call from {username}
+          </strong>
           <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>
             <button
               onClick={() => {

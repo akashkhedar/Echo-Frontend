@@ -39,6 +39,11 @@ const VideoCallPage = () => {
       await setRemoteDsp(answer);
     });
 
+    socket.on("callEnded", () => {
+      closeConnection();
+      navigate("/chat");
+    });
+
     socket.on("getIceCandidate", async ({ candidate }) => {
       await getIceCandidate(candidate);
     });
