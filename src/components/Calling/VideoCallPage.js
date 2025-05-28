@@ -11,7 +11,6 @@ import socket from "../../utils/socket";
 import {
   acceptCall,
   closeConnection,
-  connectionClosed,
   getIceCandidate,
   getNewAnswer,
   getNewOffer,
@@ -52,7 +51,6 @@ const VideoCallPage = () => {
       try {
         if (!hasCalledRef.current) {
           hasCalledRef.current = true;
-          console.log(socket.id);
           if (userId === callerId) {
             await makeCall(
               callerId,
@@ -80,7 +78,7 @@ const VideoCallPage = () => {
     initPeerConnection();
 
     socket.on("callEnded", () => {
-      connectionClosed();
+      closeConnection();
       navigate("/chat");
     });
 
@@ -99,6 +97,7 @@ const VideoCallPage = () => {
       socket.off("getNewAnswer");
       closeConnection(calleeId);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const endCall = () => {
@@ -107,8 +106,17 @@ const VideoCallPage = () => {
   };
 
   const handleMic = async () => {
+    let receiver;
     setMicOn((prev) => !prev);
-    await toggleMic();
+    if (userId !== calleeId) {
+      receiver = calleeId;
+    } else {
+      receiver = callerId;
+    }
+    await toggleMic({
+      sender: userId,
+      receiver: receiver,
+    });
   };
 
   const handleCamera = async () => {

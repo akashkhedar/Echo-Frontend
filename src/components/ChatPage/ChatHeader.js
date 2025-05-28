@@ -11,7 +11,6 @@ const ChatHeader = () => {
 
   const handleVideoCall = async () => {
     socket.emit("callUser", { callerId, calleeId, type: "video" });
-    console.log(socket.id);
   };
 
   const handleVoiceCall = async () => {

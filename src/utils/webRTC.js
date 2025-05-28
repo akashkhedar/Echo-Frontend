@@ -6,9 +6,14 @@ const configuration = {
 
 let localStream;
 let remoteStream;
+// eslint-disable-next-line no-unused-vars
 let videoStream = true;
 let audioStream = true;
+
+// eslint-disable-next-line no-unused-vars
 let currentVideoTrack = null;
+let globalRemote;
+let globalLocal;
 
 let peerConnection;
 
@@ -33,6 +38,8 @@ const initPeerConnection = async (
   localVideoRef,
   remoteVideoRef
 ) => {
+  globalLocal = localVideoRef;
+  globalRemote = remoteVideoRef;
   if (type === "video") {
     localStream = await navigator.mediaDevices.getUserMedia(videoCall);
   } else {
@@ -51,21 +58,23 @@ const initPeerConnection = async (
   }
 
   peerConnection.ontrack = (event) => {
-    console.log("ontrack fired", event.track);
+    const kind = event.track.kind;
 
-    event.streams[0].getTracks().forEach((track) => {
-      const existingTrack = remoteStream
-        .getTracks()
-        .find((t) => t.id === track.id);
-      if (!existingTrack) {
-        remoteStream.addTrack(track);
-      }
-    });
+    remoteStream
+      .getTracks()
+      .filter((t) => t.kind === kind)
+      .forEach((t) => remoteStream.removeTrack(t));
+
+    remoteStream.addTrack(event.track);
 
     if (remoteVideoRef?.current) {
+      remoteVideoRef.current.pause();
+      remoteVideoRef.current.srcObject = null;
+
       remoteVideoRef.current.srcObject = remoteStream;
     }
   };
+
   peerConnection.onicecandidate = (event) => {
     if (event.candidate) {
       socket.emit("sendIceCandidate", {
@@ -204,19 +213,51 @@ export const peerNegotiation = async (sender, receiver) => {
   }
 };
 
-export const toggleMic = async () => {
-  if ((localStream != null) & (localStream.getAudioTracks().length > 0)) {
-    audioStream = !audioStream;
-    localStream.getAudioTracks()[0].enabled = audioStream;
+export const toggleMic = async ({ sender, receiver }) => {
+  const audioTracks = localStream.getAudioTracks();
+
+  if (audioTracks.length > 0) {
+    const audioTrack = audioTracks[0];
+    audioTrack.stop();
+    localStream.removeTrack(audioTrack);
+
+    const senderToRemove = peerConnection
+      .getSenders()
+      .find((s) => s.track === audioTrack);
+    if (senderToRemove) {
+      peerConnection.removeTrack(senderToRemove);
+    }
+
+    await peerNegotiation(sender, receiver);
+
+    audioStream = false;
+    return;
+  }
+
+  try {
+    const newStream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+    });
+    const newAudioTrack = newStream.getAudioTracks()[0];
+
+    localStream.addTrack(newAudioTrack);
+
+    peerConnection.addTrack(newAudioTrack, localStream);
+
+    await peerNegotiation(sender, receiver);
+
+    videoStream = true;
+  } catch (err) {
+    console.error("Error turning on camera:", err);
   }
 };
 
 export const toggleCamera = async ({ sender, receiver }) => {
-  if (localStream && localStream.getVideoTracks().length > 0) {
-    console.log("disabled");
-    const videoTrack = localStream.getVideoTracks()[0];
+  const videoTracks = localStream.getVideoTracks();
+
+  if (videoTracks.length > 0) {
+    const videoTrack = videoTracks[0];
     videoTrack.stop();
-    localStream.removeTrack(videoTrack);
 
     const senderToRemove = peerConnection
       .getSenders()
@@ -225,28 +266,33 @@ export const toggleCamera = async ({ sender, receiver }) => {
       peerConnection.removeTrack(senderToRemove);
     }
 
-    currentVideoTrack = null;
+    localStream.removeTrack(videoTrack);
 
-    await peerNegotiation(sender, receiver);
+    // Set a timeout to allow browser to release the camera hardware
+    setTimeout(async () => {
+      await peerNegotiation(sender, receiver);
+    }, 200); // 200ms delay before renegotiation
+
     videoStream = false;
+    console.log("Camera turned off");
     return;
   }
 
-  if (localStream && localStream.getVideoTracks().length === 0) {
-    console.log("enabled");
+  try {
     const newStream = await navigator.mediaDevices.getUserMedia({
       video: true,
     });
-
     const newVideoTrack = newStream.getVideoTracks()[0];
-    currentVideoTrack = newVideoTrack;
 
     localStream.addTrack(newVideoTrack);
     peerConnection.addTrack(newVideoTrack, localStream);
 
     await peerNegotiation(sender, receiver);
+
     videoStream = true;
-    return;
+    console.log("Camera turned on");
+  } catch (err) {
+    console.error("Error turning on camera:", err);
   }
 };
 
@@ -256,10 +302,7 @@ export const getNewOffer = async (sender, receiver, newOffer) => {
   );
   const newAnswer = await peerConnection.createAnswer();
   await peerConnection.setLocalDescription(newAnswer);
-
-  remoteStream.getTracks().forEach((track) => {
-    remoteStream.removeTrack(track);
-  });
+  globalRemote.current.srcObject = remoteStream;
 
   socket.emit("sendNewAnswer", {
     sender: receiver,
@@ -269,7 +312,6 @@ export const getNewOffer = async (sender, receiver, newOffer) => {
 };
 
 export const getNewAnswer = async (answer) => {
-  console.log(answer);
   await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
   isRemoteDescriptionSet = true;
 
@@ -290,18 +332,6 @@ export const closeConnection = (callee) => {
     isLocalDescriptionSet = false;
     isRemoteDescriptionSet = false;
     candidateQueue = [];
-    peerConnection.close();
-    peerConnection = null;
-  }
-};
-
-export const connectionClosed = () => {
-  if (peerConnection && peerConnection.connectionState !== "closed") {
-    peerConnection.onicecandidate = null;
-    peerConnection.onconnectionstatechange = null;
-    if (localStream) {
-      localStream.getTracks().forEach((track) => track.stop());
-    }
     peerConnection.close();
     peerConnection = null;
   }
