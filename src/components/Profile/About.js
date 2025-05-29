@@ -116,17 +116,3 @@ const About = () => {
 };
 
 export default About;
-
-// Example Usage:
-// Replace 'user' object with dynamic data from your application
-/*
-const user = {
-  bio: "I love coding and building amazing things!",
-  location: "India",
-  email: "akash@example.com",
-  joined: "January 2024",
-  interests: ["Web Development", "AI", "Blockchain"],
-  website: "https://example.com",
-};
-<About user={user} />;
-*/

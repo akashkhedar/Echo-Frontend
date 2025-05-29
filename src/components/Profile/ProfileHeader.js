@@ -1,3 +1,4 @@
+import CreateRoundedIcon from "@mui/icons-material/CreateRounded";
 import {
   Avatar,
   Box,
@@ -7,13 +8,18 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
-import CreateRoundedIcon from "@mui/icons-material/CreateRounded";
 import { useSelector } from "react-redux";
 import female from "../../assets/female.jpg";
 import male from "../../assets/male.jpg";
+import AboutUpdate from "./AboutUpdate";
 
 const ProfileHeader = () => {
   const user = useSelector((state) => state.user);
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => setOpen(false);
   return (
     <Card
       sx={{
@@ -70,10 +76,11 @@ const ProfileHeader = () => {
             <Typography variant="h5" fontWeight="bold">
               {user.fullname}
             </Typography>
-            <Typography color="whitesmoke">{`@${user.username}`}</Typography>
+            <Typography color="rgb(191, 0, 255)">{`@${user.username}`}</Typography>
           </Box>
 
           <Button
+            onClick={handleOpen}
             sx={{
               borderRadius: "30px",
               backgroundColor: "rgb(39, 39, 52)",
@@ -91,6 +98,7 @@ const ProfileHeader = () => {
             <Typography variant="subtitle2" color="whitesmoke">
               Edit Profile
             </Typography>
+            <AboutUpdate open={open} handleClose={handleClose} user={user} />
           </Button>
         </Box>
       </Box>
