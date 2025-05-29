@@ -20,7 +20,7 @@ const Sections = () => {
           <Typography fontWeight={800} fontSize={16}>
             Followers
             <Chip
-              label={user.follower.length}
+              label="2"
               size="small"
               sx={{
                 marginLeft: 1,
@@ -36,7 +36,7 @@ const Sections = () => {
           <Typography fontWeight={800} fontSize={16}>
             Following
             <Chip
-              label={user.following.length}
+              label="2"
               size="small"
               sx={{
                 marginLeft: 1,

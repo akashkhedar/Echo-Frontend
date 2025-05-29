@@ -50,14 +50,16 @@ const profileValidationSchema = yup.object({
   username: yup
     .string()
     .min(4, "username too short")
+    .max(25, "Should be under 25 characters")
     .required("Username cannot be empty"),
   fullname: yup
     .string()
     .min(2, "Fullname too short")
+    .max(25, "Should be under 25 characters")
     .required("Field is required"),
-  bio: yup.string(),
-  interest: yup.string(),
-  websites: yup.string(),
+  bio: yup.string().max(135, "135 characters only"),
+  interests: yup.string().max(100, "100 characters only"),
+  website: yup.string(),
   dob: yup.date().required("DOB is required").typeError("Invalid date format"),
   gender: yup.string().required("Choose a value"),
   file: yup
@@ -103,8 +105,8 @@ const AboutUpdate = ({ open, handleClose, user }) => {
       username: user.username,
       fullname: user.fullname,
       bio: user.bio,
-      interest: user.interest,
-      websites: user.websites,
+      interests: user.interests,
+      website: user.website,
       dob: user.dob,
       gender: user.gender,
       file: null,
@@ -138,10 +140,10 @@ const AboutUpdate = ({ open, handleClose, user }) => {
         if (values.fullname !== user.fullname)
           updatedFields.fullname = values.fullname;
         if (values.bio !== user.bio) updatedFields.bio = values.bio;
-        if (values.interest !== user.interest)
-          updatedFields.interest = values.interest;
-        if (values.websites !== user.websites)
-          updatedFields.websites = values.websites;
+        if (values.interests !== user.interests)
+          updatedFields.interests = values.interests;
+        if (values.website !== user.website)
+          updatedFields.website = values.website;
         if (values.dob !== user.dob) updatedFields.dob = values.dob;
         if (values.gender !== user.gender) updatedFields.gender = values.gender;
 
@@ -149,7 +151,7 @@ const AboutUpdate = ({ open, handleClose, user }) => {
 
         const res = await axiosInstance.post("/update/profile", updatedFields);
         if (res.status === 200) {
-          dispatch(setUser(res.data));
+          dispatch(setUser(res.data.user));
           handleClose();
         }
       } catch (err) {
@@ -363,22 +365,21 @@ const AboutUpdate = ({ open, handleClose, user }) => {
                   },
                 }}
               />
-              {/* Websites Field */}
+              {/* website Field */}
               <TextField
-                label="Websites"
+                label="website"
                 variant="outlined"
                 fullWidth
                 id="website"
                 name="website"
-                value={formikProfile.values.websites}
+                value={formikProfile.values.website}
                 onBlur={formikProfile.handleBlur}
                 error={
-                  formikProfile.touched.websites &&
-                  Boolean(formikProfile.errors.websites)
+                  formikProfile.touched.website &&
+                  Boolean(formikProfile.errors.website)
                 }
                 helperText={
-                  formikProfile.touched.websites &&
-                  formikProfile.errors.websites
+                  formikProfile.touched.website && formikProfile.errors.website
                 }
                 onChange={formikProfile.handleChange}
                 InputLabelProps={{
@@ -396,22 +397,22 @@ const AboutUpdate = ({ open, handleClose, user }) => {
                   },
                 }}
               />
-              {/* Interest Field */}
+              {/* interests Field */}
               <TextField
-                label="Interest"
+                label="Interests"
                 variant="outlined"
                 fullWidth
-                id="interest"
-                name="interest"
-                value={formikProfile.values.interest}
+                id="interests"
+                name="interests"
+                value={formikProfile.values.interests}
                 onBlur={formikProfile.handleBlur}
                 error={
-                  formikProfile.touched.interest &&
-                  Boolean(formikProfile.errors.interest)
+                  formikProfile.touched.interests &&
+                  Boolean(formikProfile.errors.interests)
                 }
                 helperText={
-                  formikProfile.touched.interest &&
-                  formikProfile.errors.interest
+                  formikProfile.touched.interests &&
+                  formikProfile.errors.interests
                 }
                 onChange={formikProfile.handleChange}
                 InputLabelProps={{

@@ -75,7 +75,7 @@ const About = () => {
           </Typography>
           <Typography variant="body1">
             {user.interests && user.interests.length > 0
-              ? user.interests.join(", ")
+              ? user.interests
               : "No interests listed"}
           </Typography>
         </Grid>
@@ -94,7 +94,7 @@ const About = () => {
               rel="noopener noreferrer"
               style={{
                 textDecoration: "none",
-                color: "inherit", // Inherits the text color for a clean look
+                color: "inherit",
               }}
             >
               {user.website || "No website"}
