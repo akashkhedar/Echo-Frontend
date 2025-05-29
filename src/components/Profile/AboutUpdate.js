@@ -13,7 +13,7 @@ import imageCompression from "browser-image-compression";
 import { useFormik } from "formik";
 import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import * as yup from "yup";
 import axiosInstance from "../../axiosInstance";
 import { setUser } from "../../redux/slices/AuthSlice/AuthSlice";
@@ -24,6 +24,9 @@ import * as React from "react";
 import Backdrop from "@mui/material/Backdrop";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
+import { useEffect } from "react";
+import socket from "../../utils/socket";
+import { debounce } from "lodash";
 
 const style = {
   position: "absolute",
@@ -46,17 +49,33 @@ const style = {
   "scrollbar-width": "none",
 };
 
+const usernameRegex = /^(?!.*[._]{2})[a-z0-9._]{4,25}$/;
+const usernameBoundaryRegex = /^(?![._])[a-z0-9._]+(?<![._])$/;
+
 const profileValidationSchema = yup.object({
   username: yup
     .string()
-    .min(4, "username too short")
+    .required("Username cannot be empty")
+    .min(4, "Username too short")
     .max(25, "Should be under 25 characters")
-    .required("Username cannot be empty"),
+    .matches(
+      usernameRegex,
+      "Only lowercase letters, numbers, dots or underscores allowed. No consecutive dots or underscores."
+    )
+    .matches(
+      usernameBoundaryRegex,
+      "Cannot start or end with dot or underscore"
+    ),
+
   fullname: yup
     .string()
-    .min(2, "Fullname too short")
+    .required("Full name is required")
+    .min(2, "Full name too short")
     .max(25, "Should be under 25 characters")
-    .required("Field is required"),
+    .matches(
+      /^[A-Za-z\s]+$/,
+      "Full name should contain only letters and spaces"
+    ),
   bio: yup.string().max(135, "135 characters only"),
   interests: yup.string().max(100, "100 characters only"),
   website: yup.string(),
@@ -89,6 +108,7 @@ const profileValidationSchema = yup.object({
 const AboutUpdate = ({ open, handleClose, user }) => {
   const [profileImage, setProfileImage] = useState(user.profileImage);
   const [error, setError] = useState(false);
+  const userId = useSelector((state) => state.user._id);
 
   const dispatch = useDispatch();
 
@@ -99,6 +119,22 @@ const AboutUpdate = ({ open, handleClose, user }) => {
       formikProfile.setFieldValue("file", selectedFile);
     }
   };
+
+  const checkUsername = debounce(async (username, setFieldError) => {
+    try {
+      await axiosInstance.get(`/check/username?username=${username}`);
+    } catch (error) {
+      if (error.status === 409) {
+        setFieldError("username", "Username already taken");
+      }
+    }
+  }, 100);
+
+  useEffect(() => {
+    return () => {
+      checkUsername.cancel();
+    };
+  }, []);
 
   const formikProfile = useFormik({
     initialValues: {
@@ -132,7 +168,7 @@ const AboutUpdate = ({ open, handleClose, user }) => {
             }
           );
           if (response?.data?.secure_url)
-            updatedFields.pic_url = response.data.secure_url;
+            updatedFields.profileImage = response.data.secure_url;
         }
 
         if (values.username !== user.username)
@@ -146,8 +182,6 @@ const AboutUpdate = ({ open, handleClose, user }) => {
           updatedFields.website = values.website;
         if (values.dob !== user.dob) updatedFields.dob = values.dob;
         if (values.gender !== user.gender) updatedFields.gender = values.gender;
-
-        console.log(updatedFields);
 
         const res = await axiosInstance.post("/update/profile", updatedFields);
         if (res.status === 200) {
@@ -284,7 +318,13 @@ const AboutUpdate = ({ open, handleClose, user }) => {
                   formikProfile.touched.username &&
                   formikProfile.errors.username
                 }
-                onChange={formikProfile.handleChange}
+                onChange={(e) => {
+                  formikProfile.handleChange(e);
+                  const newUsername = e.target.value;
+                  if (newUsername.length >= 4) {
+                    checkUsername(newUsername, formikProfile.setFieldError);
+                  }
+                }}
                 InputLabelProps={{
                   sx: { color: "secondary.light" }, // or use a hex code like "#FFFF00"
                 }}

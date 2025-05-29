@@ -26,6 +26,9 @@ import imageCompression from "browser-image-compression";
 import { setUser } from "../../redux/slices/AuthSlice/AuthSlice";
 import { useDispatch } from "react-redux";
 
+const usernameRegex = /^(?!.*[._]{2})[a-z0-9._]{4,25}$/;
+const usernameBoundaryRegex = /^(?![._])[a-z0-9._]+(?<![._])$/;
+
 const emailValidationSchema = yup.object({
   email: yup.string().email("Enter valid email").required("Email is required"),
 });
@@ -44,12 +47,27 @@ const profileValidationSchema = yup.object({
     .required("Password is required"),
   username: yup
     .string()
+    .required("Username cannot be empty")
     .min(4, "Username too short")
-    .required("Username cannot be empty"),
+    .max(25, "Should be under 25 characters")
+    .matches(
+      usernameRegex,
+      "Only lowercase letters, numbers, dots or underscores allowed. No consecutive dots or underscores."
+    )
+    .matches(
+      usernameBoundaryRegex,
+      "Cannot start or end with dot or underscore"
+    ),
+
   fullname: yup
     .string()
-    .min(2, "Fullname too short")
-    .required("Field is required"),
+    .required("Full name is required")
+    .min(2, "Full name too short")
+    .max(25, "Should be under 25 characters")
+    .matches(
+      /^[A-Za-z\s]+$/,
+      "Full name should contain only letters and spaces"
+    ),
   dob: yup.date().required("DOB is required").typeError("Invalid date format"),
   gender: yup.string().required("Choose a value"),
   file: yup
@@ -148,6 +166,9 @@ const SignUpPage = () => {
           gender: values.gender,
           pic_url: response.data.secure_url,
         });
+        if (res.status === 409) {
+          formikProfile.setFieldError("username", "Username already taken");
+        }
         if (res.status === 200) {
           dispatch(setUser(res.data));
           navigate("/");
