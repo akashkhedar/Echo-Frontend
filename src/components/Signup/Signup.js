@@ -40,6 +40,18 @@ const codeValidationSchema = yup.object({
     .required("Field is required"),
 });
 
+const usernameExists = async (username) => {
+  try {
+    await axiosInstance.get(`/check/username?username=${username}`);
+    return false; // username doesn't exist
+  } catch (error) {
+    if (error.response?.status === 409) {
+      return true; // username already taken
+    }
+    return false;
+  }
+};
+
 const profileValidationSchema = yup.object({
   password: yup
     .string()
@@ -57,7 +69,12 @@ const profileValidationSchema = yup.object({
     .matches(
       usernameBoundaryRegex,
       "Cannot start or end with dot or underscore"
-    ),
+    )
+    .test("is-unique", "Username already taken", async function (value) {
+      if (!value) return true;
+      const exists = await usernameExists(value);
+      return !exists;
+    }),
 
   fullname: yup
     .string()

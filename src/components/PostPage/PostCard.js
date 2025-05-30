@@ -28,6 +28,7 @@ import { useNavigate } from "react-router-dom";
 import HoverCard from "../Profile/HoverCard";
 import CommentSection from "./CommentSection";
 import PostModal from "./PostModal";
+import { useSelector } from "react-redux";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -48,6 +49,8 @@ const PostCard = ({ post }) => {
   const [isReported, setisReported] = React.useState(false);
   const [viewPost, setViewPost] = React.useState(false);
   const [viewCommment, setViewComment] = React.useState(false);
+
+  const id = useSelector((state) => state.user._id);
 
   const navigate = useNavigate();
 
@@ -93,6 +96,14 @@ const PostCard = ({ post }) => {
     }, 1000);
   };
 
+  const handleDeletePost = () => {
+    console.log("Post deleted!");
+  };
+
+  const handleEditPost = () => {
+    console.log("Post Updated!");
+  };
+
   const handleViewPost = () => {
     handleClose();
     setViewPost(true);
@@ -114,14 +125,12 @@ const PostCard = ({ post }) => {
   };
 
   function formatDate(isoString) {
-    const date = new Date(isoString); // Convert ISO string to Date object
+    const date = new Date(isoString);
 
-    // Format the date
     const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Months are 0-indexed
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
 
-    // Combine into a readable format (e.g., DD-MM-YYYY HH:mm:ss)
     return `${day}-${month}-${year}`;
   }
 
@@ -131,11 +140,11 @@ const PostCard = ({ post }) => {
         key={post.id}
         sx={{
           width: {
-            xs: "100%", // Full width on mobile
-            sm: "92%", // Slightly reduced on small screens
-            md: "67%", // Larger size on medium screens
-            lg: "52%", // Instagram-like width for desktop
-            xl: "40%", // Even more compact on extra-large screens
+            xs: "100%",
+            sm: "92%",
+            md: "67%",
+            lg: "52%",
+            xl: "40%",
           },
           marginBottom: 2,
           background: "#1E1E2F",
@@ -212,6 +221,12 @@ const PostCard = ({ post }) => {
                 </MenuItem>
                 <MenuItem onClick={handleViewPost}>View Post</MenuItem>
                 <MenuItem onClick={handleShare}>Share</MenuItem>
+                {post.userId._id === id ? (
+                  <MenuItem onClick={handleDeletePost}>Delete Post</MenuItem>
+                ) : null}
+                {post.userId._id === id ? (
+                  <MenuItem onClick={handleEditPost}>Edit Post</MenuItem>
+                ) : null}
               </Menu>
             </>
           }

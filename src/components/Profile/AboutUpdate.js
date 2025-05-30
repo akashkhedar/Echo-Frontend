@@ -10,7 +10,7 @@ import {
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import axios from "axios";
 import imageCompression from "browser-image-compression";
-import { useFormik } from "formik";
+import { Formik, useFormik } from "formik";
 import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -36,7 +36,7 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 400,
-  bgcolor: "#1e1e2f",
+  bgcolor: " #1e1e2f",
   border: "2px solid #000",
   boxShadow: 24,
   borderRadius: 2,
@@ -52,6 +52,18 @@ const style = {
 const usernameRegex = /^(?!.*[._]{2})[a-z0-9._]{4,25}$/;
 const usernameBoundaryRegex = /^(?![._])[a-z0-9._]+(?<![._])$/;
 
+const usernameExists = async (username) => {
+  try {
+    await axiosInstance.get(`/check/username?username=${username}`);
+    return false; // username doesn't exist
+  } catch (error) {
+    if (error.response?.status === 409) {
+      return true; // username already taken
+    }
+    return false;
+  }
+};
+
 const profileValidationSchema = yup.object({
   username: yup
     .string()
@@ -65,7 +77,12 @@ const profileValidationSchema = yup.object({
     .matches(
       usernameBoundaryRegex,
       "Cannot start or end with dot or underscore"
-    ),
+    )
+    .test("is-unique", "Username already taken", async function (value) {
+      if (!value) return true;
+      const exists = await usernameExists(value);
+      return !exists;
+    }),
 
   fullname: yup
     .string()
@@ -119,22 +136,6 @@ const AboutUpdate = ({ open, handleClose, user }) => {
       formikProfile.setFieldValue("file", selectedFile);
     }
   };
-
-  const checkUsername = debounce(async (username, setFieldError) => {
-    try {
-      await axiosInstance.get(`/check/username?username=${username}`);
-    } catch (error) {
-      if (error.status === 409) {
-        setFieldError("username", "Username already taken");
-      }
-    }
-  }, 100);
-
-  useEffect(() => {
-    return () => {
-      checkUsername.cancel();
-    };
-  }, []);
 
   const formikProfile = useFormik({
     initialValues: {
@@ -240,10 +241,10 @@ const AboutUpdate = ({ open, handleClose, user }) => {
                   component="label"
                   sx={{
                     textTransform: "none",
-                    backgroundColor: "#1976d2",
+                    backgroundColor: " #1976d2",
                     color: "white",
                     "&:hover": {
-                      backgroundColor: "#1565c0",
+                      backgroundColor: " #1565c0",
                     },
                   }}
                 >
@@ -318,13 +319,7 @@ const AboutUpdate = ({ open, handleClose, user }) => {
                   formikProfile.touched.username &&
                   formikProfile.errors.username
                 }
-                onChange={(e) => {
-                  formikProfile.handleChange(e);
-                  const newUsername = e.target.value;
-                  if (newUsername.length >= 4) {
-                    checkUsername(newUsername, formikProfile.setFieldError);
-                  }
-                }}
+                onChange={formikProfile.handleChange}
                 InputLabelProps={{
                   sx: { color: "secondary.light" }, // or use a hex code like "#FFFF00"
                 }}
@@ -595,7 +590,7 @@ const AboutUpdate = ({ open, handleClose, user }) => {
                   backgroundColor: "secondary.light",
                   color: "white",
                   "&:hover": {
-                    backgroundColor: "#1565c0",
+                    backgroundColor: " #1565c0",
                   },
                 }}
               >

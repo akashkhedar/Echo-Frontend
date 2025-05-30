@@ -77,7 +77,6 @@ const Navbar = () => {
     try {
       if (searchInput.length > 0) {
         const res = await axiosInstance.get(`/search?q=${searchInput}`);
-        console.log(res.data);
         setSearchResults(res.data);
         setOpenDropdown(true);
       } else {
