@@ -2,8 +2,12 @@ import { Box, Button, ButtonGroup, Chip, Typography } from "@mui/material";
 import React from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { selectFollowerCount } from "../../redux/selectors/followerSelector";
+import { selectFollowingCount } from "../../redux/selectors/followingSelector";
 
 const Sections = () => {
+  const followerCount = useSelector(selectFollowerCount);
+  const followingCount = useSelector(selectFollowingCount);
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
   return (
@@ -20,7 +24,7 @@ const Sections = () => {
           <Typography fontWeight={800} fontSize={16}>
             Followers
             <Chip
-              label={user.follower.length}
+              label={followerCount}
               size="small"
               sx={{
                 marginLeft: 1,
@@ -36,7 +40,7 @@ const Sections = () => {
           <Typography fontWeight={800} fontSize={16}>
             Following
             <Chip
-              label={user.following.length}
+              label={followingCount}
               size="small"
               sx={{
                 marginLeft: 1,

@@ -27,8 +27,10 @@ import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import HoverCard from "../Profile/HoverCard";
 import CommentSection from "./CommentSection";
-import PostModal from "./PostModal";
 import { useSelector } from "react-redux";
+import debounce from "lodash.debounce";
+import axiosInstance from "../../axiosInstance";
+import ShareModal from "./ShareModal";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -43,14 +45,22 @@ const ExpandMore = styled((props) => {
 
 const PostCard = ({ post }) => {
   const [expanded, setExpanded] = React.useState(false);
-  const [liked, setLiked] = React.useState(false);
+
   const [saved, setSaved] = React.useState(false);
-  const [isCopied, setIsCopied] = React.useState(false);
   const [isReported, setisReported] = React.useState(false);
-  const [viewPost, setViewPost] = React.useState(false);
   const [viewCommment, setViewComment] = React.useState(false);
 
+  const countLikes = post.likes.length;
+  const [likeCount, setLikeCount] = React.useState(countLikes);
+
+  const countComment = post.comments.length;
+  const [commentCount, setCommentCount] = React.useState(countComment);
+
   const id = useSelector((state) => state.user._id);
+
+  const hasLiked = post.likes.includes(id);
+
+  const [liked, setLiked] = React.useState(hasLiked);
 
   const navigate = useNavigate();
 
@@ -58,34 +68,45 @@ const PostCard = ({ post }) => {
     setExpanded(!expanded);
   };
 
-  const handleLikeClick = () => {
-    setLiked(!liked);
+  const handleLike = async (id) => {
+    if (liked) {
+      setLikeCount((prev) => prev - 1);
+    } else {
+      setLikeCount((prev) => prev + 1);
+    }
+    try {
+      setLiked(!liked);
+      await axiosInstance.put(`/like/post/${id}`);
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  const handleDebouncedLike = debounce(handleLike, 300);
 
   const handleSaveClick = () => {
     setSaved(!saved);
   };
+
   const popupState = usePopupState({
     variant: "popover",
     popupId: "demoPopover",
   });
 
+  const [openShare, setOpenShare] = React.useState(false);
+  const openShareModal = () => setOpenShare(true);
+  const closeShareModal = () => setOpenShare(false);
+
   const [anchorEl, setAnchorEl] = React.useState(null);
+
   const open = Boolean(anchorEl);
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
-  };
-
-  const handleShare = () => {
-    handleClose();
-    setIsCopied(true);
-    handleClose();
-    setTimeout(() => {
-      setIsCopied(false);
-    }, 1000);
   };
 
   const handleReport = () => {
@@ -98,20 +119,6 @@ const PostCard = ({ post }) => {
 
   const handleDeletePost = () => {
     console.log("Post deleted!");
-  };
-
-  const handleEditPost = () => {
-    console.log("Post Updated!");
-  };
-
-  const handleViewPost = () => {
-    handleClose();
-    setViewPost(true);
-  };
-
-  const handleModal = () => {
-    handleClose();
-    setViewPost(false);
   };
 
   const toggleComment = () => {
@@ -182,7 +189,6 @@ const PostCard = ({ post }) => {
                   profilePhoto={post.userId.profileImage}
                   follower={post.userId.follower.length}
                   following={post.userId.following.length}
-                  post={5}
                 />
               </HoverPopover>
             </>
@@ -214,18 +220,10 @@ const PostCard = ({ post }) => {
                 }}
               >
                 <MenuItem onClick={handleReport} sx={{ color: "red" }}>
-                  Report
+                  Report Post
                 </MenuItem>
-                <MenuItem onClick={() => navigate(`/${post.userId.username}`)}>
-                  View Account
-                </MenuItem>
-                <MenuItem onClick={handleViewPost}>View Post</MenuItem>
-                <MenuItem onClick={handleShare}>Share</MenuItem>
                 {post.userId._id === id ? (
                   <MenuItem onClick={handleDeletePost}>Delete Post</MenuItem>
-                ) : null}
-                {post.userId._id === id ? (
-                  <MenuItem onClick={handleEditPost}>Edit Post</MenuItem>
                 ) : null}
               </Menu>
             </>
@@ -265,20 +263,6 @@ const PostCard = ({ post }) => {
             width: "100%",
           }}
         >
-          {isCopied && (
-            <Alert
-              severity="success"
-              sx={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                zIndex: 1300,
-              }}
-            >
-              Link Copied!
-            </Alert>
-          )}
           {isReported && (
             <Alert
               severity="warning"
@@ -319,14 +303,14 @@ const PostCard = ({ post }) => {
           {/* Left Actions */}
           <Box display={"flex"} alignItems={"center"}>
             <IconButton
-              onClick={handleLikeClick}
+              onClick={() => handleDebouncedLike(post._id)}
               aria-label="add to favorites"
               sx={{ color: "whitesmoke" }}
             >
               {liked ? <FavoriteIcon color="error" /> : <FavoriteBorderIcon />}
             </IconButton>
             <Typography variant="body2" mr={1}>
-              {liked ? post.likes.length + 1 : post.likes.length}
+              {likeCount}
             </Typography>
             <IconButton
               aria-label="comment"
@@ -335,7 +319,7 @@ const PostCard = ({ post }) => {
             >
               <ChatOutlinedIcon />
             </IconButton>
-            <Typography variant="body2">{post.comments.length}</Typography>
+            <Typography variant="body2">{commentCount}</Typography>
           </Box>
           {/* Right Actions */}
           <Box display={"flex"} alignItems={"center"}>
@@ -350,7 +334,11 @@ const PostCard = ({ post }) => {
                 <BookmarkBorderIcon />
               )}
             </IconButton>
-            <IconButton aria-label="share" sx={{ color: "whitesmoke" }}>
+            <IconButton
+              aria-label="share"
+              onClick={openShareModal}
+              sx={{ color: "whitesmoke" }}
+            >
               <ShareIcon />
             </IconButton>
             <ExpandMore
@@ -367,6 +355,11 @@ const PostCard = ({ post }) => {
             </ExpandMore>
           </Box>
         </CardActions>
+        <ShareModal
+          closeShareModal={closeShareModal}
+          postId={post._id}
+          openShare={openShare}
+        />
 
         <CardContent
           sx={{ marginBottom: -1.5, marginTop: -2.6, fontFamily: "Roboto" }}
@@ -385,12 +378,13 @@ const PostCard = ({ post }) => {
         >
           {viewCommment && (
             <CardActions>
-              <CommentSection />
+              <CommentSection
+                postId={post._id}
+                setCommentCount={setCommentCount}
+              />
             </CardActions>
           )}
         </CardContent>
-
-        {viewPost && <PostModal isOpen={viewPost} handleClose={handleModal} />}
       </Card>
     </>
   );

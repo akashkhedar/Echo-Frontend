@@ -13,23 +13,27 @@ import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 
 const Comment = ({ comment }) => {
   const navigate = useNavigate();
+
   const popupState = usePopupState({
     variant: "popover",
     popupId: "demoPopover",
   });
+
   const [like, setLike] = React.useState(false);
+
   const handleLike = () => {
     setLike(!like);
   };
+
   return (
     <CardHeader
-      key={comment.id}
+      key={comment._id}
       avatar={
         <>
           <Avatar
-            src={comment.userProfilePhoto}
+            src={comment.user.profileImage}
             {...bindHover(popupState)}
-            onClick={() => navigate(`/${comment.username}`)}
+            onClick={() => navigate(`/${comment.user.username}`)}
             sx={{ cursor: "pointer" }}
           />
           <HoverPopover
@@ -44,8 +48,8 @@ const Comment = ({ comment }) => {
             }}
           >
             <HoverCard
-              username={comment.username}
-              userProfilePhoto={comment.userProfilePhoto}
+              username={comment.user.username}
+              userProfilePhoto={comment.user.profileImage}
             />
           </HoverPopover>
         </>
@@ -54,12 +58,12 @@ const Comment = ({ comment }) => {
         <Typography
           variant="body2"
           sx={{ cursor: "pointer" }}
-          onClick={() => navigate(`/${comment.username}`)}
+          onClick={() => navigate(`/${comment.user.username}`)}
         >
-          {comment.username}
+          {comment.user.username}
         </Typography>
       }
-      subheader={<Typography variant="body2">{comment.commentText}</Typography>}
+      subheader={<Typography variant="body2">{comment.comment}</Typography>}
       action={
         <Box
           display={"flex"}

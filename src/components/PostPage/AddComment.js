@@ -1,7 +1,26 @@
 import React, { useState } from "react";
 import { Avatar, Box, Button, TextField } from "@mui/material";
+import axiosInstance from "../../axiosInstance";
+import { useSelector } from "react-redux";
 
-const AddComment = () => {
+const AddComment = ({ postId, setComments, setCommentCount }) => {
+  const userProfile = useSelector((state) => state.user.profileImage);
+  const [comment, setComment] = useState("");
+
+  const handleSubmit = async () => {
+    try {
+      const res = await axiosInstance.post(`/post/comment/${postId}`, {
+        comment: comment,
+      });
+      if (res) {
+        setComments((prev) => [res.data, ...prev]);
+        setCommentCount((prev) => prev + 1);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -16,14 +35,14 @@ const AddComment = () => {
     >
       {/* Profile Image */}
       <Avatar
-        src="https://via.placeholder.com/40"
+        src={userProfile}
         alt="User Avatar"
         sx={{ width: 40, height: 40 }}
       />
       {/* Comment Input */}
       <TextField
-        // value={commentText}
-        // onChange={(e) => setCommentText(e.target.value)}
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
         placeholder="Write a comment..."
         variant="outlined"
         size="small"
@@ -38,9 +57,10 @@ const AddComment = () => {
       />
       {/* Submit Button */}
       <Button
-        // onClick={handleSubmit}
+        onClick={handleSubmit}
         variant="contained"
         size="medium"
+        disabled={!comment.trim()}
         sx={{
           textTransform: "none",
           borderRadius: "10px",

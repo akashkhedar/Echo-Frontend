@@ -1,82 +1,24 @@
-import { Box, CardActions, CardContent, Divider } from "@mui/material";
-import React from "react";
-import Comment from "./Comment";
+import { Box, Divider } from "@mui/material";
+import { useEffect, useState } from "react";
+import axiosInstance from "../../axiosInstance";
 import AddComment from "./AddComment";
+import Comment from "./Comment";
 
-const comments = [
-  {
-    id: 1,
-    username: "john_doe",
-    userProfilePhoto: "https://via.placeholder.com/40",
-    commentText: "This is such an amazing post! Loved it. 😊",
-    likes: 15,
-  },
-  {
-    id: 2,
-    username: "jane_smith",
-    userProfilePhoto: "https://via.placeholder.com/40",
-    commentText: "Great insights shared here. Thanks for posting!",
-    likes: 8,
-  },
-  {
-    id: 3,
-    username: "michael_b",
-    userProfilePhoto: "https://via.placeholder.com/40",
-    commentText: "Wow! This totally resonates with me. Keep it up!",
-    likes: 25,
-  },
-  {
-    id: 4,
-    username: "emily_rose",
-    userProfilePhoto: "https://via.placeholder.com/40",
-    commentText: "Interesting perspective. I hadn’t thought of it this way!",
-    likes: 12,
-  },
-  {
-    id: 5,
-    username: "alexander",
-    userProfilePhoto: "https://via.placeholder.com/40",
-    commentText: "This is exactly what I was looking for. Thank you!",
-    likes: 5,
-  },
-  {
-    id: 6,
-    username: "john_doe",
-    userProfilePhoto: "https://via.placeholder.com/40",
-    commentText: "This is such an amazing post! Loved it. 😊",
-    likes: 15,
-  },
-  {
-    id: 7,
-    username: "jane_smith",
-    userProfilePhoto: "https://via.placeholder.com/40",
-    commentText: "Great insights shared here. Thanks for posting!",
-    likes: 8,
-  },
-  {
-    id: 8,
-    username: "michael_b",
-    userProfilePhoto: "https://via.placeholder.com/40",
-    commentText: "Wow! This totally resonates with me. Keep it up!",
-    likes: 25,
-  },
-  {
-    id: 9,
-    username: "emily_rose",
-    userProfilePhoto: "https://via.placeholder.com/40",
-    commentText: "Interesting perspective. I hadn’t thought of it this way!",
-    likes: 12,
-  },
-  {
-    id: 10,
-    username: "alexander",
-    userProfilePhoto: "https://via.placeholder.com/40",
-    commentText: "This is exactly what I was looking for. Thank you!",
-    likes: 5,
-  },
-];
-
-const CommentSection = () => {
+const CommentSection = ({ postId, setCommentCount }) => {
+  const [comments, setComments] = useState([]);
+  useEffect(() => {
+    const fetchComments = async (postId) => {
+      try {
+        const res = await axiosInstance.get(`/fetch/comments/${postId}`);
+        if (res.data) {
+          setComments(res.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchComments(postId);
+  }, []);
   return (
     <Box
       sx={{
@@ -110,12 +52,16 @@ const CommentSection = () => {
         Comments
       </Divider>
       <Box sx={{ position: "sticky", zIndex: 1, top: 0 }}>
-        <AddComment />
+        <AddComment
+          postId={postId}
+          setComments={setComments}
+          setCommentCount={setCommentCount}
+        />
       </Box>
       <Box mt={1}>
-        {comments.map((comment) => (
-          <Comment comment={comment} />
-        ))}
+        {comments && comments.length > 0
+          ? comments.map((comment) => <Comment comment={comment} />)
+          : null}
       </Box>
     </Box>
   );

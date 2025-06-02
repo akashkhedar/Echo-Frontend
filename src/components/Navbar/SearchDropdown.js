@@ -1,9 +1,17 @@
 import { Box, Typography, Avatar, IconButton } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import PersonRemoveAlt1Icon from "@mui/icons-material/PersonRemoveAlt1";
+import axiosInstance from "../../axiosInstance";
 
 const SearchDropdown = ({ results, navigate, isOpen }) => {
   if (!isOpen) return null;
+
+  const handleFollow = async (id) => {
+    try {
+      const res = await axiosInstance.put(`/user/follow/${id}`);
+      console.log(res);
+    } catch (error) {}
+  };
 
   return (
     <Box
@@ -29,9 +37,9 @@ const SearchDropdown = ({ results, navigate, isOpen }) => {
       ) : (
         results.map((user) => (
           <Box
-            onClick={() => {
-              navigate(`/profile/${user.username}`);
-            }}
+            // onClick={() => {
+            //   navigate(`/profile/${user.username}`);
+            // }}
             key={user._id}
             sx={{
               display: "flex",
@@ -63,7 +71,7 @@ const SearchDropdown = ({ results, navigate, isOpen }) => {
               <IconButton>
                 <SendIcon sx={{ color: "whitesmoke" }} />
               </IconButton>
-              <IconButton>
+              <IconButton onClick={() => handleFollow(user._id)}>
                 <PersonRemoveAlt1Icon sx={{ color: "whitesmoke" }} />
               </IconButton>
             </Box>

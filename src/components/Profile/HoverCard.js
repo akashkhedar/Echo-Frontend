@@ -14,7 +14,6 @@ import { useSelector } from "react-redux";
 export default function HoverCard({
   id,
   username,
-  post,
   profilePhoto,
   follower,
   following,
@@ -49,17 +48,6 @@ export default function HoverCard({
               gap: 2,
             }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                flexDirection: "column",
-              }}
-            >
-              <Typography sx={{ fontWeight: "900" }}>Post</Typography>
-              <Typography sx={{ fontWeight: "900" }}>{post}</Typography>
-            </Box>
             <Box
               sx={{
                 display: "flex",

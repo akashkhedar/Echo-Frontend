@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import UserList from "./UserList";
 import { useSelector } from "react-redux";
 import axiosInstance from "../../axiosInstance";
+import { Typography } from "@mui/material";
 
 const FriendsPage = ({ path }) => {
   const [followers, setFollowers] = useState([]);
@@ -12,20 +13,18 @@ const FriendsPage = ({ path }) => {
   const userId = useSelector((state) => state.user._id);
   React.useEffect(() => {
     const fetchFollowers = async () => {
-      console.log("follower");
       try {
         const res = await axiosInstance.get(`/fetch/followers/${userId}`);
-        console.log(res.data);
+        setFollowers(res.data);
       } catch (error) {
         console.log(error);
       }
     };
 
     const fetchFollowing = async () => {
-      console.log("following");
       try {
         const res = await axiosInstance.get(`/fetch/following/${userId}`);
-        console.log(res.data);
+        setFollowing(res.data);
       } catch (error) {
         console.log(error);
       }
@@ -36,7 +35,7 @@ const FriendsPage = ({ path }) => {
     } else {
       fetchFollowing();
     }
-  });
+  }, [path, userId]);
 
   return (
     <Box
@@ -58,9 +57,55 @@ const FriendsPage = ({ path }) => {
         spacing={{ xs: 1 }}
         columns={{ xs: 4, sm: 8, md: 12 }}
       >
-        {path === "/profile/followers"
-          ? followers.map((follower) => <UserList user={follower} />)
-          : following.map((following) => <UserList user={following} />)}
+        {path === "/profile/followers" ? (
+          followers && followers.length > 0 ? (
+            followers.map((follower) => (
+              <UserList
+                key={follower._id}
+                user={follower}
+                setFollowers={setFollowers}
+              />
+            ))
+          ) : (
+            <Box
+              sx={{
+                width: "100%",
+                height: "10rem",
+                textAlign: "center",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Typography variant="h6" fontWeight={600} color="whitesmoke">
+                You have no followers!
+              </Typography>
+            </Box>
+          )
+        ) : following && following.length > 0 ? (
+          following.map((following) => (
+            <UserList
+              key={following._id}
+              user={following}
+              setFollowing={setFollowing}
+            />
+          ))
+        ) : (
+          <Box
+            sx={{
+              width: "100%",
+              height: "10rem",
+              textAlign: "center",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Typography variant="h6" fontWeight={600} color="whitesmoke">
+              You are not following anyone!
+            </Typography>
+          </Box>
+        )}
       </Grid>
     </Box>
   );
