@@ -11,7 +11,7 @@ import React from "react";
 import useConversationSelection from "../../hooks/useConversationSelection";
 import { useSelector } from "react-redux";
 
-const ConversationsList = ({ conversation, selectedChat, handleClick }) => {
+const ConversationsList = ({ conversation, selectedChat }) => {
   const { _id } = useSelector((state) => state.user);
   const selectConversation = useConversationSelection();
   return (

@@ -3,8 +3,11 @@ import { Box, IconButton, InputBase } from "@mui/material";
 import { AttachFile, Send } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import socket from "../../utils/socket";
+import { useLocation } from "react-router-dom";
 
 const ChatInput = () => {
+  const path = useLocation();
+
   const selectedUser = useSelector((state) => state.chat.chatUserId);
   const userId = useSelector((state) => state.user._id);
   const username = useSelector((state) => state.user.username);
@@ -51,18 +54,20 @@ const ChatInput = () => {
         color: "whitesmoke",
       }}
     >
-      <IconButton
-        sx={{
-          color: "rgba(255, 255, 255, 0.7)",
-          "&:hover": {
-            backgroundColor: "#1e1e1f",
-            borderRadius: 2,
-            padding: 1,
-          },
-        }}
-      >
-        <AttachFile sx={{ fontSize: 25 }} />
-      </IconButton>
+      {path === "/chat" ? null : (
+        <IconButton
+          sx={{
+            color: "rgba(255, 255, 255, 0.7)",
+            "&:hover": {
+              backgroundColor: "#1e1e1f",
+              borderRadius: 2,
+              padding: 1,
+            },
+          }}
+        >
+          <AttachFile sx={{ fontSize: 25 }} />
+        </IconButton>
+      )}
       <InputBase
         placeholder="Type a message"
         multiline

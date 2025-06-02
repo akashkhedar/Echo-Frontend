@@ -3,8 +3,11 @@ import { Avatar, Box, IconButton, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import { selectChatUser } from "../../redux/selectors/statusSelector";
 import socket from "../../utils/socket";
+import { useLocation } from "react-router-dom";
 
 const ChatHeader = () => {
+  const path = useLocation();
+
   const user = useSelector(selectChatUser);
   let callerId = useSelector((state) => state.user._id);
   let calleeId = user._id;
@@ -57,24 +60,26 @@ const ChatHeader = () => {
       </Box>
 
       {/* Action Buttons */}
-      <Box>
-        <IconButton
-          onClick={handleVideoCall}
-          sx={{
-            color: "whitesmoke",
-          }}
-        >
-          <Videocam sx={{ fontSize: 30 }} />
-        </IconButton>
-        <IconButton
-          onClick={handleVoiceCall}
-          sx={{
-            color: "whitesmoke",
-          }}
-        >
-          <Phone sx={{ fontSize: 27 }} />
-        </IconButton>
-      </Box>
+      {path === "/chat" ? null : (
+        <Box>
+          <IconButton
+            onClick={handleVideoCall}
+            sx={{
+              color: "whitesmoke",
+            }}
+          >
+            <Videocam sx={{ fontSize: 30 }} />
+          </IconButton>
+          <IconButton
+            onClick={handleVoiceCall}
+            sx={{
+              color: "whitesmoke",
+            }}
+          >
+            <Phone sx={{ fontSize: 27 }} />
+          </IconButton>
+        </Box>
+      )}
     </Box>
   );
 };

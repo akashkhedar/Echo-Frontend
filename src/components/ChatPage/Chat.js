@@ -43,7 +43,7 @@ const ChatPage = () => {
           overflow: "auto",
         }}
       >
-        {selectedChat === null ? null : <ChatHeader navigate={navigate} />}
+        {selectedChat === null ? null : <ChatHeader />}
         <ChatSection />
         {selectedChat === null ? null : <ChatInput />}
       </Box>

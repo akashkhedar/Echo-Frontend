@@ -1,24 +1,20 @@
-import * as React from "react";
+import Diversity1OutlinedIcon from "@mui/icons-material/Diversity1Outlined";
+import { IconButton, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import Avatar from "@mui/material/Avatar";
-import ListItemText from "@mui/material/ListItemText";
-import Divider from "@mui/material/Divider";
-import { IconButton, Typography } from "@mui/material";
-import Diversity1OutlinedIcon from "@mui/icons-material/Diversity1Outlined";
-
-const users = [
-  { name: "John Doe", avatar: "https://i.pravatar.cc/150?img=1" },
-  { name: "Jane Smith", avatar: "https://i.pravatar.cc/150?img=2" },
-  { name: "Alex Johnson", avatar: "https://i.pravatar.cc/150?img=3" },
-  { name: "Emily Davis", avatar: "https://i.pravatar.cc/150?img=4" },
-  { name: "Michael Brown", avatar: "https://i.pravatar.cc/150?img=5" },
-];
+import * as React from "react";
+import { useSelector } from "react-redux";
+import QuickMessages from "./QuickMessages";
+import UserTabs from "./UserTabs";
 
 const LGQuickChat = () => {
+  const conversations = useSelector((state) => state.convo);
+
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
   return (
     <Drawer
       variant="permanent"
@@ -70,26 +66,15 @@ const LGQuickChat = () => {
         </Typography>
       </Box>
       <List sx={{ overflow: "hidden" }}>
-        {users.map((user, index) => (
-          <React.Fragment key={index}>
-            <ListItem disablePadding sx={{ marginY: "0.5rem" }}>
-              <ListItemButton sx={{ display: "flex", gap: 2 }}>
-                <Avatar src={user.avatar} alt={user.name} />
-                <ListItemText
-                  primary={user.name}
-                  sx={{
-                    display: { xs: "none", md: "block" }, // Hide names on small screens
-                    color: "whitesmoke",
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-            {index !== users.length - 1 && (
-              <Divider variant="middle" sx={{ bgcolor: "secondary.light" }} />
-            )}
-          </React.Fragment>
+        {conversations.slice(0.5).map((conversation) => (
+          <UserTabs
+            conversation={conversation}
+            key={conversation._id}
+            handleOpen={handleOpen}
+          />
         ))}
       </List>
+      <QuickMessages open={open} handleClose={handleClose} />
     </Drawer>
   );
 };
