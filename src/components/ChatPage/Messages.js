@@ -5,18 +5,8 @@ import { markMessageRead } from "../../redux/slices/ChatSlice/ChatSlice";
 import socket from "../../utils/socket";
 import Message from "./Message";
 import NewMessage from "./NewMessage";
-
-const StyledBox = styled(Box)({
-  padding: "16px",
-  display: "flex",
-  flexDirection: "column",
-  height: "100%",
-  overflowY: "auto",
-  flexGrow: 1,
-  "&::-webkit-scrollbar": { display: "none" },
-  scrollbarWidth: "none",
-  "-ms-overflow-style": "none",
-});
+import QuickChat from "../../assets/QuickChat.jpg";
+import { useLocation } from "react-router-dom";
 
 const MessageContainer = styled(Box)({
   display: "flex",
@@ -24,14 +14,33 @@ const MessageContainer = styled(Box)({
 });
 
 const MessageSection = () => {
+  const outerDiv = useRef(null);
+  const innerDiv = useRef(null);
+  const isUserAtBottom = useRef(true);
+  const path = useLocation();
+
+  useEffect(() => {
+    if (path.pathname === "/") {
+      outerDiv.current.style.background = `url(${QuickChat}) no-repeat center center/cover`;
+    }
+  });
+
+  const StyledBox = styled(Box)({
+    padding: "16px",
+    display: "flex",
+    flexDirection: "column",
+    height: "100%",
+    overflowY: "auto",
+    flexGrow: 1,
+    "&::-webkit-scrollbar": { display: "none" },
+    scrollbarWidth: "none",
+    "-ms-overflow-style": "none",
+  });
+
   const dispatch = useDispatch();
   const chats = useSelector((state) => state.chat.chat);
   const userId = useSelector((state) => state.user._id);
   const currentOpenedChat = useSelector((state) => state.chat.chatId);
-
-  const outerDiv = useRef(null);
-  const innerDiv = useRef(null);
-  const isUserAtBottom = useRef(true);
 
   const [showScrollButton, setShowScrollButton] = useState(false);
 

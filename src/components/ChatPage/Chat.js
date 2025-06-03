@@ -1,19 +1,16 @@
 import { Box } from "@mui/material";
-import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import ChatBG from "../../assets/ChatBG.jpeg";
+import { clearChat } from "../../redux/slices/ChatSlice/ChatSlice";
 import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
 import ChatList from "./ChatList";
 import ChatSection from "./ChatSection";
-import { clearChat } from "../../redux/slices/ChatSlice/ChatSlice";
-import { useDispatch } from "react-redux";
-import ChatBG from "../../assets/ChatBG.jpeg";
-import { useNavigate } from "react-router-dom";
 
 const ChatPage = () => {
   const selectedChat = useSelector((state) => state.chat.chatId);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   useEffect(() => {
     return () => {
@@ -26,7 +23,6 @@ const ChatPage = () => {
     <Box
       sx={{
         display: "flex",
-        // backgroundColor: "#1e1e1f",
         background: `url(${ChatBG}) no-repeat center center/cover`,
         backgroundSize: "cover",
         height: "90.8vh",

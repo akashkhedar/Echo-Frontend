@@ -46,7 +46,6 @@ const ExpandMore = styled((props) => {
 const PostCard = ({ post }) => {
   const [expanded, setExpanded] = React.useState(false);
 
-  const [saved, setSaved] = React.useState(false);
   const [isReported, setisReported] = React.useState(false);
   const [viewCommment, setViewComment] = React.useState(false);
 
@@ -83,10 +82,6 @@ const PostCard = ({ post }) => {
   };
 
   const handleDebouncedLike = debounce(handleLike, 300);
-
-  const handleSaveClick = () => {
-    setSaved(!saved);
-  };
 
   const popupState = usePopupState({
     variant: "popover",
@@ -323,17 +318,6 @@ const PostCard = ({ post }) => {
           </Box>
           {/* Right Actions */}
           <Box display={"flex"} alignItems={"center"}>
-            <IconButton
-              onClick={handleSaveClick}
-              aria-label="save"
-              sx={{ color: "whitesmoke" }}
-            >
-              {saved ? (
-                <BookmarkIcon color="primary" />
-              ) : (
-                <BookmarkBorderIcon />
-              )}
-            </IconButton>
             <IconButton
               aria-label="share"
               onClick={openShareModal}
