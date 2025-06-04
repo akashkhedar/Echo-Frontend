@@ -8,6 +8,9 @@ import Post from "./components/PostPage/Post";
 import Profile from "./components/Profile/Profile";
 import SignupPage from "./components/Signup/Signup";
 import VideoCallPage from "./components/Calling/VideoCallPage";
+import ForgetPassword from "./components/ChangePassword/ForgetPassword";
+import UpdatePassword from "./components/ChangePassword/UpdatePassword";
+import ValidateToken from "./components/ChangePassword/ValidateToken";
 
 function App() {
   return (
@@ -15,6 +18,9 @@ function App() {
       <Routes>
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/login" element={<LogInPage />} />
+        <Route path="/forget-password" element={<ForgetPassword />} />
+        <Route path="/validate/:token" element={<ValidateToken />} />
+        <Route path="/update-password/:token" element={<UpdatePassword />} />
         <Route
           path="/"
           element={

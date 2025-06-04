@@ -522,6 +522,9 @@ const SignUpPage = () => {
                             color: "white", // Input text color
                             backgroundColor: "transparent", // Dark background for visibility
                           },
+                          "& svg": {
+                            color: "white",
+                          },
                         }}
                       />
                     }

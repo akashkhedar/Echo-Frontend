@@ -210,7 +210,7 @@ const LogInPage = () => {
                     sx={{ cursor: "pointer", marginBottom: 2 }}
                   >
                     <Link
-                      to="/forgetpassword"
+                      to="/forget-password"
                       style={{ textDecoration: "none", color: "inherit" }}
                     >
                       Forgot password?

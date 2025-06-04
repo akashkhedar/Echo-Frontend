@@ -19,7 +19,10 @@ const ProfileHeader = () => {
   const handleOpen = () => {
     setOpen(true);
   };
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   return (
     <Card
       sx={{
@@ -98,10 +101,10 @@ const ProfileHeader = () => {
             <Typography variant="subtitle2" color="whitesmoke">
               Edit Profile
             </Typography>
-            <AboutUpdate open={open} handleClose={handleClose} user={user} />
           </Button>
         </Box>
       </Box>
+      <AboutUpdate open={open} handleClose={handleClose} user={user} />
     </Card>
   );
 };

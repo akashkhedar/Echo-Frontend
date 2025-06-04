@@ -199,20 +199,20 @@ const AboutUpdate = ({ open, handleClose, user }) => {
   });
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Modal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
-        open={open}
-        onClose={handleClose}
-        closeAfterTransition
-        slots={{ backdrop: Backdrop }}
-        slotProps={{
-          backdrop: {
-            timeout: 500,
-          },
-        }}
-      >
+    <Modal
+      aria-labelledby="transition-modal-title"
+      aria-describedby="transition-modal-description"
+      open={open}
+      onClose={handleClose}
+      closeAfterTransition
+      slots={{ backdrop: Backdrop }}
+      slotProps={{
+        backdrop: {
+          timeout: 500,
+        },
+      }}
+    >
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Fade in={open}>
           <Box sx={style}>
             <Typography
@@ -509,6 +509,9 @@ const AboutUpdate = ({ open, handleClose, user }) => {
                             color: "white",
                             backgroundColor: "transparent",
                           },
+                          "& svg": {
+                            color: "white",
+                          },
                         },
                       },
                     }}
@@ -599,8 +602,8 @@ const AboutUpdate = ({ open, handleClose, user }) => {
             </form>
           </Box>
         </Fade>
-      </Modal>
-    </LocalizationProvider>
+      </LocalizationProvider>
+    </Modal>
   );
 };
 

@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../axiosInstance";
 import UploadPost from "../uploadPost/UploadPost";
 import { selectHasUnreadMessages } from "../../redux/selectors/unreadSelector";
+import PasswordIcon from "@mui/icons-material/Password";
 
 const LGSidebar = () => {
   const hasUnread = useSelector(selectHasUnreadMessages);
@@ -46,6 +47,12 @@ const LGSidebar = () => {
       if (res.status) {
         navigate("/signup");
       }
+    } catch (error) {}
+  };
+
+  const handleForgetPassword = async () => {
+    try {
+      const res = await axiosInstance.post("/forget/password");
     } catch (error) {}
   };
 
@@ -193,6 +200,20 @@ const LGSidebar = () => {
             alignItems: "start",
           }}
         >
+          <Item
+            sx={{
+              width: "100%",
+              "&:hover": {
+                backgroundColor: "rgb(18, 25, 34)",
+              },
+            }}
+            onClick={handleForgetPassword}
+          >
+            <PasswordIcon sx={{ color: "whitesmoke" }} />
+            <Typography variant="body1" flex={1} sx={{ color: "whitesmoke" }}>
+              Forget Password
+            </Typography>
+          </Item>
           <Item
             sx={{
               width: "100%",
