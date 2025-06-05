@@ -19,8 +19,6 @@ const ImageCropper = ({ file, setFile }) => {
   }, [file.file]);
 
   const handleImageLoad = (e) => {
-    console.log(e);
-
     const { naturalWidth, naturalHeight } = e.currentTarget;
 
     if (naturalWidth < MIN_DIMENSION || naturalHeight < MIN_DIMENSION) {

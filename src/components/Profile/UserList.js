@@ -1,29 +1,27 @@
-import * as React from "react";
-import { experimentalStyled as styled } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import Paper from "@mui/material/Paper";
-import Grid from "@mui/material/Grid2";
-import QuestionAnswerRoundedIcon from "@mui/icons-material/QuestionAnswerRounded";
+import PersonAddAlt1RoundedIcon from "@mui/icons-material/PersonAddAlt1Rounded";
 import PersonRemoveAlt1RoundedIcon from "@mui/icons-material/PersonRemoveAlt1Rounded";
+import QuestionAnswerRoundedIcon from "@mui/icons-material/QuestionAnswerRounded";
 import { Avatar, IconButton, Typography } from "@mui/material";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid2";
+import Paper from "@mui/material/Paper";
+import { experimentalStyled as styled } from "@mui/material/styles";
+import debounce from "lodash.debounce";
 import {
   bindHover,
   bindPopover,
   usePopupState,
 } from "material-ui-popup-state/hooks";
-import HoverCard from "./HoverCard";
 import HoverPopover from "material-ui-popup-state/HoverPopover";
-import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
-import PersonAddAlt1RoundedIcon from "@mui/icons-material/PersonAddAlt1Rounded";
-import debounce from "lodash.debounce";
+import { useDispatch } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
 import axiosInstance from "../../axiosInstance";
-import { useSelector, useDispatch } from "react-redux";
 import {
   removeFollower,
   removeFollowing,
 } from "../../redux/slices/AuthSlice/AuthSlice";
-import { use } from "react";
+import HoverCard from "./HoverCard";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: "rgb(21, 21, 35)",
@@ -54,24 +52,18 @@ const UserList = ({ key, user, setFollowers = null, setFollowing = null }) => {
 
   const updateList = async (userIdToRemove) => {
     if (path === "/profile/followers") {
-      console.log("removing follower");
       setFollowers((prev) => prev.filter((u) => u._id !== userIdToRemove));
       dispatch(removeFollower(userIdToRemove));
     } else {
-      console.log("unfollowing user");
       setFollowing((prev) => prev.filter((u) => u._id !== userIdToRemove));
       dispatch(removeFollowing(userIdToRemove));
     }
     setAdd((prev) => !prev);
     try {
       if (path === "/profile/followers") {
-        console.log("removing follower");
-        const res = await axiosInstance.put(`/user/remove/${userIdToRemove}`);
-        console.log(res);
+        await axiosInstance.put(`/user/remove/${userIdToRemove}`);
       } else {
-        console.log("unfollowing user");
-        const res = await axiosInstance.put(`/user/unfollow/${userIdToRemove}`);
-        console.log(res);
+        await axiosInstance.put(`/user/unfollow/${userIdToRemove}`);
       }
     } catch (err) {
       console.log(err);

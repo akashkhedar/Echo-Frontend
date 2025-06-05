@@ -7,26 +7,23 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import Backdrop from "@mui/material/Backdrop";
+import Fade from "@mui/material/Fade";
+import Modal from "@mui/material/Modal";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider/LocalizationProvider";
 import axios from "axios";
 import imageCompression from "browser-image-compression";
-import { Formik, useFormik } from "formik";
+import dayjs from "dayjs";
+import { useFormik } from "formik";
 import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch, useSelector } from "react-redux";
 import * as yup from "yup";
 import axiosInstance from "../../axiosInstance";
 import { setUser } from "../../redux/slices/AuthSlice/AuthSlice";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from "dayjs";
-import * as React from "react";
-import Backdrop from "@mui/material/Backdrop";
-import Modal from "@mui/material/Modal";
-import Fade from "@mui/material/Fade";
-import { useEffect } from "react";
-import socket from "../../utils/socket";
-import { debounce } from "lodash";
+import DeleteAccountModal from "./DeleteAccountModal";
 
 const style = {
   position: "absolute",
@@ -197,6 +194,10 @@ const AboutUpdate = ({ open, handleClose, user }) => {
       }
     },
   });
+
+  const [delModal, setDelModal] = useState(false);
+  const openDelModal = () => setDelModal(true);
+  const closeDelModal = () => setDelModal(false);
 
   return (
     <Modal
@@ -593,15 +594,33 @@ const AboutUpdate = ({ open, handleClose, user }) => {
                   backgroundColor: "secondary.light",
                   color: "white",
                   "&:hover": {
-                    backgroundColor: " #1565c0",
+                    backgroundColor: "rgb(152, 63, 179)",
                   },
                 }}
               >
                 Save Changes
               </Button>
             </form>
+            <Button
+              variant="contained"
+              type="submit"
+              fullWidth
+              onClick={openDelModal}
+              sx={{
+                mt: 2,
+                textTransform: "none",
+                backgroundColor: "red",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "rgb(145, 50, 50)",
+                },
+              }}
+            >
+              Delete Account
+            </Button>
           </Box>
         </Fade>
+        <DeleteAccountModal delModal={delModal} closeDelModal={closeDelModal} />
       </LocalizationProvider>
     </Modal>
   );

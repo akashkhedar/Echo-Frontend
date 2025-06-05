@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../axiosInstance";
 import PostCard from "./PostCard";
 
-export default function ResponsiveCard() {
+const Post = () => {
   const navigate = useNavigate();
   const [posts, setPosts] = React.useState([]);
 
@@ -34,8 +34,15 @@ export default function ResponsiveCard() {
       }}
     >
       {posts.map((post) => (
-        <PostCard key={post._id} post={post} /> // Render each post
+        <PostCard
+          key={post._id}
+          posts={posts}
+          post={post}
+          setPosts={setPosts}
+        /> // Render each post
       ))}
     </Box>
   );
-}
+};
+
+export default Post;

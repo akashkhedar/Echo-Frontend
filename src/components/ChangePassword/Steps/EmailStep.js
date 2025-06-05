@@ -2,24 +2,19 @@ import { Box, TextField, Button, Typography } from "@mui/material";
 import axiosInstance from "../../../axiosInstance";
 import { useState } from "react";
 
-const EmailStep = ({ setActiveStep, setDirection }) => {
+const EmailStep = () => {
   const [email, setEmail] = useState("");
   const handleSubmit = async () => {
     try {
-      const res = await axiosInstance.post("/forget-password", {
-        email: email,
+      await axiosInstance.post("/forget-password", {
+        userInfo: email,
       });
-      if (res) {
-        console.log(res);
-        setDirection("left");
-        setActiveStep((prev) => prev + 1);
-      }
     } catch (error) {}
   };
   return (
     <Box>
       <Typography variant="h6" color="white" mb={2}>
-        Enter your registered email/Username
+        Enter your detail
       </Typography>
       <TextField
         fullWidth

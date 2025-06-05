@@ -2,7 +2,7 @@
 import { Alert, Box, Grid, Slide, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import SideImg from "../../assets/UpdatePassword.webp"; // Replace with actual path
-import Gradient from "../../assets/ForgetPasswordGradient.jpg"; // Replace with actual path
+import Gradient from "../../assets/UpdatePasswordGradient.png"; // Replace with actual path
 import NewPasswordStep from "./Steps/NewPasswordStep";
 import { useState } from "react";
 

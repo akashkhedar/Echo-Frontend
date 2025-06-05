@@ -161,7 +161,6 @@ const SignUpPage = () => {
         maxSizeMB: 1,
         useWebWorker: true,
       };
-      console.log(values.file);
 
       try {
         const compressImg = await imageCompression(values.file, options);

@@ -1,5 +1,3 @@
-import BookmarkIcon from "@mui/icons-material/Bookmark";
-import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -17,6 +15,7 @@ import CardMedia from "@mui/material/CardMedia";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
+import debounce from "lodash.debounce";
 import HoverPopover from "material-ui-popup-state/HoverPopover";
 import {
   bindHover,
@@ -24,12 +23,11 @@ import {
   usePopupState,
 } from "material-ui-popup-state/hooks";
 import * as React from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../axiosInstance";
 import HoverCard from "../Profile/HoverCard";
 import CommentSection from "./CommentSection";
-import { useSelector } from "react-redux";
-import debounce from "lodash.debounce";
-import axiosInstance from "../../axiosInstance";
 import ShareModal from "./ShareModal";
 
 const ExpandMore = styled((props) => {
@@ -43,7 +41,7 @@ const ExpandMore = styled((props) => {
   transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
 }));
 
-const PostCard = ({ post }) => {
+const PostCard = ({ post, setPosts, posts }) => {
   const [expanded, setExpanded] = React.useState(false);
 
   const [isReported, setisReported] = React.useState(false);
@@ -112,8 +110,18 @@ const PostCard = ({ post }) => {
     }, 1000);
   };
 
-  const handleDeletePost = () => {
-    console.log("Post deleted!");
+  const handleDeletePost = async () => {
+    handleClose();
+    try {
+      const res = await axiosInstance.delete(`/delete/post/${post._id}`);
+      console.log(posts);
+      if (res.status === 200) {
+        setPosts((prev) =>
+          prev.filter((p) => p._id.toString() !== post._id.toString())
+        );
+      }
+      console.log(posts);
+    } catch (error) {}
   };
 
   const toggleComment = () => {

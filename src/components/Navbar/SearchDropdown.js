@@ -8,8 +8,7 @@ const SearchDropdown = ({ results, navigate, isOpen }) => {
 
   const handleFollow = async (id) => {
     try {
-      const res = await axiosInstance.put(`/user/follow/${id}`);
-      console.log(res);
+      await axiosInstance.put(`/user/follow/${id}`);
     } catch (error) {}
   };
 

@@ -261,7 +261,6 @@ export const toggleCamera = async ({ sender, receiver }) => {
       await peerNegotiation(sender, receiver);
     }, 200); // 200ms delay before renegotiation
 
-    console.log("Camera turned off");
     return;
   }
 
@@ -275,8 +274,6 @@ export const toggleCamera = async ({ sender, receiver }) => {
     peerConnection.addTrack(newVideoTrack, localStream);
 
     await peerNegotiation(sender, receiver);
-
-    console.log("Camera turned on");
   } catch (err) {
     console.error("Error turning on camera:", err);
   }

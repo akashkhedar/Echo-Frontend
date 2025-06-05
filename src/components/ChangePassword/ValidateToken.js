@@ -11,11 +11,9 @@ const InvalidResetToken = () => {
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        console.log("verifying");
         const res = await axiosInstance.get(
           `/auth/verify-reset-token/${token}`
         );
-        console.log(res);
         if (res.data?.valid) {
           setIsValid(true);
           navigate(`/update-password/${token}`);

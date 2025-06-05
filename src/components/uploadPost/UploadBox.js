@@ -29,8 +29,6 @@ const UploadBox = ({ handleClose }) => {
   });
 
   const handlePost = async () => {
-    console.log(about);
-
     const ratio = file.ratio;
     const croppedImage = file.croppedImage;
     if (!croppedImage) {
@@ -53,13 +51,12 @@ const UploadBox = ({ handleClose }) => {
           },
         }
       );
-      const uploadPost = await axiosInstance.post("/upload/post", {
+      await axiosInstance.post("/upload/post", {
         media: res.data.secure_url,
         caption: about.caption,
         tags: about.tags,
         mentions: about.mentions,
       });
-      console.log(uploadPost);
       handleClose();
     } catch (error) {
       console.error("Error uploading image:", error);

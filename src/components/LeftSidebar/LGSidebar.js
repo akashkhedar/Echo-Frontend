@@ -12,6 +12,7 @@ import axiosInstance from "../../axiosInstance";
 import UploadPost from "../uploadPost/UploadPost";
 import { selectHasUnreadMessages } from "../../redux/selectors/unreadSelector";
 import PasswordIcon from "@mui/icons-material/Password";
+import NewPassword from "../ChangePassword/NewPassword";
 
 const LGSidebar = () => {
   const hasUnread = useSelector(selectHasUnreadMessages);
@@ -49,12 +50,9 @@ const LGSidebar = () => {
       }
     } catch (error) {}
   };
-
-  const handleForgetPassword = async () => {
-    try {
-      const res = await axiosInstance.post("/forget/password");
-    } catch (error) {}
-  };
+  const [passModal, setPassModal] = React.useState(false);
+  const openPassModal = () => setPassModal(true);
+  const closePassModal = () => setPassModal(false);
 
   return (
     <Drawer
@@ -207,7 +205,7 @@ const LGSidebar = () => {
                 backgroundColor: "rgb(18, 25, 34)",
               },
             }}
-            onClick={handleForgetPassword}
+            onClick={openPassModal}
           >
             <PasswordIcon sx={{ color: "whitesmoke" }} />
             <Typography variant="body1" flex={1} sx={{ color: "whitesmoke" }}>
@@ -230,6 +228,7 @@ const LGSidebar = () => {
           </Item>
         </Box>
       </Box>
+      <NewPassword open={passModal} handleClose={closePassModal} />
     </Drawer>
   );
 };
