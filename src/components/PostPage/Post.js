@@ -34,12 +34,7 @@ const Post = () => {
       }}
     >
       {posts.map((post) => (
-        <PostCard
-          key={post._id}
-          posts={posts}
-          post={post}
-          setPosts={setPosts}
-        /> // Render each post
+        <PostCard key={post._id} post={post} /> // Render each post
       ))}
     </Box>
   );

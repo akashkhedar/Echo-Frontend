@@ -186,7 +186,7 @@ const SignUpPage = () => {
           formikProfile.setFieldError("username", "Username already taken");
         }
         if (res.status === 200) {
-          dispatch(setUser(res.data));
+          dispatch(setUser(res.data.user));
           navigate("/");
         }
       } catch (error) {

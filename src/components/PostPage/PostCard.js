@@ -41,7 +41,7 @@ const ExpandMore = styled((props) => {
   transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
 }));
 
-const PostCard = ({ post, setPosts, posts }) => {
+const PostCard = ({ post, key, setPosts = null }) => {
   const [expanded, setExpanded] = React.useState(false);
 
   const [isReported, setisReported] = React.useState(false);
@@ -114,13 +114,9 @@ const PostCard = ({ post, setPosts, posts }) => {
     handleClose();
     try {
       const res = await axiosInstance.delete(`/delete/post/${post._id}`);
-      console.log(posts);
       if (res.status === 200) {
-        setPosts((prev) =>
-          prev.filter((p) => p._id.toString() !== post._id.toString())
-        );
+        setPosts((prev) => prev.filter((p) => p._id !== post._id));
       }
-      console.log(posts);
     } catch (error) {}
   };
 
@@ -147,7 +143,7 @@ const PostCard = ({ post, setPosts, posts }) => {
   return (
     <>
       <Card
-        key={post.id}
+        key={key}
         sx={{
           width: {
             xs: "100%",

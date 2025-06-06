@@ -31,7 +31,9 @@ const PostMade = () => {
       }}
     >
       {postMade && postMade.length > 0 ? (
-        postMade.map((post) => <PostCard key={post._id} post={post} />)
+        postMade.map((post) => (
+          <PostCard key={post._id} post={post} setPosts={setPostMade} />
+        ))
       ) : (
         <Box
           sx={{
