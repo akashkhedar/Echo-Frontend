@@ -113,15 +113,22 @@ const SignUpPage = () => {
     validationSchema: emailValidationSchema,
     onSubmit: async (values) => {
       try {
-        await axiosInstance.post("/user/create", {
+        const res = await axiosInstance.post("/user/create", {
           email: values.email,
         });
-        handleNext();
+        if (res.status === 200) {
+          handleNext();
+        }
       } catch (error) {
-        setError(true);
-        setTimeout(() => {
-          setError(false);
-        }, 2000);
+        if (error.status === 401) {
+          setActiveStep((prev) => prev + 2);
+        }
+        if (error.status === 409) {
+          setError(true);
+          setTimeout(() => {
+            setError(false);
+          }, 2000);
+        }
       }
     },
   });
@@ -223,8 +230,6 @@ const SignUpPage = () => {
       case 0:
         return (
           <>
-            {/* Email Field */}
-            {/* Email Field */}
             <form onSubmit={formikEmail.handleSubmit}>
               <Box mb={3} sx={{ height: "3vh" }}>
                 {error && (
@@ -268,7 +273,6 @@ const SignUpPage = () => {
                   },
                 }}
               />
-              {/* Continue Button */}
               <Button
                 type="submit" // This makes the button submit the form
                 variant="contained"
@@ -291,7 +295,6 @@ const SignUpPage = () => {
       case 1:
         return (
           <>
-            {/* Verification Code Field */}
             <form onSubmit={formikCode.handleSubmit}>
               <Box mb={3} sx={{ height: "3vh" }}>
                 {error && <Alert severity="error">Invalid Code!</Alert>}
@@ -369,7 +372,6 @@ const SignUpPage = () => {
       case 2:
         return (
           <>
-            {/* Password Field */}
             <form onSubmit={formikProfile.handleSubmit}>
               <TextField
                 label="Password"
