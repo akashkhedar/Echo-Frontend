@@ -16,7 +16,6 @@ const ChatPage = () => {
     return () => {
       dispatch(clearChat());
     };
-    // eslint-disable-next-line
   }, []);
 
   return (
