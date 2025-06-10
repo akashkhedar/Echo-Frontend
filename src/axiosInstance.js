@@ -1,9 +1,13 @@
 import axios from "axios";
 
-// Create an Axios instance
+const baseURL =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:5000"
+    : "https://echo-backend-4am1.onrender.com";
+
 const axiosInstance = axios.create({
-  baseURL: "https://echo-backend-4am1.onrender.com", // Your backend URL
-  withCredentials: true, // This will include cookies in all requests
+  baseURL,
+  withCredentials: true,
 });
 
 export default axiosInstance;
