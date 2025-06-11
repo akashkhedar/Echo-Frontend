@@ -11,7 +11,7 @@ const Post = () => {
   React.useEffect(() => {
     const getPost = async () => {
       try {
-        const userPosts = await axiosInstance.get("/feed/post"); // Fetch posts
+        const userPosts = await axiosInstance.get("/post/feed"); // Fetch posts
         setPosts(userPosts.data.data);
       } catch (error) {
         navigate("/signup");

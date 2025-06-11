@@ -16,7 +16,7 @@ const InvalidResetToken = () => {
         );
         if (res.data?.valid) {
           setIsValid(true);
-          navigate(`/update-password/${token}`);
+          navigate(`/auth/update-password/${token}`);
         } else {
           setIsValid(false);
         }

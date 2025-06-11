@@ -14,7 +14,7 @@ const FriendsPage = ({ path }) => {
   React.useEffect(() => {
     const fetchFollowers = async () => {
       try {
-        const res = await axiosInstance.get(`/fetch/followers/${userId}`);
+        const res = await axiosInstance.get(`/user/fetch/followers/${userId}`);
         setFollowers(res.data);
       } catch (error) {
         console.log(error);
@@ -23,7 +23,7 @@ const FriendsPage = ({ path }) => {
 
     const fetchFollowing = async () => {
       try {
-        const res = await axiosInstance.get(`/fetch/following/${userId}`);
+        const res = await axiosInstance.get(`/user/fetch/following/${userId}`);
         setFollowing(res.data);
       } catch (error) {
         console.log(error);

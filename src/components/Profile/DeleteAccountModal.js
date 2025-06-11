@@ -37,7 +37,7 @@ const DeleteAccountModal = ({ delModal, closeDelModal }) => {
     }
 
     try {
-      const res = await axiosInstance.post("/deleteaccount", {
+      const res = await axiosInstance.post("/user/delete-account", {
         password: password,
       });
       if (res.status === 200) {

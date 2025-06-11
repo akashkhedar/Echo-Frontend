@@ -6,7 +6,7 @@ const EmailStep = () => {
   const [email, setEmail] = useState("");
   const handleSubmit = async () => {
     try {
-      await axiosInstance.post("/forget-password", {
+      await axiosInstance.post("/auth/forget-password", {
         userInfo: email,
       });
     } catch (error) {}

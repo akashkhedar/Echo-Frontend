@@ -3,7 +3,7 @@ import SendIcon from "@mui/icons-material/Send";
 import PersonRemoveAlt1Icon from "@mui/icons-material/PersonRemoveAlt1";
 import axiosInstance from "../../axiosInstance";
 
-const SearchDropdown = ({ results, navigate, isOpen }) => {
+const SearchDropdown = ({ results, isOpen }) => {
   if (!isOpen) return null;
 
   const handleFollow = async (id) => {

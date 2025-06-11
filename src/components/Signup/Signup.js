@@ -42,7 +42,7 @@ const codeValidationSchema = yup.object({
 
 const usernameExists = async (username) => {
   try {
-    await axiosInstance.get(`/check/username?username=${username}`);
+    await axiosInstance.get(`/user/check/username?username=${username}`);
     return false; // username doesn't exist
   } catch (error) {
     if (error.response?.status === 409) {

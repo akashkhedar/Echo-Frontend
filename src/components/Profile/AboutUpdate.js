@@ -51,7 +51,7 @@ const usernameBoundaryRegex = /^(?![._])[a-z0-9._]+(?<![._])$/;
 
 const usernameExists = async (username) => {
   try {
-    await axiosInstance.get(`/check/username?username=${username}`);
+    await axiosInstance.get(`/user/check/username?username=${username}`);
     return false; // username doesn't exist
   } catch (error) {
     if (error.response?.status === 409) {
@@ -181,7 +181,10 @@ const AboutUpdate = ({ open, handleClose, user }) => {
         if (values.dob !== user.dob) updatedFields.dob = values.dob;
         if (values.gender !== user.gender) updatedFields.gender = values.gender;
 
-        const res = await axiosInstance.post("/update/profile", updatedFields);
+        const res = await axiosInstance.post(
+          "/user/update/profile",
+          updatedFields
+        );
         if (res.status === 200) {
           dispatch(setUser(res.data.user));
           handleClose();

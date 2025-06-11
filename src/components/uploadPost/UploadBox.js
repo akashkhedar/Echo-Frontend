@@ -51,7 +51,7 @@ const UploadBox = ({ handleClose }) => {
           },
         }
       );
-      await axiosInstance.post("/upload/post", {
+      await axiosInstance.post("/post/upload", {
         media: res.data.secure_url,
         caption: about.caption,
         tags: about.tags,

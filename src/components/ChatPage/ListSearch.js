@@ -54,7 +54,7 @@ const ListSearch = () => {
   const handleSearch = async (e) => {
     try {
       if (searchInput.length > 0) {
-        const res = await axiosInstance.get(`/search?q=${searchInput}`);
+        const res = await axiosInstance.get(`/user/search?q=${searchInput}`);
         const result = res.data.filter((p) => p._id !== userId);
         setSearchResults(result);
         setOpenDropdown(true);

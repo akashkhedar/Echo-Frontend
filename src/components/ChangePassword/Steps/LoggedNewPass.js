@@ -39,7 +39,7 @@ const LoggedNewPass = () => {
     validationSchema,
     onSubmit: async (values) => {
       try {
-        const res = await axiosInstance.post("/update/logged/password", {
+        const res = await axiosInstance.post("/auth/update/logged/password", {
           currentPassword: values.currentPassword,
           newPassword: values.password,
         });
@@ -75,7 +75,7 @@ const LoggedNewPass = () => {
 
   const handleForgetPassword = async () => {
     try {
-      const res = await axiosInstance.post("/forget-password", {
+      const res = await axiosInstance.post("/auth/forget-password", {
         userInfo: email,
       });
 

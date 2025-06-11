@@ -9,7 +9,7 @@ const CommentSection = ({ postId, setCommentCount }) => {
   useEffect(() => {
     const fetchComments = async (postId) => {
       try {
-        const res = await axiosInstance.get(`/fetch/comments/${postId}`);
+        const res = await axiosInstance.get(`/post/fetch/comments/${postId}`);
         if (res.data) {
           setComments(res.data);
         }

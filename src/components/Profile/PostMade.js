@@ -8,7 +8,7 @@ const PostMade = () => {
 
   const fetchPosts = async () => {
     try {
-      const res = await axiosInstance.get("/fetch/posts");
+      const res = await axiosInstance.get("/post/fetch");
       setPostMade(res.data);
     } catch (error) {
       console.log(error);

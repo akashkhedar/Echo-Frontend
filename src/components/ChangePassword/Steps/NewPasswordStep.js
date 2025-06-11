@@ -33,7 +33,7 @@ const NewPasswordStep = ({ setError }) => {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const res = await axiosInstance.post(`/update-password/${token}`, {
+        const res = await axiosInstance.post(`/auth/update-password/${token}`, {
           newPassword: formik.values.password,
         });
         if (res.status === 200) {

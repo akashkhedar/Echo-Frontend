@@ -73,7 +73,7 @@ const PostCard = ({ post, key, setPosts = null }) => {
     }
     try {
       setLiked(!liked);
-      await axiosInstance.put(`/like/post/${id}`);
+      await axiosInstance.put(`/post/like/${id}`);
     } catch (error) {
       console.log(error);
     }
@@ -113,7 +113,7 @@ const PostCard = ({ post, key, setPosts = null }) => {
   const handleDeletePost = async () => {
     handleClose();
     try {
-      const res = await axiosInstance.delete(`/delete/post/${post._id}`);
+      const res = await axiosInstance.delete(`/post/delete/${post._id}`);
       if (res.status === 200) {
         setPosts((prev) => prev.filter((p) => p._id !== post._id));
       }
