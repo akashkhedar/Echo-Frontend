@@ -113,7 +113,7 @@ const SignUpPage = () => {
     validationSchema: emailValidationSchema,
     onSubmit: async (values) => {
       try {
-        const res = await axiosInstance.post("/user/create", {
+        const res = await axiosInstance.post("/auth/create", {
           email: values.email,
         });
         if (res.status === 200) {
@@ -140,7 +140,7 @@ const SignUpPage = () => {
     validationSchema: codeValidationSchema,
     onSubmit: async (values) => {
       try {
-        await axiosInstance.post("/user/verify", {
+        await axiosInstance.post("/auth/verify", {
           code: values.code,
         });
         handleNext();

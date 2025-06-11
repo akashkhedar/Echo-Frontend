@@ -44,7 +44,7 @@ const LGSidebar = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await axiosInstance.post("/user/logout");
+      const res = await axiosInstance.post("/auth/logout");
       if (res.status) {
         navigate("/signup");
       }
