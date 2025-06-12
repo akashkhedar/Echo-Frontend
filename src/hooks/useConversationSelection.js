@@ -19,7 +19,7 @@ const useConversationSelection = () => {
       dispatch(setChatId(convo._id));
       dispatch(setRoomId(convo.roomId));
       dispatch(setChatUserId(convo.user._id));
-      const res = await axiosInstance(`/fetch/chats/${convo._id}`);
+      const res = await axiosInstance(`/chat/fetch/msg/${convo._id}`);
       dispatch(setChat(res.data));
     } catch (error) {
       console.log(error);

@@ -74,12 +74,7 @@ const profileValidationSchema = yup.object({
     .matches(
       usernameBoundaryRegex,
       "Cannot start or end with dot or underscore"
-    )
-    .test("is-unique", "Username already taken", async function (value) {
-      if (!value) return true;
-      const exists = await usernameExists(value);
-      return !exists;
-    }),
+    ),
 
   fullname: yup
     .string()
@@ -314,7 +309,22 @@ const AboutUpdate = ({ open, handleClose, user }) => {
                 id="username"
                 name="username"
                 value={formikProfile.values.username}
-                onBlur={formikProfile.handleBlur}
+                onChange={formikProfile.handleChange}
+                onBlur={async (e) => {
+                  formikProfile.handleBlur(e);
+
+                  const value = e.target.value;
+
+                  if (value.length >= 4) {
+                    const exists = await usernameExists(value);
+                    if (exists) {
+                      formikProfile.setFieldError(
+                        "username",
+                        "Username already taken"
+                      );
+                    }
+                  }
+                }}
                 error={
                   formikProfile.touched.username &&
                   Boolean(formikProfile.errors.username)
@@ -323,12 +333,11 @@ const AboutUpdate = ({ open, handleClose, user }) => {
                   formikProfile.touched.username &&
                   formikProfile.errors.username
                 }
-                onChange={formikProfile.handleChange}
                 InputLabelProps={{
-                  sx: { color: "secondary.light" }, // or use a hex code like "#FFFF00"
+                  sx: { color: "secondary.light" },
                 }}
                 InputProps={{
-                  sx: { color: "white" }, // or use a hex code like "#FFFF00"
+                  sx: { color: "white" },
                 }}
                 sx={{
                   marginBottom: 2,

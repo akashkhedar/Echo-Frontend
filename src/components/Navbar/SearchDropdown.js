@@ -2,14 +2,22 @@ import { Box, Typography, Avatar, IconButton } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import PersonRemoveAlt1Icon from "@mui/icons-material/PersonRemoveAlt1";
 import axiosInstance from "../../axiosInstance";
+import socket from "../../utils/socket";
 
-const SearchDropdown = ({ results, isOpen }) => {
+const SearchDropdown = ({ results, isOpen, userId }) => {
   if (!isOpen) return null;
 
   const handleFollow = async (id) => {
     try {
       await axiosInstance.put(`/user/follow/${id}`);
     } catch (error) {}
+  };
+
+  const handleMessage = (id) => {
+    socket.emit("redirectConvo", {
+      sender: userId,
+      receiver: id,
+    });
   };
 
   return (
@@ -67,7 +75,7 @@ const SearchDropdown = ({ results, isOpen }) => {
               </Box>
             </Box>
             <Box>
-              <IconButton>
+              <IconButton onClick={() => handleMessage(user._id)}>
                 <SendIcon sx={{ color: "whitesmoke" }} />
               </IconButton>
               <IconButton onClick={() => handleFollow(user._id)}>

@@ -191,6 +191,7 @@ const Navbar = () => {
             results={searchResults}
             navigate={navigate}
             isOpen={openDropdown}
+            userId={user._id}
           />
         </Box>
 

@@ -35,7 +35,7 @@ const LogInPage = () => {
       validationSchema: validationSchema,
       onSubmit: async (values) => {
         try {
-          const res = await axiosInstance.post("/user/login", {
+          const res = await axiosInstance.post("/auth/login", {
             user: values.user,
             userPassword: values.password,
           });

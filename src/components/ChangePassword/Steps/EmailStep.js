@@ -3,11 +3,11 @@ import axiosInstance from "../../../axiosInstance";
 import { useState } from "react";
 
 const EmailStep = () => {
-  const [email, setEmail] = useState("");
+  const [detail, setDetail] = useState("");
   const handleSubmit = async () => {
     try {
       await axiosInstance.post("/auth/forget-password", {
-        userInfo: email,
+        userInfo: detail,
       });
     } catch (error) {}
   };
@@ -18,10 +18,10 @@ const EmailStep = () => {
       </Typography>
       <TextField
         fullWidth
-        type="email"
+        type="text"
         label="Email/Username"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        value={detail}
+        onChange={(e) => setDetail(e.target.value)}
         variant="outlined"
         sx={{
           input: { color: "white" },
@@ -37,7 +37,7 @@ const EmailStep = () => {
         variant="contained"
         sx={{ mt: 3, bgcolor: "violet" }}
         onClick={handleSubmit}
-        disabled={!email}
+        disabled={!detail}
       >
         Send Code
       </Button>
