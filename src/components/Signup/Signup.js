@@ -746,7 +746,12 @@ const SignUpPage = () => {
           }}
         >
           <Box>
-            <Typography variant="h4" fontWeight="bold" color="violet" gutterBottom>
+            <Typography
+              variant="h4"
+              fontWeight="bold"
+              color="violet"
+              gutterBottom
+            >
               Hi there!
             </Typography>
             <Typography variant="subtitle1" gutterBottom>
