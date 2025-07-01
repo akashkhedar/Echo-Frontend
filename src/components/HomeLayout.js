@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box";
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Flip, ToastContainer } from "react-toastify";
@@ -32,6 +32,8 @@ const HomeLayout = ({ children }) => {
   const currentOpenedChat = useSelector((state) => state.chat.chatId);
   const convo = useSelector((state) => state.convo);
 
+  const [verified, setVerified] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -40,30 +42,29 @@ const HomeLayout = ({ children }) => {
         dispatch(setConversations(res.data));
         const rooms = res.data.map((convo) => convo.roomId);
         socket.emit("joinAllRooms", rooms);
+        setVerified(true);
       } catch (error) {
-        console.log(error);
+        if (error.status === 401) {
+          navigate("/signup");
+        }
       }
     };
 
-    const handleConnect = async () => {
-      await fetchData();
-    };
+    fetchData();
 
     const handleBeforeUnload = () => {
       socket.emit("leaveChat", userId);
     };
 
-    socket.on("connect", handleConnect);
-
     window.addEventListener("beforeunload", handleBeforeUnload);
 
     return () => {
       dispatch(clearChat());
-      socket.off("connect", handleConnect);
+      // socket.off("connect", handleConnect);
       socket.off("leaveChat");
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [dispatch, userId]);
+  }, [dispatch, navigate, userId]);
 
   useEffect(() => {
     socket.on("receiveMsg", (message, username) => {
@@ -153,7 +154,7 @@ const HomeLayout = ({ children }) => {
     };
   });
 
-  return (
+  return verified ? (
     <Box
       sx={{
         display: "grid",
@@ -254,7 +255,7 @@ const HomeLayout = ({ children }) => {
         transition={Flip}
       />
     </Box>
-  );
+  ) : null;
 };
 
 export default HomeLayout;
