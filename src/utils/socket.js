@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-const socket = io("https://echo-backend-4am1.onrender.com", {
+const socket = io("https://api.echo.linkpc.net", {
   transports: ["websocket", "polling"],
 });
 
