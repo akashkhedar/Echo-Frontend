@@ -20,11 +20,11 @@ const ChatList = () => {
   const selectedChat = useSelector((state) => state.chat.chatId);
   useEffect(() => {
     socket.on("userOnline", (userId) => {
-      dispatch(setUserOnline(userId)); // Update Redux/chatList
+      dispatch(setUserOnline(userId));
     });
 
     socket.on("userOffline", (userId) => {
-      dispatch(setUserOffline(userId)); // Update Redux/chatList
+      dispatch(setUserOffline(userId));
     });
 
     return () => {
@@ -37,7 +37,7 @@ const ChatList = () => {
     <Box
       sx={{
         width: "25%",
-        height: "calc(100vh - 4rem)", // Full height for proper scrolling
+        height: "calc(100vh - 4rem)",
         display: "flex",
         flexDirection: "column",
         backgroundColor: "#1E1E2F",

@@ -12,7 +12,7 @@ import XIcon from "@mui/icons-material/X";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 const ShareModal = ({ openShare, closeShareModal, postId }) => {
-  const shareUrl = `https://yourdomain.com/post/${postId}`;
+  const shareUrl = `https://app.echo.linkpc.net/post/${postId}`;
 
   const copyToClipboard = async () => {
     try {

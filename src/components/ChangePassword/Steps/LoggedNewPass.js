@@ -2,7 +2,6 @@ import { Alert, Box, Button, TextField, Typography } from "@mui/material";
 import { useFormik } from "formik";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
 import * as yup from "yup";
 import axiosInstance from "../../../axiosInstance";
 
@@ -25,7 +24,6 @@ const validationSchema = yup.object({
 });
 
 const LoggedNewPass = () => {
-  const { token } = useParams();
   const [mail, setMail] = useState(false);
   const [pass, setPass] = useState(false);
   const [error, setError] = useState(false);

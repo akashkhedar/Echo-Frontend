@@ -5,9 +5,8 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import Avatar from "@mui/material/Avatar";
-import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
-import { IconButton, Typography } from "@mui/material";
+import { IconButton } from "@mui/material";
 import Diversity1OutlinedIcon from "@mui/icons-material/Diversity1Outlined";
 
 const users = [

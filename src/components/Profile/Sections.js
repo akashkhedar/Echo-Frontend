@@ -1,5 +1,4 @@
 import { Box, Button, ButtonGroup, Chip, Typography } from "@mui/material";
-import React from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { selectFollowerCount } from "../../redux/selectors/followerSelector";
@@ -8,7 +7,6 @@ import { selectFollowingCount } from "../../redux/selectors/followingSelector";
 const Sections = () => {
   const followerCount = useSelector(selectFollowerCount);
   const followingCount = useSelector(selectFollowingCount);
-  const user = useSelector((state) => state.user);
   const navigate = useNavigate();
   return (
     <Box

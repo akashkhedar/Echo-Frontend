@@ -44,7 +44,6 @@ const MessageSection = () => {
 
   const [showScrollButton, setShowScrollButton] = useState(false);
 
-  // 📦 Scroll to bottom when component first mounts (like WhatsApp)
   useEffect(() => {
     setTimeout(() => {
       if (outerDiv.current && innerDiv.current) {
@@ -56,10 +55,9 @@ const MessageSection = () => {
         isUserAtBottom.current = true;
         setShowScrollButton(false);
       }
-    }, 0); // Ensure DOM is ready
+    }, 0);
   }, [currentOpenedChat]);
 
-  // 📦 Scroll on new message if at bottom
   useEffect(() => {
     if (!outerDiv.current || !innerDiv.current) return;
 
@@ -84,7 +82,6 @@ const MessageSection = () => {
     }
   }, [chats]);
 
-  // 📦 Track scroll to toggle "new message" button
   useEffect(() => {
     const handleScroll = () => {
       if (!outerDiv.current || !innerDiv.current) return;

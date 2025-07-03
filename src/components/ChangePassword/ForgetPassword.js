@@ -1,10 +1,8 @@
-// ForgetPassword.jsx
 import { Box, Grid, Slide, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
-import SideImg from "../../assets/ForgetPassword.jpg"; // Replace with actual path
-import Gradient from "../../assets/ForgetPasswordGradient.jpg"; // Replace with actual path
+import SideImg from "../../assets/ForgetPassword.jpg";
+import Gradient from "../../assets/ForgetPasswordGradient.jpg";
 import EmailStep from "./Steps/EmailStep";
-import { useState } from "react";
 
 const ForgetPassword = () => {
   return (
@@ -30,7 +28,6 @@ const ForgetPassword = () => {
           border: "2px solid #333",
         }}
       >
-        {/* Left Side */}
         <Grid
           item
           xs={12}
@@ -87,7 +84,6 @@ const ForgetPassword = () => {
           </Box>
         </Grid>
 
-        {/* Right Side */}
         <Grid
           item
           md={6}

@@ -19,7 +19,7 @@ import dayjs from "dayjs";
 import { useFormik } from "formik";
 import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import * as yup from "yup";
 import axiosInstance from "../../axiosInstance";
 import { setUser } from "../../redux/slices/AuthSlice/AuthSlice";
@@ -116,8 +116,8 @@ const profileValidationSchema = yup.object({
 
 const AboutUpdate = ({ open, handleClose, user }) => {
   const [profileImage, setProfileImage] = useState(user.profileImage);
+  // eslint-disable-next-line no-unused-vars
   const [error, setError] = useState(false);
-  const userId = useSelector((state) => state.user._id);
 
   const dispatch = useDispatch();
 

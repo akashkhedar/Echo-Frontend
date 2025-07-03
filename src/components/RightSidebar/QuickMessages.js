@@ -13,7 +13,6 @@ const style = {
   bgcolor: "#1e1e2f",
   boxShadow: 24,
   borderRadius: 2,
-  // p: 2,
   height: 450,
   display: "flex",
   flexDirection: "column",

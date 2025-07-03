@@ -18,7 +18,7 @@ const CommentSection = ({ postId, setCommentCount }) => {
       }
     };
     fetchComments(postId);
-  }, []);
+  }, [postId]);
   return (
     <Box
       sx={{
