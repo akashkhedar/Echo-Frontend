@@ -24,8 +24,8 @@ const LGQuickChat = () => {
       sx={{
         flexShrink: 0,
         "& .MuiDrawer-paper": {
-          height: "calc(100vh - 20.5rem)", // Adjust height to exclude navbar
-          marginTop: "4rem", // Push down to align below navbar
+          height: "calc(100vh - 20.5rem)",
+          marginTop: "4rem",
           width: { md: "4rem", lg: "14rem" },
           borderTopLeftRadius: "8px",
           borderBottomLeftRadius: "8px",
@@ -39,13 +39,15 @@ const LGQuickChat = () => {
         },
       }}
     >
+      {/* Header */}
       <Box
         sx={{
           display: "flex",
-          flexDirection: "key",
+          flexDirection: "row", // ✅ fixed typo from "key"
           alignItems: "center",
           padding: "0.5rem",
           gap: 1,
+          justifyContent: { xs: "center", lg: "flex-start" },
         }}
       >
         <IconButton>
@@ -62,37 +64,55 @@ const LGQuickChat = () => {
             color: "whitesmoke",
             fontWeight: "bold",
             textAlign: "center",
+            display: { xs: "none", lg: "block" },
           }}
         >
           Quick Chat
         </Typography>
       </Box>
-      <List sx={{ overflow: "hidden" }}>
-        {conversations.slice(0.5).map((conversation) => (
-          <UserTabs
-            conversation={conversation}
-            key={conversation._id}
-            handleOpen={handleOpen}
-          />
-        ))}
-        {Array.isArray(conversations) ? (
-          conversations.length > 0 ? (
-            conversations
-              .slice(0, 5)
-              .map((conversation) => (
-                <UserTabs
-                  conversation={conversation}
-                  key={conversation._id}
-                  handleOpen={handleOpen}
-                />
-              ))
+
+      {/* Conversation List */}
+      <Box
+        sx={{
+          height: "100%",
+          p: 1,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: conversations.length > 0 ? "flex-start" : "center",
+          // alignItems: "center",
+        }}
+      >
+        <List
+          sx={{
+            overflowY: "auto",
+            overflowX: "hidden",
+            scrollbarWidth: "none", // Firefox
+            "&::-webkit-scrollbar": {
+              display: "none", // Chrome, Safari, Edge
+            },
+          }}
+        >
+          {Array.isArray(conversations) ? (
+            conversations.length > 0 ? (
+              conversations
+                .slice(0, 5)
+                .map((conversation) => (
+                  <UserTabs
+                    conversation={conversation}
+                    key={conversation._id}
+                    handleOpen={handleOpen}
+                  />
+                ))
+            ) : (
+              <EmptyChatList />
+            )
           ) : (
-            <EmptyChatList />
-          )
-        ) : (
-          <ListLoading />
-        )}
-      </List>
+            <ListLoading />
+          )}
+        </List>
+      </Box>
+
+      {/* Chat Drawer */}
       <QuickMessages open={open} handleClose={handleClose} />
     </Drawer>
   );

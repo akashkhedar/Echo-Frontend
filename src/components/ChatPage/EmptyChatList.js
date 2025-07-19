@@ -1,4 +1,4 @@
-import { Box, Paper } from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
 
 const EmptyChatList = () => {
   return (
@@ -20,15 +20,15 @@ const EmptyChatList = () => {
           textAlign: "center",
           color: "whitesmoke",
           fontWeight: "bold",
-          backgroundColor: "rgb(58, 28, 66)",
+          backgroundColor: "rgba(28, 30, 66, 1)",
           borderRadius: 2,
           opacity: 0.8,
         }}
       >
-        <Box>No Chats</Box>
-        <Box sx={{ fontSize: "0.9rem", fontWeight: "normal", mt: 1 }}>
+        <Typography>No Chats</Typography>
+        <Typography sx={{ fontSize: "0.9rem", fontWeight: "normal", mt: 1 }}>
           Start a new conversation
-        </Box>
+        </Typography>
       </Paper>
     </Box>
   );

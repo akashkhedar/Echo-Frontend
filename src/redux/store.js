@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import storage from "redux-persist/lib/storage";
+import storageSession from "redux-persist/lib/storage/session";
 import AuthSlice from "./slices/AuthSlice/AuthSlice";
 import { persistReducer } from "redux-persist";
 import { combineReducers } from "@reduxjs/toolkit";
@@ -9,7 +9,7 @@ import ConversationSlice from "./slices/ConversationSlice/ConversationSlice";
 const persistConfig = {
   key: "root",
   version: 1,
-  storage,
+  storage: storageSession,
 };
 
 const reducer = combineReducers({

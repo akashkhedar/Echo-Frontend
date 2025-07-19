@@ -47,13 +47,13 @@ const PostCardSkeleton = () => {
         title={
           <Skeleton
             animation="wave"
-            height={10}
+            height={26}
             width="80%"
-            style={{ marginBottom: 6 }}
+            style={{ marginBottom: 1 }}
           />
         }
-        subheader={<Skeleton animation="wave" height={10} width="40%" />}
-        sx={{ paddingY: "0.7rem" }}
+        subheader={<Skeleton animation="wave" height={22} width="40%" />}
+        sx={{ paddingY: "0.3rem" }}
       />
 
       {/* Image */}
@@ -77,20 +77,21 @@ const PostCardSkeleton = () => {
       >
         <Box display="flex" alignItems="center" gap={1}>
           <Skeleton variant="circular" width={24} height={24} />
-          <Skeleton variant="text" width={30} height={10} />
+          <Skeleton variant="text" width={30} height={25} />
           <Skeleton variant="circular" width={24} height={24} />
-          <Skeleton variant="text" width={30} height={10} />
-        </Box>
-        <Box display="flex" alignItems="center" gap={1}>
-          <Skeleton variant="circular" width={24} height={24} />
-          <Skeleton variant="circular" width={24} height={24} />
+          <Skeleton variant="text" width={30} height={25} />
         </Box>
       </CardActions>
 
       {/* Caption */}
       <CardContent sx={{ pt: 1 }}>
-        <Skeleton animation="wave" height={10} style={{ marginBottom: 6 }} />
-        <Skeleton animation="wave" height={10} width="80%" />
+        <Skeleton
+          variant="rounded"
+          animation="wave"
+          height={21}
+          style={{ marginBottom: 6 }}
+        />
+        <Skeleton variant="rounded" animation="wave" height={21} width="80%" />
       </CardContent>
     </Card>
   );

@@ -61,6 +61,7 @@ const ProfileHeader = () => {
             border: "3px solid white",
             zIndex: 1,
             mb: 2.8,
+            bgcolor: "#1e1e2f",
           }}
         />
         <Box

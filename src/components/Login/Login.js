@@ -233,7 +233,19 @@ const LogInPage = () => {
                     color="primary"
                     type="submit"
                     fullWidth
-                    sx={{ textTransform: "none", marginBottom: 2 }}
+                    sx={{
+                      textTransform: "none",
+                      marginBottom: 2,
+                      backgroundColor: "#ad19d2ff",
+                      color: "white",
+                      "&:hover": {
+                        backgroundColor: "#82109eff",
+                      },
+                      "&.Mui-disabled": {
+                        backgroundColor: "rgba(102, 14, 125, 1)", // darker blue when loading
+                        color: "#fff",
+                      },
+                    }}
                     loading={loadingLogin}
                     loadingPosition="end"
                     disabled={loadingLogin}

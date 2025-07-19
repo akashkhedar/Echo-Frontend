@@ -1,6 +1,6 @@
-import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
+import React, { useEffect, useState } from "react";
 import { Box, IconButton, List, Typography } from "@mui/material";
-import React, { useEffect } from "react";
+import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,27 +11,31 @@ import socket from "../../utils/socket";
 import ConversationsList from "./ConversationsList";
 import EmptyChatList from "./EmptyChatList";
 import ListSearch from "./ListSearch";
+import ChatListLoading from "./ChatListLoading";
 
 const ChatList = () => {
   const conversations = useSelector((state) => state.convo);
+  const selectedChat = useSelector((state) => state.chat.chatId);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const selectedChat = useSelector((state) => state.chat.chatId);
-  useEffect(() => {
-    socket.on("userOnline", (userId) => {
-      dispatch(setUserOnline(userId));
-    });
+  const [loading, setLoading] = useState(true);
 
-    socket.on("userOffline", (userId) => {
-      dispatch(setUserOffline(userId));
-    });
+  useEffect(() => {
+    socket.on("userOnline", (userId) => dispatch(setUserOnline(userId)));
+    socket.on("userOffline", (userId) => dispatch(setUserOffline(userId)));
 
     return () => {
       socket.off("userOnline");
       socket.off("userOffline");
     };
-  });
+  }, [dispatch]);
+
+  useEffect(() => {
+    // Simulate loading delay — replace with real loading logic
+    const timer = setTimeout(() => setLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <Box
@@ -58,12 +62,10 @@ const ChatList = () => {
         }}
       >
         <IconButton
-          onClick={() => {
-            navigate("/");
-          }}
+          onClick={() => navigate("/")}
           sx={{
             "&:hover": {
-              background: " #1e1e1f",
+              background: "#1e1e1f",
             },
           }}
         >
@@ -81,19 +83,34 @@ const ChatList = () => {
       <Box
         sx={{
           flexGrow: 1,
-          display: "flex",
           overflowY: "auto",
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-          "-ms-overflow-style": "none",
+          "&::-webkit-scrollbar": { display: "none" },
           "scrollbar-width": "none",
+          msOverflowStyle: "none",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent:
+            !loading && (!conversations || conversations.length === 0)
+              ? "center"
+              : "flex-start",
+          alignItems:
+            !loading && (!conversations || conversations.length === 0)
+              ? "center"
+              : "stretch",
         }}
       >
-        <List>
-          {conversations && conversations.length > 0 ? (
+        <List
+          disablePadding
+          sx={{
+            width: "100%",
+          }}
+        >
+          {loading ? (
+            <ChatListLoading />
+          ) : conversations && conversations.length > 0 ? (
             conversations.map((conversation) => (
               <ConversationsList
+                key={conversation._id}
                 conversation={conversation}
                 selectedChat={selectedChat}
               />

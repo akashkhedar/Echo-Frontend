@@ -301,18 +301,22 @@ const SignUpPage = () => {
                 type="submit"
                 variant="contained"
                 fullWidth
-                sx={{
-                  textTransform: "none",
-                  marginBottom: 2,
-                  backgroundColor: "#1976d2",
-                  color: "white",
-                  "&:hover": {
-                    backgroundColor: "#1565c0",
-                  },
-                }}
                 loading={loadingEmail}
                 loadingPosition="end"
                 disabled={loadingEmail}
+                sx={{
+                  textTransform: "none",
+                  marginBottom: 2,
+                  backgroundColor: "#ad19d2ff",
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: "#82109eff",
+                  },
+                  "&.Mui-disabled": {
+                    backgroundColor: "rgba(102, 14, 125, 1)", // darker blue when loading
+                    color: "#fff",
+                  },
+                }}
               >
                 Continue
               </Button>
@@ -388,10 +392,14 @@ const SignUpPage = () => {
                     sx={{
                       textTransform: "none",
                       marginBottom: 2,
-                      backgroundColor: "#1976d2",
+                      backgroundColor: "#ad19d2ff",
                       color: "white",
                       "&:hover": {
-                        backgroundColor: "#1565c0",
+                        backgroundColor: "#82109eff",
+                      },
+                      "&.Mui-disabled": {
+                        backgroundColor: "rgba(102, 14, 125, 1)", // darker blue when loading
+                        color: "#fff",
                       },
                     }}
                     loading={loadingCode}
@@ -656,10 +664,14 @@ const SignUpPage = () => {
                   component="label"
                   sx={{
                     textTransform: "none",
-                    backgroundColor: "#1976d2",
+                    backgroundColor: "#7f19d2ff",
                     color: "white",
                     "&:hover": {
-                      backgroundColor: "#1565c0",
+                      backgroundColor: "#65109eff",
+                    },
+                    "&.Mui-disabled": {
+                      backgroundColor: "#580e7dff", // darker blue when loading
+                      color: "#fff",
                     },
                   }}
                 >
@@ -731,10 +743,14 @@ const SignUpPage = () => {
                 fullWidth
                 sx={{
                   textTransform: "none",
-                  backgroundColor: "#1976d2",
+                  backgroundColor: "#ad19d2ff",
                   color: "white",
                   "&:hover": {
-                    backgroundColor: "#1565c0",
+                    backgroundColor: "#82109eff",
+                  },
+                  "&.Mui-disabled": {
+                    backgroundColor: "rgba(102, 14, 125, 1)", // darker blue when loading
+                    color: "#fff",
                   },
                 }}
                 loading={loadingProfile}

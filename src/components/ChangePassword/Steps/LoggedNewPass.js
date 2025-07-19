@@ -27,6 +27,7 @@ const LoggedNewPass = () => {
   const [mail, setMail] = useState(false);
   const [pass, setPass] = useState(false);
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -37,6 +38,7 @@ const LoggedNewPass = () => {
     validationSchema,
     onSubmit: async (values) => {
       try {
+        setLoading(true);
         const res = await axiosInstance.post("/auth/update/logged/password", {
           currentPassword: values.currentPassword,
           newPassword: values.password,
@@ -55,6 +57,8 @@ const LoggedNewPass = () => {
         }
       } catch (error) {
         setError(true);
+      } finally {
+        setLoading(false);
       }
     },
   });
@@ -177,17 +181,24 @@ const LoggedNewPass = () => {
 
       <Button
         type="submit"
+        loading={loading}
+        loadingPosition="end"
         variant="contained"
-        disabled={!formik.isValid || !formik.dirty}
+        disabled={(!formik.isValid || !formik.dirty) && loading}
         sx={{
           mt: 4,
           bgcolor: !formik.isValid || !formik.dirty ? "gray" : "violet",
           color: "white",
           fontWeight: "bold",
-          "&.Mui-disabled": {
-            bgcolor: "gray",
-            color: "white",
+          backgroundColor: "#ad19d2ff",
+          "&:hover": {
+            backgroundColor: "#82109eff",
           },
+          "&.Mui-disabled": {
+            backgroundColor: "rgba(102, 14, 125, 1)", // darker blue when loading
+            color: "#fff",
+          },
+
           transition: "background-color 0.3s",
         }}
       >

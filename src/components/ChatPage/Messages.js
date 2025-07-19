@@ -7,6 +7,8 @@ import Message from "./Message";
 import NewMessage from "./NewMessage";
 import QuickChat from "../../assets/QuickChat.jpg";
 import { useLocation } from "react-router-dom";
+import axiosInstance from "../../axiosInstance";
+import LoadingChats from "./LoadingChats";
 
 const MessageContainer = styled(Box)({
   display: "flex",
@@ -38,9 +40,28 @@ const MessageSection = () => {
   });
 
   const dispatch = useDispatch();
-  const chats = useSelector((state) => state.chat.chat);
   const userId = useSelector((state) => state.user._id);
   const currentOpenedChat = useSelector((state) => state.chat.chatId);
+
+  const chatId = useSelector((state) => state.chat.convo._id);
+
+  const [loading, setLoading] = useState(true);
+  const [chats, setChats] = useState([]);
+
+  useEffect(() => {
+    const fetchChats = async () => {
+      try {
+        setLoading(true);
+        const res = await axiosInstance(`/chat/fetch/msg/${chatId}`);
+        dispatch(setChats(res.data));
+      } catch (error) {
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchChats();
+  });
 
   const [showScrollButton, setShowScrollButton] = useState(false);
 
@@ -127,7 +148,11 @@ const MessageSection = () => {
     <div style={{ position: "relative", height: "100%" }}>
       <StyledBox ref={outerDiv}>
         <MessageContainer ref={innerDiv}>
-          {chats.length > 0 ? (
+          {}
+
+          {loading ? (
+            <LoadingChats />
+          ) : chats.length > 0 ? (
             chats.map((msg) => (
               <Message msg={msg} userId={userId} key={msg._id} />
             ))

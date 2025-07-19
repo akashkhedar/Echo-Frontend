@@ -194,8 +194,10 @@ const AboutUpdate = ({ open, handleClose, user }) => {
   });
 
   const [delModal, setDelModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const openDelModal = () => setDelModal(true);
   const closeDelModal = () => setDelModal(false);
+  const handleLoading = () => setLoading(!loading);
 
   return (
     <Modal
@@ -223,7 +225,13 @@ const AboutUpdate = ({ open, handleClose, user }) => {
             >
               Edit Profile
             </Typography>
-            <form onSubmit={formikProfile.handleSubmit}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                formikProfile.handleSubmit();
+                handleLoading();
+              }}
+            >
               {/* Profile Picture Selector */}
               <Box
                 sx={{
@@ -603,12 +611,19 @@ const AboutUpdate = ({ open, handleClose, user }) => {
                 fullWidth
                 sx={{
                   textTransform: "none",
-                  backgroundColor: "secondary.light",
+                  backgroundColor: "#ad19d2ff",
                   color: "white",
                   "&:hover": {
-                    backgroundColor: "rgb(152, 63, 179)",
+                    backgroundColor: "#82109eff",
+                  },
+                  "&.Mui-disabled": {
+                    backgroundColor: "rgba(102, 14, 125, 1)", // darker blue when loading
+                    color: "#fff",
                   },
                 }}
+                loading={loading}
+                loadingPosition="end"
+                disabled={loading}
               >
                 Save Changes
               </Button>

@@ -1,13 +1,11 @@
 import { useDispatch } from "react-redux";
-import { markConversationRead } from "../redux/slices/ConversationSlice/ConversationSlice";
 import {
-  setChat,
-  setRoomId,
   setChatId,
   setChatUserId,
+  setRoomId,
 } from "../redux/slices/ChatSlice/ChatSlice";
+import { markConversationRead } from "../redux/slices/ConversationSlice/ConversationSlice";
 import socket from "../utils/socket";
-import axiosInstance from "../axiosInstance";
 
 const useConversationSelection = () => {
   const dispatch = useDispatch();
@@ -19,8 +17,6 @@ const useConversationSelection = () => {
       dispatch(setChatId(convo._id));
       dispatch(setRoomId(convo.roomId));
       dispatch(setChatUserId(convo.user._id));
-      const res = await axiosInstance(`/chat/fetch/msg/${convo._id}`);
-      dispatch(setChat(res.data));
     } catch (error) {
       console.log(error);
     }

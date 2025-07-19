@@ -1,3 +1,4 @@
+import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
 import { Box, Typography } from "@mui/material";
 
 const EmptyChatList = () => {
@@ -11,19 +12,21 @@ const EmptyChatList = () => {
         alignItems: "center",
         justifyContent: "center",
         color: "#ccc",
+        p: 2,
       }}
     >
       <Box
         sx={{
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
+          textAlign: "center",
         }}
       >
+        <ChatOutlinedIcon sx={{ fontSize: 40, color: "#555", mb: 1 }} />
+
         <Typography variant="h6" fontWeight={500}>
-          Quick chat empty
+          Quick Chat Empty
+        </Typography>
+        <Typography variant="body2" color="#888" mt={1}>
+          Start a conversation to see it here!
         </Typography>
       </Box>
     </Box>
