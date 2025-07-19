@@ -7,6 +7,8 @@ import * as React from "react";
 import { useSelector } from "react-redux";
 import QuickMessages from "./QuickMessages";
 import UserTabs from "./UserTabs";
+import ListLoading from "./ListLoading";
+import EmptyChatList from "./EmptyChatList";
 
 const LGQuickChat = () => {
   const conversations = useSelector((state) => state.convo);
@@ -73,6 +75,23 @@ const LGQuickChat = () => {
             handleOpen={handleOpen}
           />
         ))}
+        {Array.isArray(conversations) ? (
+          conversations.length > 0 ? (
+            conversations
+              .slice(0, 5)
+              .map((conversation) => (
+                <UserTabs
+                  conversation={conversation}
+                  key={conversation._id}
+                  handleOpen={handleOpen}
+                />
+              ))
+          ) : (
+            <EmptyChatList />
+          )
+        ) : (
+          <ListLoading />
+        )}
       </List>
       <QuickMessages open={open} handleClose={handleClose} />
     </Drawer>

@@ -162,6 +162,7 @@ const HomeLayout = ({ children }) => {
         gridTemplateColumns: "auto",
         height: "100vh",
         width: "100vw",
+        background: "#181818",
         "&::-webkit-scrollbar": {
           display: "none",
         },
@@ -175,7 +176,6 @@ const HomeLayout = ({ children }) => {
         sx={{
           gridRow: "1 / 2",
           gridColumn: "1 / 2",
-          background: "#181818",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

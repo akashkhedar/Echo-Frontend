@@ -21,7 +21,6 @@ import SignupImg from "../../assets/Signup.jpg";
 import axiosInstance from "../../axiosInstance";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import Gradient from "../../assets/SignupGradient.png";
 import imageCompression from "browser-image-compression";
 import { setUser } from "../../redux/slices/AuthSlice/AuthSlice";
 import { useDispatch } from "react-redux";
@@ -221,8 +220,27 @@ const SignUpPage = () => {
   };
 
   const handleBack = () => {
+    handleEmailSubmit();
     setDirection("right");
     setActiveStep((prev) => prev - 1);
+  };
+
+  const [loadingEmail, setLoadingEmail] = useState(false);
+
+  const handleEmailSubmit = () => {
+    setLoadingEmail(!loadingEmail);
+  };
+
+  const [loadingCode, setLoadingCode] = useState(false);
+
+  const handleCodeSubmit = () => {
+    setLoadingCode(true);
+  };
+
+  const [loadingProfile, setLoadingProfile] = useState(false);
+
+  const handleProfileSubmit = () => {
+    setLoadingProfile(true);
   };
 
   const renderForm = () => {
@@ -230,7 +248,13 @@ const SignUpPage = () => {
       case 0:
         return (
           <>
-            <form onSubmit={formikEmail.handleSubmit}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                formikEmail.handleSubmit();
+                handleEmailSubmit();
+              }}
+            >
               <Box mb={3} sx={{ height: "3vh" }}>
                 {error && (
                   <Alert severity="error">Email Already Registered!</Alert>
@@ -274,7 +298,7 @@ const SignUpPage = () => {
                 }}
               />
               <Button
-                type="submit" // This makes the button submit the form
+                type="submit"
                 variant="contained"
                 fullWidth
                 sx={{
@@ -286,6 +310,9 @@ const SignUpPage = () => {
                     backgroundColor: "#1565c0",
                   },
                 }}
+                loading={loadingEmail}
+                loadingPosition="end"
+                disabled={loadingEmail}
               >
                 Continue
               </Button>
@@ -295,7 +322,13 @@ const SignUpPage = () => {
       case 1:
         return (
           <>
-            <form onSubmit={formikCode.handleSubmit}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                formikCode.handleSubmit();
+                handleCodeSubmit();
+              }}
+            >
               <Box mb={3} sx={{ height: "3vh" }}>
                 {error && <Alert severity="error">Invalid Code!</Alert>}
               </Box>
@@ -361,6 +394,9 @@ const SignUpPage = () => {
                         backgroundColor: "#1565c0",
                       },
                     }}
+                    loading={loadingCode}
+                    loadingPosition="end"
+                    disabled={loadingCode}
                   >
                     Verify
                   </Button>
@@ -372,7 +408,13 @@ const SignUpPage = () => {
       case 2:
         return (
           <>
-            <form onSubmit={formikProfile.handleSubmit}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                formikProfile.handleSubmit();
+                handleProfileSubmit();
+              }}
+            >
               <TextField
                 label="Password"
                 type="password"
@@ -695,6 +737,9 @@ const SignUpPage = () => {
                     backgroundColor: "#1565c0",
                   },
                 }}
+                loading={loadingProfile}
+                loadingPosition="end"
+                disabled={loadingProfile}
               >
                 Complete Sign Up
               </Button>
@@ -714,7 +759,11 @@ const SignUpPage = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundImage: `url(${Gradient})`,
+        backgroundImage: `
+      linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+      linear-gradient(to left top, #7731a8ff, #454fae, #0060ae, #025480ff, #015d79ff, #006c8a, #006680, #004c5fff, #023a51ff, #123150ff, #202449, #2d0f45ff)
+    `,
+        backgroundBlendMode: "darken",
         backgroundSize: "cover",
         color: "white",
       }}

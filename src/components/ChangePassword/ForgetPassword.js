@@ -1,7 +1,6 @@
 import { Box, Grid, Slide, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import SideImg from "../../assets/ForgetPassword.jpg";
-import Gradient from "../../assets/ForgetPasswordGradient.jpg";
 import EmailStep from "./Steps/EmailStep";
 
 const ForgetPassword = () => {
@@ -12,7 +11,8 @@ const ForgetPassword = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundImage: `url(${Gradient})`,
+        backgroundImage:
+          "linear-gradient(to right bottom, #121319, #181b25, #1e2231, #25293e, #2b314b, #2b3351, #2b3456, #2b365c, #24315b, #1d2d5a, #142859, #072458)",
         backgroundSize: "cover",
         color: "white",
       }}

@@ -3,6 +3,8 @@ import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../axiosInstance";
 import PostCard from "./PostCard";
+import PostLoading from "./PostLoading";
+import NoPostsBox from "./NoPostsBox";
 
 const Post = () => {
   const navigate = useNavigate();
@@ -33,9 +35,15 @@ const Post = () => {
         marginTop: -0.6,
       }}
     >
-      {posts.map((post) => (
-        <PostCard key={post._id} post={post} /> // Render each post
-      ))}
+      {Array.isArray(posts) ? (
+        posts.length > 0 ? (
+          posts.map((post) => <PostCard key={post._id} post={post} />)
+        ) : (
+          <NoPostsBox />
+        )
+      ) : (
+        <PostLoading />
+      )}
     </Box>
   );
 };

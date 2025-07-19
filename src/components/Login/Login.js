@@ -8,12 +8,11 @@ import {
   Typography,
 } from "@mui/material";
 import { useFormik } from "formik";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import LoginImg from "../../assets/Login.jpg";
-import LoginGradient from "../../assets/LoginGradient.png";
 import axiosInstance from "../../axiosInstance";
 import { setUser } from "../../redux/slices/AuthSlice/AuthSlice";
 
@@ -24,6 +23,7 @@ const validationSchema = yup.object({
 
 const LogInPage = () => {
   const [error, setError] = useState(false);
+  const [loadingLogin, setLoadingLogin] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { values, errors, touched, handleBlur, handleSubmit, handleChange } =
@@ -51,11 +51,17 @@ const LogInPage = () => {
         }
       },
     });
+
+  const handleLoginSubmit = () => {
+    setLoadingLogin(!loadingLogin);
+  };
+
   return (
     <Box
       sx={{
         height: "100vh",
-        backgroundImage: `url(${LoginGradient})`,
+        backgroundImage:
+          "linear-gradient(to left top, #5f604a, #4f5a48, #425347, #384b46, #314343, #2c3e41, #293a3f, #26353c, #22323c, #202f3d, #1f2c3d, #20283c)",
         backgroundSize: "cover",
         display: "flex",
         alignItems: "center",
@@ -129,7 +135,13 @@ const LogInPage = () => {
               "scrollbar-width": "none",
             }}
           >
-            <form onSubmit={handleSubmit}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmit();
+                handleLoginSubmit();
+              }}
+            >
               <Slide direction={"right"} in={true} mountOnEnter unmountOnExit>
                 <Box>
                   <TextField
@@ -222,6 +234,9 @@ const LogInPage = () => {
                     type="submit"
                     fullWidth
                     sx={{ textTransform: "none", marginBottom: 2 }}
+                    loading={loadingLogin}
+                    loadingPosition="end"
+                    disabled={loadingLogin}
                   >
                     Login
                   </Button>

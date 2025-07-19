@@ -8,6 +8,8 @@ import Avatar from "@mui/material/Avatar";
 import Divider from "@mui/material/Divider";
 import { IconButton } from "@mui/material";
 import Diversity1OutlinedIcon from "@mui/icons-material/Diversity1Outlined";
+import EmptyChatList from "./EmptyChatList";
+import ListLoading from "./ListLoading";
 
 const users = [
   { name: "John Doe", avatar: "https://i.pravatar.cc/150?img=1" },
@@ -59,18 +61,29 @@ const MDQuickChat = () => {
         </IconButton>
       </Box>
       <List sx={{ overflow: "hidden" }}>
-        {users.map((user, index) => (
-          <React.Fragment key={index}>
-            <ListItem disablePadding sx={{ marginY: "0.5rem" }}>
-              <ListItemButton sx={{ display: "flex", gap: 2 }}>
-                <Avatar src={user.avatar} alt={user.name} />
-              </ListItemButton>
-            </ListItem>
-            {index !== users.length - 1 && (
-              <Divider variant="middle" sx={{ bgcolor: "secondary.light" }} />
-            )}
-          </React.Fragment>
-        ))}
+        {users ? (
+          users.length > 0 ? (
+            users.map((user, index) => (
+              <React.Fragment key={index}>
+                <ListItem disablePadding sx={{ marginY: "0.5rem" }}>
+                  <ListItemButton sx={{ display: "flex", gap: 2 }}>
+                    <Avatar src={user.avatar} alt={user.name} />
+                  </ListItemButton>
+                </ListItem>
+                {index !== users.length - 1 && (
+                  <Divider
+                    variant="middle"
+                    sx={{ bgcolor: "secondary.light" }}
+                  />
+                )}
+              </React.Fragment>
+            ))
+          ) : (
+            <ListLoading />
+          )
+        ) : (
+          <EmptyChatList />
+        )}
       </List>
     </Drawer>
   );
