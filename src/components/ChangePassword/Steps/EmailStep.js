@@ -3,13 +3,19 @@ import axiosInstance from "../../../axiosInstance";
 import { useState } from "react";
 
 const EmailStep = () => {
+  const [loading, setLoading] = useState(false);
   const [detail, setDetail] = useState("");
   const handleSubmit = async () => {
     try {
+      setLoading(true);
       await axiosInstance.post("/auth/forget-password", {
         userInfo: detail,
       });
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      setLoading(false);
+      setDetail("");
+    }
   };
   return (
     <Box>
@@ -35,9 +41,23 @@ const EmailStep = () => {
       />
       <Button
         variant="contained"
-        sx={{ mt: 3, bgcolor: "violet" }}
+        sx={{
+          mt: 3,
+          bgcolor: "violet",
+          "&.Mui-disabled": {
+            backgroundColor: "rgba(102, 14, 125, 1)", // darker blue when loading
+            color: "#fff",
+          },
+          backgroundColor: "#ad19d2ff",
+          color: "white",
+          "&:hover": {
+            backgroundColor: "#82109eff",
+          },
+        }}
         onClick={handleSubmit}
-        disabled={!detail}
+        disabled={!detail && !loading}
+        loading={loading}
+        loadingPosition="end"
       >
         Send Code
       </Button>

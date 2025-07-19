@@ -83,6 +83,7 @@ const LogInPage = () => {
           item
           md={6}
           sx={{
+            bgcolor: "#191919",
             display: { xs: "none", md: "block" },
             backgroundImage: `url(${LoginImg})`,
             backgroundSize: "cover",

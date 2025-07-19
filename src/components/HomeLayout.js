@@ -60,7 +60,6 @@ const HomeLayout = ({ children }) => {
 
     return () => {
       dispatch(clearChat());
-      // socket.off("connect", handleConnect);
       socket.off("leaveChat");
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };

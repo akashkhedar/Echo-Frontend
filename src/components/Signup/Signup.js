@@ -91,7 +91,10 @@ const profileValidationSchema = yup.object({
     .required("Profile Picture is required")
     .test("fileType", "Unsupported file format", (value) => {
       return (
-        value && ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
+        value &&
+        ["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(
+          value.type
+        )
       );
     }),
 });
@@ -894,6 +897,7 @@ const SignUpPage = () => {
           item
           md={6}
           sx={{
+            bgcolor: "#191919",
             display: { xs: "none", md: "block" },
             backgroundImage: `url(${SignupImg})`,
 

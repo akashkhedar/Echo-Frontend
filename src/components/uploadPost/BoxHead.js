@@ -19,9 +19,9 @@ const BoxHead = ({ handleClose }) => {
       <IconButton
         sx={{
           backgroundColor: "rgb(25, 25, 23)",
-          height: "3rem",
-          width: "3rem",
-          marginTop: 1,
+          height: { xs: "2.5rem", sm: "2.7rem" },
+          width: { xs: "2.5rem", sm: "2.7rem" },
+          mt: 1,
           color: "rgb(100, 100, 107)",
           "&:hover": {
             backgroundColor: "rgb(21, 21, 24)",

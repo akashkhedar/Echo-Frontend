@@ -9,10 +9,9 @@ export default function PostCreator({ about, setAbout }) {
         backgroundColor: "rgb(25, 24, 24)",
         border: "1px solid rgb(62, 46, 62)",
         borderRadius: 2,
-        p: 3,
+        p: { xs: 2, sm: 3 },
         color: "whitesmoke",
-        overflow: "hidden",
-        position: "relative",
+        overflowY: "auto",
       }}
     >
       <Typography variant="h5" gutterBottom fontWeight={700} mb={2}>

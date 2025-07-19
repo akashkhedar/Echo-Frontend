@@ -23,14 +23,15 @@ const UploadPost = ({ open, handleClose }) => {
       <Fade in={open}>
         <Box
           sx={{
-            height: "100vh",
-            width: "100vw",
-            background: "rgba(26, 12, 12, 0.2)",
+            height: "100dvh",
+            width: "100dvw",
+            backgroundColor: "rgba(26, 12, 12, 0.2)",
             backdropFilter: "blur(10px)",
-            " -webkit-backdrop-filter": "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            px: 2, // add padding for smaller devices
           }}
         >
           <UploadBox handleClose={handleClose} />

@@ -86,7 +86,7 @@ const UserList = ({ key, user, setFollowers = null, setFollowing = null }) => {
           <Avatar
             src={user.profileImage}
             {...bindHover(popupState)}
-            sx={{ cursor: "pointer" }}
+            sx={{ cursor: "pointer", bgcolor: "#303049ff" }}
             onClick={() => navigate(`/${user.username}`)}
           />
 

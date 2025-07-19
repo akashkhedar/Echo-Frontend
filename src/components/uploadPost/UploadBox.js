@@ -9,6 +9,7 @@ import axiosInstance from "../../axiosInstance";
 
 const UploadBox = ({ handleClose }) => {
   const [step, setStep] = useState(0);
+  const [loading, setLoading] = useState(false);
   const forward = () => {
     setStep((prev) => prev + 1);
   };
@@ -29,6 +30,7 @@ const UploadBox = ({ handleClose }) => {
   });
 
   const handlePost = async () => {
+    setLoading(true);
     const ratio = file.ratio;
     const croppedImage = file.croppedImage;
     if (!croppedImage) {
@@ -60,36 +62,44 @@ const UploadBox = ({ handleClose }) => {
       handleClose();
     } catch (error) {
       console.error("Error uploading image:", error);
+    } finally {
+      setLoading(false);
     }
   };
   return (
     <Box
       sx={{
-        height: "90%",
-        width: { xs: "100%", md: "60%", lg: "50%", xl: "40%" },
+        width: {
+          xs: "100%", // mobile
+          sm: "95%", // small tablets
+          md: "70%",
+          lg: "55%",
+          xl: "40%",
+        },
+        height: {
+          xs: "95%",
+          md: "90%",
+        },
+        overflowY: "auto", // support scroll on small devices
         backgroundColor: "rgb(32, 32, 40)",
         borderRadius: 3,
         display: "flex",
-        alignItems: "center",
         flexDirection: "column",
-        justifyContent: "center",
-        pt: 0.8,
-        px: 2,
-        pb: 1.5,
+        justifyContent: "space-between",
+        py: 2,
+        px: { xs: 2, sm: 3 },
       }}
     >
-      <Box sx={{ mb: 3, width: "100%" }}>
+      <Box sx={{ mb: 2, width: "100%" }}>
         <BoxHead handleClose={handleClose} />
       </Box>
       <Box
         sx={{
-          width: "min(80vw, 80vh)",
-          height: "min(80vw, 80vh)",
+          width: "100%",
+          flex: 1,
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "black",
-          borderRadius: 2,
         }}
       >
         {step === 0 ? (
@@ -107,6 +117,7 @@ const UploadBox = ({ handleClose }) => {
           backward={backward}
           step={step}
           handlePost={handlePost}
+          loading={loading}
         />
       </Box>
     </Box>

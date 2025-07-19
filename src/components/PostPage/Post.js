@@ -14,6 +14,7 @@ const Post = () => {
     const getPost = async () => {
       try {
         const userPosts = await axiosInstance.get("/post/feed"); // Fetch posts
+        console.log(userPosts);
         setPosts(userPosts.data.data);
       } catch (error) {
         navigate("/signup");

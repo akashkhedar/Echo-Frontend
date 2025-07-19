@@ -1,8 +1,7 @@
-import { Box, Typography, Avatar, IconButton } from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
-import PersonRemoveAlt1Icon from "@mui/icons-material/PersonRemoveAlt1";
+import { Box, Typography } from "@mui/material";
 import axiosInstance from "../../axiosInstance";
 import socket from "../../utils/socket";
+import SearchList from "./SearchList";
 
 const SearchDropdown = ({ results, isOpen, userId }) => {
   if (!isOpen) return null;
@@ -10,6 +9,12 @@ const SearchDropdown = ({ results, isOpen, userId }) => {
   const handleFollow = async (id) => {
     try {
       await axiosInstance.put(`/user/follow/${id}`);
+    } catch (error) {}
+  };
+
+  const handleUnfollow = async (id) => {
+    try {
+      await axiosInstance.put(`/user/unfollow/${id}`);
     } catch (error) {}
   };
 
@@ -43,46 +48,11 @@ const SearchDropdown = ({ results, isOpen, userId }) => {
         </Typography>
       ) : (
         results.map((user) => (
-          <Box
-            // onClick={() => {
-            //   navigate(`/profile/${user.username}`);
-            // }}
-            key={user._id}
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 2,
-              p: 1.5,
-              borderBottom: "1px solid #2a2a2a",
-              "&:hover": { backgroundColor: "#1e1e1e", cursor: "pointer" },
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 2,
-              }}
-            >
-              <Avatar src={user.profileImage} alt={user.username} />
-
-              <Box>
-                <Typography color="whitesmoke">{user.username}</Typography>
-                <Typography color="gray" fontSize="0.8rem">
-                  {user.fullname}
-                </Typography>
-              </Box>
-            </Box>
-            <Box>
-              <IconButton onClick={() => handleMessage(user._id)}>
-                <SendIcon sx={{ color: "whitesmoke" }} />
-              </IconButton>
-              <IconButton onClick={() => handleFollow(user._id)}>
-                <PersonRemoveAlt1Icon sx={{ color: "whitesmoke" }} />
-              </IconButton>
-            </Box>
-          </Box>
+          <SearchList
+            user={user}
+            handleFollow={handleFollow}
+            handleMessage={handleMessage}
+          />
         ))
       )}
     </Box>

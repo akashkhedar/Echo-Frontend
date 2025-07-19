@@ -4,9 +4,16 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import PhotoSizeSelectActualRoundedIcon from "@mui/icons-material/PhotoSizeSelectActualRounded";
 import { Button, Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import React from "react";
 
-const Controls = ({ forward, backward, file, setFile, step, handlePost }) => {
+const Controls = ({
+  forward,
+  backward,
+  file,
+  setFile,
+  step,
+  handlePost,
+  loading,
+}) => {
   const handleFile = (e) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
@@ -22,8 +29,9 @@ const Controls = ({ forward, backward, file, setFile, step, handlePost }) => {
       sx={{
         width: "100%",
         display: "flex",
-        flexDirection: "row",
+        flexDirection: { xs: "column", sm: "row" },
         justifyContent: "space-between",
+        gap: 2,
         mt: 2,
       }}
     >
@@ -39,6 +47,8 @@ const Controls = ({ forward, backward, file, setFile, step, handlePost }) => {
           <Button
             variant="contained"
             color="primary"
+            fullWidth={true} // for xs screens
+            sx={{ minWidth: "unset" }} // override MUI default
             component="span"
             startIcon={<PhotoSizeSelectActualRoundedIcon />}
           >
@@ -50,6 +60,8 @@ const Controls = ({ forward, backward, file, setFile, step, handlePost }) => {
       ) : (
         <Button
           variant="contained"
+          fullWidth={true} // for xs screens
+          sx={{ minWidth: "unset" }} // override MUI default
           color="success"
           onClick={backward}
           startIcon={<ArrowBackIcon />}
@@ -66,6 +78,8 @@ const Controls = ({ forward, backward, file, setFile, step, handlePost }) => {
           onClick={forward}
           disabled={!file.file}
           endIcon={<ArrowForwardIcon />}
+          fullWidth={true} // for xs screens
+          sx={{ minWidth: "unset" }} // override MUI default
         >
           <Typography
             variant="body1"
@@ -80,8 +94,23 @@ const Controls = ({ forward, backward, file, setFile, step, handlePost }) => {
           variant="contained"
           color="secondary"
           onClick={handlePost}
-          disabled={!file.file}
+          disabled={!file.file && loading}
+          fullWidth={true} // for xs screens
           startIcon={<CheckCircleRoundedIcon />}
+          sx={{
+            backgroundColor: "#ad19d2ff",
+            color: "white",
+            "&:hover": {
+              backgroundColor: "#82109eff",
+            },
+            "&.Mui-disabled": {
+              backgroundColor: "rgba(102, 14, 125, 1)", // darker blue when loading
+              color: "#fff",
+            },
+            minWidth: "unset",
+          }}
+          loading={loading}
+          loadingPosition="end"
         >
           <Typography
             variant="body1"

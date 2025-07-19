@@ -125,15 +125,16 @@ const ImageCropper = ({ file, setFile }) => {
     <Box
       sx={{
         width: "100%",
+        maxWidth: "100%",
         height: "100%",
         display: "flex",
-        alignItems: "center",
         justifyContent: "center",
+        alignItems: "center",
         backgroundColor: "rgb(25, 24, 24)",
         border: "1px solid rgb(62, 46, 62)",
         borderRadius: 2,
-        overflow: "hidden",
         position: "relative",
+        overflow: "hidden",
       }}
     >
       {file.file.length > 0 ? (
@@ -177,8 +178,8 @@ const ImageCropper = ({ file, setFile }) => {
                 alt="Crop Preview"
                 onLoad={handleImageLoad}
                 style={{
-                  maxHeight: "74.4vh",
-                  display: "block",
+                  maxHeight: "60vh",
+                  maxWidth: "100%",
                   objectFit: "contain",
                 }}
               />
