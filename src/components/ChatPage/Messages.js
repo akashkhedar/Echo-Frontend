@@ -1,7 +1,10 @@
 import { Box, styled } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { markMessageRead } from "../../redux/slices/ChatSlice/ChatSlice";
+import {
+  markMessageRead,
+  setChat,
+} from "../../redux/slices/ChatSlice/ChatSlice";
 import socket from "../../utils/socket";
 import Message from "./Message";
 import NewMessage from "./NewMessage";
@@ -28,42 +31,40 @@ const MessageSection = () => {
   });
 
   const StyledBox = styled(Box)({
-    padding: "16px",
-    display: "flex",
-    flexDirection: "column",
+    padding: "12px",
     height: "100%",
     overflowY: "auto",
     flexGrow: 1,
     "&::-webkit-scrollbar": { display: "none" },
     scrollbarWidth: "none",
+
+    display: "flex",
+    flexDirection: "column",
     "-ms-overflow-style": "none",
   });
 
   const dispatch = useDispatch();
   const userId = useSelector((state) => state.user._id);
+  const chats = useSelector((state) => state.chat.chat);
   const currentOpenedChat = useSelector((state) => state.chat.chatId);
 
-  const chatId = useSelector((state) => state.chat.convo._id);
-
   const [loading, setLoading] = useState(true);
-  const [chats, setChats] = useState([]);
 
   useEffect(() => {
     const fetchChats = async () => {
       try {
         setLoading(true);
-        const res = await axiosInstance(`/chat/fetch/msg/${chatId}`);
-        dispatch(setChats(res.data));
+        const res = await axiosInstance(`/chat/fetch/msg/${currentOpenedChat}`);
+        dispatch(setChat(res.data));
       } catch (error) {
+        setLoading(false);
       } finally {
         setLoading(false);
       }
     };
 
     fetchChats();
-  });
-
-  const [showScrollButton, setShowScrollButton] = useState(false);
+  }, [currentOpenedChat, dispatch]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -74,7 +75,6 @@ const MessageSection = () => {
           behavior: "auto",
         });
         isUserAtBottom.current = true;
-        setShowScrollButton(false);
       }
     }, 0);
   }, [currentOpenedChat]);
@@ -92,14 +92,12 @@ const MessageSection = () => {
     isUserAtBottom.current = nearBottom;
 
     if (nearBottom) {
-      setShowScrollButton(false);
       outerDiv.current.scrollTo({
         top: innerDivHeight - outerDivHeight + 30,
         left: 0,
         behavior: "smooth",
       });
     } else {
-      setShowScrollButton(true);
     }
   }, [chats]);
 
@@ -115,8 +113,6 @@ const MessageSection = () => {
         outerDivScrollTop >= innerDivHeight - outerDivHeight - 100;
 
       isUserAtBottom.current = nearBottom;
-
-      if (nearBottom) setShowScrollButton(false);
     };
 
     const scrollBox = outerDiv.current;
@@ -133,23 +129,10 @@ const MessageSection = () => {
     return () => socket.off("receiverRead", handleMessageRead);
   }, [dispatch]);
 
-  const handleScrollToBottom = () => {
-    if (outerDiv.current && innerDiv.current) {
-      outerDiv.current.scrollTo({
-        top: innerDiv.current.scrollHeight,
-        left: 0,
-        behavior: "smooth",
-      });
-      setShowScrollButton(false);
-    }
-  };
-
   return (
     <div style={{ position: "relative", height: "100%" }}>
       <StyledBox ref={outerDiv}>
         <MessageContainer ref={innerDiv}>
-          {}
-
           {loading ? (
             <LoadingChats />
           ) : chats.length > 0 ? (
@@ -161,33 +144,6 @@ const MessageSection = () => {
           )}
         </MessageContainer>
       </StyledBox>
-
-      {showScrollButton && (
-        <Box
-          onClick={handleScrollToBottom}
-          sx={{
-            position: "absolute",
-            bottom: 90,
-            left: "50%",
-            transform: "translateX(-50%)",
-            backgroundColor: "#2e2e48",
-            color: "white",
-            px: 2,
-            py: 1,
-            borderRadius: 5,
-            boxShadow: 3,
-            cursor: "pointer",
-            fontSize: "0.9rem",
-            transition: "all 0.3s ease-in-out",
-            zIndex: 10,
-            "&:hover": {
-              backgroundColor: "#3b3b59",
-            },
-          }}
-        >
-          New Message
-        </Box>
-      )}
     </div>
   );
 };

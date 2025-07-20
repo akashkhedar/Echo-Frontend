@@ -10,12 +10,13 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 550,
+  height: 450,
   bgcolor: "#1e1e2f",
   boxShadow: 24,
   borderRadius: 2,
-  height: 450,
   display: "flex",
   flexDirection: "column",
+  overflow: "hidden", // Ensures no extra scroll
 };
 
 const QuickMessages = ({ open, handleClose }) => {
@@ -30,8 +31,21 @@ const QuickMessages = ({ open, handleClose }) => {
       <Fade in={open}>
         <Box sx={style}>
           <ChatHeader />
-          <Messages />
-          <ChatInput />
+
+          <Box sx={{ flex: 1, overflowY: "auto" }}>
+            <Messages />
+          </Box>
+
+          <Box
+            sx={{
+              borderTop: "1px solid #333",
+              padding: "8px 12px",
+              bgcolor: "#1e1e2f",
+              flexShrink: 0,
+            }}
+          >
+            <ChatInput />
+          </Box>
         </Box>
       </Fade>
     </Modal>

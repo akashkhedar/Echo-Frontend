@@ -3,18 +3,29 @@ import axiosInstance from "../../axiosInstance";
 import socket from "../../utils/socket";
 import SearchList from "./SearchList";
 
-const SearchDropdown = ({ results, isOpen, userId }) => {
+const SearchDropdown = ({
+  results,
+  isOpen,
+  userId,
+  dropdownRef,
+  setOpenDropdown,
+  setSearchInput,
+}) => {
   if (!isOpen) return null;
 
   const handleFollow = async (id) => {
     try {
       await axiosInstance.put(`/user/follow/${id}`);
+      setOpenDropdown(false);
+      setSearchInput("");
     } catch (error) {}
   };
 
   const handleUnfollow = async (id) => {
     try {
       await axiosInstance.put(`/user/unfollow/${id}`);
+      setOpenDropdown(false);
+      setSearchInput("");
     } catch (error) {}
   };
 
@@ -23,13 +34,16 @@ const SearchDropdown = ({ results, isOpen, userId }) => {
       sender: userId,
       receiver: id,
     });
+    setOpenDropdown(false);
+    setSearchInput("");
   };
 
   return (
     <Box
+      ref={dropdownRef} // 🔴 Add ref here
       sx={{
         position: "absolute",
-        top: "3.5rem", // adjust based on your navbar height
+        top: "3.5rem",
         left: "50%",
         transform: "translateX(-43.5%)",
         width: "100%",
@@ -49,9 +63,11 @@ const SearchDropdown = ({ results, isOpen, userId }) => {
       ) : (
         results.map((user) => (
           <SearchList
+            key={user._id}
             user={user}
             handleFollow={handleFollow}
             handleMessage={handleMessage}
+            handleUnfollow={handleUnfollow}
           />
         ))
       )}

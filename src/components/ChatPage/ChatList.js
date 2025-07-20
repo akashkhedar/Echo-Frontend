@@ -12,9 +12,10 @@ import ConversationsList from "./ConversationsList";
 import EmptyChatList from "./EmptyChatList";
 import ListSearch from "./ListSearch";
 import ChatListLoading from "./ChatListLoading";
+import { selectConversations } from "../../redux/selectors/unreadSelector";
 
 const ChatList = () => {
-  const conversations = useSelector((state) => state.convo);
+  const conversations = useSelector(selectConversations);
   const selectedChat = useSelector((state) => state.chat.chatId);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -40,13 +41,13 @@ const ChatList = () => {
   return (
     <Box
       sx={{
-        width: "25%",
-        height: "calc(100vh - 4rem)",
+        width: { xs: "100%", sm: "30%", md: "25%" }, // Full width on small screens
+        height: { xs: "40vh", sm: "auto" },
+        borderRight: { sm: "2px solid rgb(51, 51, 71)" },
+        backgroundColor: "#1E1E2F",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: "#1E1E2F",
         color: "whitesmoke",
-        borderRight: "2px solid rgb(51, 51, 71)",
       }}
     >
       {/* Header */}

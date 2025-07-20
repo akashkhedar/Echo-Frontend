@@ -3,9 +3,22 @@ import PersonRemoveAlt1Icon from "@mui/icons-material/PersonRemoveAlt1";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import SendIcon from "@mui/icons-material/Send";
 import { useSelector } from "react-redux";
+import { useState } from "react";
 
-const SearchList = ({ user, handleMessage, handleFollow }) => {
+const SearchList = ({ user, handleMessage, handleFollow, handleUnfollow }) => {
   const follower = useSelector((state) => state.user.follower);
+  const [inList, setinList] = useState(follower.includes(user._id));
+
+  const handleButton = () => {
+    setinList(!inList);
+    if (inList) {
+      handleUnfollow(user._id);
+      follower.filter((u) => (u._id = user._id));
+    } else {
+      handleFollow(user._id);
+    }
+  };
+
   return (
     <Box
       key={user._id}
@@ -39,12 +52,12 @@ const SearchList = ({ user, handleMessage, handleFollow }) => {
         <IconButton onClick={() => handleMessage(user._id)}>
           <SendIcon sx={{ color: "whitesmoke" }} />
         </IconButton>
-        {follower.includes(user._id) ? (
-          <IconButton onClick={() => handleFollow(user._id)}>
+        {inList ? (
+          <IconButton onClick={handleButton}>
             <PersonRemoveAlt1Icon sx={{ color: "red" }} />
           </IconButton>
         ) : (
-          <IconButton onClick={() => handleFollow(user._id)}>
+          <IconButton onClick={handleButton}>
             <PersonAddAlt1Icon sx={{ color: "green" }} />
           </IconButton>
         )}

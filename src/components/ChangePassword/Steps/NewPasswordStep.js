@@ -3,6 +3,7 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import axiosInstance from "../../../axiosInstance";
 import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
 
 const passwordValidation = yup
   .string()
@@ -22,6 +23,8 @@ const validationSchema = yup.object({
 });
 
 const NewPasswordStep = ({ setError }) => {
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const { token } = useParams();
 
@@ -33,6 +36,7 @@ const NewPasswordStep = ({ setError }) => {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
+        setLoading(true);
         const res = await axiosInstance.post(`/auth/update-password/${token}`, {
           newPassword: formik.values.password,
         });
@@ -41,6 +45,7 @@ const NewPasswordStep = ({ setError }) => {
         }
       } catch (error) {
         setError(true);
+        setLoading(false);
       }
     },
   });
@@ -105,15 +110,25 @@ const NewPasswordStep = ({ setError }) => {
       <Button
         type="submit"
         variant="contained"
-        disabled={!formik.isValid || !formik.dirty}
+        disabled={(!formik.isValid || !formik.dirty) && !loading}
         sx={{
           mt: 3,
           bgcolor: !formik.isValid || !formik.dirty ? "gray" : "violet",
           "&.Mui-disabled": {
             bgcolor: "gray",
             color: "white",
+            "&.Mui-disabled": {
+              backgroundColor: "rgba(102, 14, 125, 1)", // darker blue when loading
+              color: "#fff",
+            },
+            backgroundColor: "#ad19d2ff",
+            "&:hover": {
+              backgroundColor: "#82109eff",
+            },
           },
         }}
+        loading={loading}
+        loadingPosition="end"
       >
         Reset Password
       </Button>

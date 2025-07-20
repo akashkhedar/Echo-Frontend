@@ -35,6 +35,7 @@ const LogInPage = () => {
       validationSchema: validationSchema,
       onSubmit: async (values) => {
         try {
+          setLoadingLogin(true);
           const res = await axiosInstance.post("/auth/login", {
             user: values.user,
             userPassword: values.password,
@@ -48,13 +49,10 @@ const LogInPage = () => {
           setTimeout(() => {
             setError(false);
           }, 2000);
+          setLoadingLogin(false);
         }
       },
     });
-
-  const handleLoginSubmit = () => {
-    setLoadingLogin(!loadingLogin);
-  };
 
   return (
     <Box
@@ -136,13 +134,7 @@ const LogInPage = () => {
               "scrollbar-width": "none",
             }}
           >
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSubmit();
-                handleLoginSubmit();
-              }}
-            >
+            <form onSubmit={handleSubmit}>
               <Slide direction={"right"} in={true} mountOnEnter unmountOnExit>
                 <Box>
                   <TextField

@@ -20,12 +20,12 @@ const LoadingChats = () => {
               gap: 1.5,
               padding: "8px",
               borderRadius: "12px",
-              backgroundColor: "rgba(255, 255, 255, 0.05)",
+              // backgroundColor: "rgba(255, 255, 255, 0.05)",
             }}
           >
             <Skeleton variant="circular" width={40} height={40} />
             <Box sx={{ flexGrow: 1 }}>
-              <Skeleton variant="rounded" width="60%" height={26} />
+              <Skeleton variant="rounded" width="60%" height={24} />
             </Box>
           </Box>
         ))}

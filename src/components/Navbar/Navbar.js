@@ -62,6 +62,7 @@ const Navbar = () => {
   const user = useSelector((state) => state.user);
 
   const searchRef = React.useRef(null);
+  const dropdownRef = React.useRef(null);
 
   function debounce(func, delay) {
     let timer;
@@ -94,7 +95,12 @@ const Navbar = () => {
 
   React.useEffect(() => {
     const handleClickOutside = (event) => {
-      if (searchRef.current && !searchRef.current.contains(event.target)) {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
+      ) {
         setOpenDropdown(false);
         setSearchInput("");
         setSearchResults([]);
@@ -102,7 +108,6 @@ const Navbar = () => {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -193,6 +198,9 @@ const Navbar = () => {
             navigate={navigate}
             isOpen={openDropdown}
             userId={user._id}
+            dropdownRef={dropdownRef}
+            setOpenDropdown={setOpenDropdown}
+            setSearchInput={setSearchInput}
           />
         </Box>
 

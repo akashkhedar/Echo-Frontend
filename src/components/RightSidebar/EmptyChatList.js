@@ -5,7 +5,6 @@ const EmptyChatList = () => {
   return (
     <Box
       sx={{
-        height: "100%",
         bgcolor: "#121212",
         borderRadius: 3,
         display: "flex",

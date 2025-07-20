@@ -1,13 +1,10 @@
-import React, { useState } from "react";
+import { Send } from "@mui/icons-material";
 import { Box, IconButton, InputBase } from "@mui/material";
-import { AttachFile, Send } from "@mui/icons-material";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import socket from "../../utils/socket";
-import { useLocation } from "react-router-dom";
 
 const ChatInput = () => {
-  const path = useLocation();
-
   const selectedUser = useSelector((state) => state.chat.chatUserId);
   const userId = useSelector((state) => state.user._id);
   const username = useSelector((state) => state.user.username);
@@ -20,6 +17,13 @@ const ChatInput = () => {
     const words = text.trim().split(/\s+/);
     if (words.length <= wordLimit) {
       setInputMessage(text);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend(e);
     }
   };
 
@@ -45,43 +49,40 @@ const ChatInput = () => {
   return (
     <Box
       sx={{
-        padding: 1,
         height: "2.2rem",
-        borderTop: "1px solid rgba(255, 255, 255, 0.1)",
         display: "flex",
         alignItems: "center",
-        backgroundColor: "#2E2E48",
+        // backgroundColor: "#2E2E48",
         color: "whitesmoke",
+        padding: 1,
+        borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+        backgroundColor: "#1E1E2F",
+        position: "sticky",
+        bottom: 0,
+        zIndex: 2,
       }}
     >
-      {path === "/chat" ? null : (
-        <IconButton
-          sx={{
-            color: "rgba(255, 255, 255, 0.7)",
-            "&:hover": {
-              backgroundColor: "#1e1e1f",
-              borderRadius: 2,
-              padding: 1,
-            },
-          }}
-        >
-          <AttachFile sx={{ fontSize: 25 }} />
-        </IconButton>
-      )}
       <InputBase
+        color={inputMessage.split(/\s+/).length > wordLimit ? "red" : "gray"}
+        minRows={1}
+        maxRows={3}
         placeholder="Type a message"
-        multiline
         value={inputMessage}
         onChange={handleChange}
-        color={inputMessage.split(/\s+/).length > wordLimit ? "red" : "gray"}
-        sx={{
+        onKeyDown={handleKeyDown}
+        style={{
           flexGrow: 1,
-          marginLeft: 1,
-          marginRight: 1,
-          padding: 1,
+          marginRight: 8,
+          padding: 10,
+          resize: "none",
+          border: "none",
+          outline: "none",
+          borderRadius: "8px",
+          fontSize: "1rem",
           backgroundColor: "rgb(22, 21, 21)",
-          borderRadius: 2,
           color: "whitesmoke",
+          maxHeight: "6.5rem", // ~3 rows height
+          overflowY: "auto",
         }}
       />
       <IconButton

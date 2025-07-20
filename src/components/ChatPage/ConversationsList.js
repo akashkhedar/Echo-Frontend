@@ -21,7 +21,8 @@ const ConversationsList = ({ conversation, selectedChat }) => {
       sx={{
         display: "flex",
         alignItems: "center",
-        padding: "10px 15px",
+        padding: { xs: "8px 12px", sm: "10px 15px" },
+        fontSize: { xs: "0.8rem", sm: "1rem" },
         borderRadius: 2,
         backgroundColor:
           selectedChat === conversation._id ? "#2E2E48" : "transparent",

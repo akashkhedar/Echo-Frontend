@@ -38,13 +38,13 @@ const LoadingMessages = () => {
               <Skeleton
                 variant="text"
                 height={14}
-                width={`${50 + Math.random() * 30}%`}
+                width={120}
                 sx={{ bgcolor: "#444" }}
               />
               <Skeleton
                 variant="text"
                 height={12}
-                width="30%"
+                width={20}
                 sx={{
                   alignSelf: align === "right" ? "flex-end" : "flex-start",
                   bgcolor: "#444",

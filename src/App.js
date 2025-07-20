@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "./App.css";
 import Chat from "./components/ChatPage/Chat";
@@ -13,6 +13,24 @@ import UpdatePassword from "./components/ChangePassword/UpdatePassword";
 import ValidateToken from "./components/ChangePassword/ValidateToken";
 
 function App() {
+  // Somewhere in App.js or a `useEffect` at the root level
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === "persist:root") {
+        const newState = JSON.parse(e.newValue || "{}");
+        const oldUser = JSON.parse(localStorage.getItem("persist:root"))?.user;
+        const newUser = newState?.user;
+
+        if (oldUser !== newUser) {
+          window.location.reload(); // or trigger logout
+        }
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
   return (
     <Router>
       <Routes>

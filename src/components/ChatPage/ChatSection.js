@@ -16,6 +16,9 @@ const StyledBox = styled(Box)(({ theme }) => ({
   },
   scrollbarWidth: "none",
   "-ms-overflow-style": "none",
+  flex: 1,
+  overflow: "hidden", // prevent extra scrolls
+  width: "100%",
 }));
 
 const ChatSection = () => {

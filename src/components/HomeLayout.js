@@ -17,6 +17,7 @@ import Navbar from "./Navbar/Navbar";
 import notify from "./notify";
 import LGQuickChat from "./RightSidebar/LGQuickChat";
 import MDQuickChat from "./RightSidebar/MDQuickChat";
+import { selectConversations } from "../redux/selectors/unreadSelector";
 
 const HomeLayout = ({ children }) => {
   const location = useLocation();
@@ -30,7 +31,7 @@ const HomeLayout = ({ children }) => {
   const chats = useSelector((state) => state.chat.chat);
   const userId = useSelector((state) => state.user._id);
   const currentOpenedChat = useSelector((state) => state.chat.chatId);
-  const convo = useSelector((state) => state.convo);
+  const convo = useSelector(selectConversations);
 
   const [verified, setVerified] = useState(false);
 
@@ -39,6 +40,7 @@ const HomeLayout = ({ children }) => {
       try {
         socket.emit("joinChat", userId);
         const res = await axiosInstance.get("/chat/list");
+        console.log(res.data);
         dispatch(setConversations(res.data));
         const rooms = res.data.map((convo) => convo.roomId);
         socket.emit("joinAllRooms", rooms);
@@ -110,26 +112,11 @@ const HomeLayout = ({ children }) => {
       );
     });
 
-    const handleAcceptCall = async (callerId, calleeId, type) => {
-      socket.emit("acceptedCall", {
-        callerId,
-        calleeId,
-        type,
-      });
-    };
-
     socket.on("onCallAccept", ({ callerId, calleeId, type }) => {
       navigate("/call", {
         state: { callerId: callerId, calleeId: calleeId, type: type },
       });
     });
-
-    const handleDeclineCall = (sender) => {
-      socket.emit("declinedCall", {
-        sender: userId,
-        receiver: sender,
-      });
-    };
 
     socket.on("getOffer", async ({ callerId, calleeId, offer, type }) => {
       navigate("/call", {
@@ -141,6 +128,20 @@ const HomeLayout = ({ children }) => {
         },
       });
     });
+    const handleAcceptCall = async (callerId, calleeId, type) => {
+      socket.emit("acceptedCall", {
+        callerId,
+        calleeId,
+        type,
+      });
+    };
+
+    const handleDeclineCall = (sender) => {
+      socket.emit("declinedCall", {
+        sender: userId,
+        receiver: sender,
+      });
+    };
 
     return () => {
       socket.off("receiveMsg");
@@ -151,7 +152,15 @@ const HomeLayout = ({ children }) => {
       socket.off("receiveCall");
       socket.off("onCallAccept");
     };
-  });
+  }, [
+    currentOpenedChat,
+    userId,
+    convo,
+    dispatch,
+    chats,
+    selectConversation,
+    navigate,
+  ]);
 
   return verified ? (
     <Box
