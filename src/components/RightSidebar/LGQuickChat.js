@@ -76,7 +76,7 @@ const LGQuickChat = () => {
       <Box
         sx={{
           height: "100%",
-          p: 1,
+
           display: "flex",
           flexDirection: "column",
           justifyContent: conversations.length > 0 ? "flex-start" : "center",

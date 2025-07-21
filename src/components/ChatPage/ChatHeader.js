@@ -1,24 +1,31 @@
 import { Phone, Videocam } from "@mui/icons-material";
 import { Avatar, Box, IconButton, Typography } from "@mui/material";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { selectChatUser } from "../../redux/selectors/statusSelector";
 import socket from "../../utils/socket";
-import { useLocation } from "react-router-dom";
+import CallingModal from "./CallingModal";
 
 const ChatHeader = () => {
-  const path = useLocation();
-
   const user = useSelector(selectChatUser);
   let callerId = useSelector((state) => state.user._id);
   let calleeId = user._id;
 
   const handleVideoCall = async () => {
+    setOpen(true);
+    setTimeout(() => {
+      setOpen(false);
+    }, 30000);
     socket.emit("callUser", { callerId, calleeId, type: "video" });
   };
 
   const handleVoiceCall = async () => {
     socket.emit("callUser", { callerId, calleeId, type: "audio" });
   };
+
+  const [open, setOpen] = useState(false);
+
+  const handleClose = () => setOpen(false);
 
   return (
     <Box
@@ -59,27 +66,31 @@ const ChatHeader = () => {
         </Box>
       </Box>
 
-      {/* Action Buttons */}
-      {path === "/chat" ? null : (
-        <Box>
-          <IconButton
-            onClick={handleVideoCall}
-            sx={{
-              color: "whitesmoke",
-            }}
-          >
-            <Videocam sx={{ fontSize: 30 }} />
-          </IconButton>
-          <IconButton
-            onClick={handleVoiceCall}
-            sx={{
-              color: "whitesmoke",
-            }}
-          >
-            <Phone sx={{ fontSize: 27 }} />
-          </IconButton>
-        </Box>
-      )}
+      <Box>
+        <IconButton
+          onClick={handleVideoCall}
+          sx={{
+            color: "whitesmoke",
+          }}
+        >
+          <Videocam sx={{ fontSize: 30 }} />
+        </IconButton>
+        <IconButton
+          onClick={handleVoiceCall}
+          sx={{
+            color: "whitesmoke",
+          }}
+        >
+          <Phone sx={{ fontSize: 27 }} />
+        </IconButton>
+      </Box>
+      <CallingModal
+        open={open}
+        onClose={handleClose}
+        calleeImage={user.profileImage}
+        callerId={callerId}
+        calleeId={calleeId}
+      />
     </Box>
   );
 };

@@ -14,12 +14,16 @@ import socket from "../utils/socket";
 import LGSidebar from "./LeftSidebar/LGSidebar";
 import MDSidebar from "./LeftSidebar/MDSidebar";
 import Navbar from "./Navbar/Navbar";
-import notify from "./notify";
+import notify from "./NotifyMsg";
 import LGQuickChat from "./RightSidebar/LGQuickChat";
 import MDQuickChat from "./RightSidebar/MDQuickChat";
 import { selectConversations } from "../redux/selectors/unreadSelector";
+import { useSnackbar } from "notistack";
+import NotifyCall from "./NotifyCall";
+import NotifyMsg from "./NotifyMsg";
 
 const HomeLayout = ({ children }) => {
+  const { enqueueSnackbar } = useSnackbar();
   const location = useLocation();
   const isChatPage = location.pathname === "/chat";
 
@@ -85,7 +89,9 @@ const HomeLayout = ({ children }) => {
     });
 
     socket.on("notify", (sender) => {
-      notify(sender, "message");
+      enqueueSnackbar((key) => <NotifyMsg sender={sender} />, {
+        variant: "info",
+      });
     });
 
     socket.on("redirectConvo", (id) => {
@@ -101,14 +107,25 @@ const HomeLayout = ({ children }) => {
     });
 
     socket.on("receiveCall", ({ callerName, callerId, calleeId, type }) => {
-      notify(
-        callerName,
-
-        "call",
-        () => handleAcceptCall(callerId, calleeId, type),
-        () => handleDeclineCall(calleeId, callerId),
-        type,
-        callerName
+      enqueueSnackbar(
+        (key) => (
+          <NotifyCall
+            callerId={callerId}
+            callerName={callerName}
+            type={type}
+            handleAcceptCall={() => {
+              handleAcceptCall();
+              enqueueSnackbar("Call accepted", { variant: "success" });
+            }}
+            handleDeclineCall={() => {
+              handleDeclineCall();
+              enqueueSnackbar("Call declined", { variant: "error" });
+            }}
+            socket={socket}
+            enqueueSnackbar={enqueueSnackbar}
+          />
+        ),
+        { persist: true }
       );
     });
 
@@ -160,6 +177,7 @@ const HomeLayout = ({ children }) => {
     chats,
     selectConversation,
     navigate,
+    enqueueSnackbar,
   ]);
 
   return verified ? (
