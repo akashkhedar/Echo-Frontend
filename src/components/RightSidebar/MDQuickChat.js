@@ -2,24 +2,22 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import Avatar from "@mui/material/Avatar";
-import Divider from "@mui/material/Divider";
-import { IconButton } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
 import Diversity1OutlinedIcon from "@mui/icons-material/Diversity1Outlined";
-import EmptyChatList from "./EmptyChatList";
+import { useSelector } from "react-redux";
+import UserTabs from "./UserTabs";
+import QuickMessages from "./QuickMessages";
 import ListLoading from "./ListLoading";
-
-const users = [
-  { name: "John Doe", avatar: "https://i.pravatar.cc/150?img=1" },
-  { name: "Jane Smith", avatar: "https://i.pravatar.cc/150?img=2" },
-  { name: "Alex Johnson", avatar: "https://i.pravatar.cc/150?img=3" },
-  { name: "Emily Davis", avatar: "https://i.pravatar.cc/150?img=4" },
-  { name: "Michael Brown", avatar: "https://i.pravatar.cc/150?img=5" },
-];
+import EmptyChatList from "./EmptyChatList";
+import { selectConversations } from "../../redux/selectors/unreadSelector";
 
 const MDQuickChat = () => {
+  const conversations = useSelector(selectConversations);
+
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
   return (
     <Drawer
       variant="permanent"
@@ -27,9 +25,9 @@ const MDQuickChat = () => {
       sx={{
         flexShrink: 0,
         "& .MuiDrawer-paper": {
-          height: "calc(100vh - 20.5rem)", // Adjust height to exclude navbar
-          marginTop: "4rem", // Push down to align below navbar
-          width: { md: "4rem", lg: "14rem" },
+          height: "calc(100vh - 20.5rem)",
+          marginTop: "4rem",
+          width: "4rem",
           borderTopLeftRadius: "8px",
           borderBottomLeftRadius: "8px",
           borderTop: "1.5px solid #333",
@@ -42,13 +40,14 @@ const MDQuickChat = () => {
         },
       }}
     >
+      {/* Header Icon */}
       <Box
         sx={{
           display: "flex",
-          flexDirection: "key",
+          flexDirection: "row",
           alignItems: "center",
           padding: "0.5rem",
-          gap: 1,
+          justifyContent: "center",
         }}
       >
         <IconButton>
@@ -60,32 +59,50 @@ const MDQuickChat = () => {
           />
         </IconButton>
       </Box>
-      <List sx={{ overflow: "hidden" }}>
-        {users ? (
-          users.length > 0 ? (
-            users.map((user, index) => (
-              <React.Fragment key={index}>
-                <ListItem disablePadding sx={{ marginY: "0.5rem" }}>
-                  <ListItemButton sx={{ display: "flex", gap: 2 }}>
-                    <Avatar src={user.avatar} alt={user.name} />
-                  </ListItemButton>
-                </ListItem>
-                {index !== users.length - 1 && (
-                  <Divider
-                    variant="middle"
-                    sx={{ bgcolor: "secondary.light" }}
+
+      {/* Conversation List */}
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: conversations.length > 0 ? "flex-start" : "center",
+        }}
+      >
+        <List
+          sx={{
+            overflowY: "auto",
+            overflowX: "hidden",
+            scrollbarWidth: "none", // Firefox
+            "&::-webkit-scrollbar": {
+              display: "none", // Chrome, Safari, Edge
+            },
+          }}
+        >
+          {Array.isArray(conversations) ? (
+            conversations.length > 0 ? (
+              conversations
+                .slice(0, 5)
+                .map((conversation) => (
+                  <UserTabs
+                    conversation={conversation}
+                    key={conversation._id}
+                    handleOpen={handleOpen}
                   />
-                )}
-              </React.Fragment>
-            ))
+                ))
+            ) : (
+              <EmptyChatList />
+            )
           ) : (
             <ListLoading />
-          )
-        ) : (
-          <EmptyChatList />
-        )}
-      </List>
+          )}
+        </List>
+      </Box>
+
+      {/* Quick Chat Modal Drawer */}
+      <QuickMessages open={open} handleClose={handleClose} />
     </Drawer>
   );
 };
+
 export default MDQuickChat;

@@ -62,7 +62,7 @@ const LGSidebar = () => {
         [`& .MuiDrawer-paper`]: {
           height: "calc(100vh - 4rem)",
           marginTop: "4rem",
-          width: { md: "4rem", lg: "13rem" },
+          width: "13rem",
           borderTopRightRadius: "8px",
           borderTop: "1.5px solid #333",
           borderRight: "1.5px solid #333",
@@ -73,7 +73,7 @@ const LGSidebar = () => {
     >
       <Box
         sx={{
-          display: { xs: "none", lg: "flex" },
+          display: "flex",
           flexDirection: "column",
           height: "100%",
           justifyContent: "space-between",

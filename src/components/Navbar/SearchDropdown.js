@@ -40,13 +40,13 @@ const SearchDropdown = ({
 
   return (
     <Box
-      ref={dropdownRef} // 🔴 Add ref here
+      ref={dropdownRef}
       sx={{
         position: "absolute",
         top: "3.5rem",
         left: "50%",
-        transform: "translateX(-43.5%)",
-        width: "100%",
+        transform: "translateX(-50%)", // Perfectly centers on all screens
+        width: "90%", // Responsive width on mobile
         maxWidth: "45rem",
         backgroundColor: "#121212",
         borderRadius: "10px",

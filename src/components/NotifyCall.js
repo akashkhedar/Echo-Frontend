@@ -1,87 +1,39 @@
-import React, { useEffect } from "react";
-import { useSnackbar } from "notistack";
-import { Button, Typography, Box } from "@mui/material";
+import React, { forwardRef } from "react";
+import { Card, CardContent, Button, Typography } from "@mui/material";
 
-const NotifyCall = ({
-  callerId,
-  callerName,
-  type,
-  handleAcceptCall,
-  handleDeclineCall,
-  socket,
-}) => {
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-
-  useEffect(() => {
-    const key = enqueueSnackbar(`${callerName} is calling...`, {
-      persist: true,
-      content: (key) => (
-        <Box
-          sx={{
-            backgroundColor: "#333",
-            color: "white",
-            padding: 2,
-            borderRadius: 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 2,
-          }}
-        >
-          <Typography>{callerName} is calling...</Typography>
-          <Box>
+const NotifyCall = forwardRef(
+  ({ callerName, type, handleAcceptCall, handleDeclineCall }, ref) => {
+    return (
+      <Card ref={ref} sx={{ minWidth: 300, padding: 2 }}>
+        <CardContent>
+          <Typography variant="h6">{callerName} is calling...</Typography>
+          <Typography variant="body2">Type: {type}</Typography>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginTop: 10,
+            }}
+          >
             <Button
               variant="contained"
               color="success"
-              size="small"
-              sx={{ mr: 1 }}
-              onClick={() => {
-                closeSnackbar(key);
-                handleAcceptCall();
-              }}
+              onClick={handleAcceptCall}
             >
               Accept
             </Button>
             <Button
               variant="contained"
               color="error"
-              size="small"
-              onClick={() => {
-                socket.emit("callRejected", {
-                  callerId,
-                  reason: "declined",
-                });
-                closeSnackbar(key);
-                handleDeclineCall?.();
-              }}
+              onClick={handleDeclineCall}
             >
               Decline
             </Button>
-          </Box>
-        </Box>
-      ),
-    });
-
-    const timeout = setTimeout(() => {
-      closeSnackbar(key);
-      socket.emit("callRejected", {
-        callerId,
-        reason: "timeout",
-      });
-    }, 30000);
-
-    return () => clearTimeout(timeout);
-  }, [
-    callerId,
-    callerName,
-    closeSnackbar,
-    enqueueSnackbar,
-    handleAcceptCall,
-    handleDeclineCall,
-    socket,
-  ]);
-
-  return null;
-};
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+);
 
 export default NotifyCall;

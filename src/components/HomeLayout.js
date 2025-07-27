@@ -1,29 +1,33 @@
+import { useMediaQuery } from "@mui/material";
 import Box from "@mui/material/Box";
+import { useTheme } from "@mui/material/styles";
+import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Flip, ToastContainer } from "react-toastify";
 import axiosInstance from "../axiosInstance";
 import useConversationSelection from "../hooks/useConversationSelection";
+import { selectConversations } from "../redux/selectors/unreadSelector";
 import { clearChat, setChat } from "../redux/slices/ChatSlice/ChatSlice";
-import {
-  markConversationUnread,
-  setConversations,
-} from "../redux/slices/ConversationSlice/ConversationSlice";
+import { setConversations } from "../redux/slices/ConversationSlice/ConversationSlice";
 import socket from "../utils/socket";
+import SimpleBottomNavigation from "./BottomNavigation/BottomNavigation";
 import LGSidebar from "./LeftSidebar/LGSidebar";
 import MDSidebar from "./LeftSidebar/MDSidebar";
 import Navbar from "./Navbar/Navbar";
-import notify from "./NotifyMsg";
+import NotifyCall from "./NotifyCall";
+import NotifyMessage, { default as NotifyMsg } from "./NotifyMessage";
 import LGQuickChat from "./RightSidebar/LGQuickChat";
 import MDQuickChat from "./RightSidebar/MDQuickChat";
-import { selectConversations } from "../redux/selectors/unreadSelector";
-import { useSnackbar } from "notistack";
-import NotifyCall from "./NotifyCall";
-import NotifyMsg from "./NotifyMsg";
 
 const HomeLayout = ({ children }) => {
-  const { enqueueSnackbar } = useSnackbar();
+  const theme = useTheme();
+
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "lg"));
+
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
   const location = useLocation();
   const isChatPage = location.pathname === "/chat";
 
@@ -39,12 +43,13 @@ const HomeLayout = ({ children }) => {
 
   const [verified, setVerified] = useState(false);
 
+  const [currentCallSnackbarKey, setCurrentCallSnackbarKey] = useState(null);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         socket.emit("joinChat", userId);
         const res = await axiosInstance.get("/chat/list");
-        console.log(res.data);
         dispatch(setConversations(res.data));
         const rooms = res.data.map((convo) => convo.roomId);
         socket.emit("joinAllRooms", rooms);
@@ -77,15 +82,22 @@ const HomeLayout = ({ children }) => {
         dispatch(setChat([...chats, message]));
         return;
       }
-      if (
-        message.conversationId !== currentOpenedChat &&
-        message.sender !== userId
-      ) {
-        dispatch(markConversationUnread(message.conversationId));
-        notify(username);
-        socket.emit("offlineMessage", message.receiver, message.conversationId);
-        return;
-      }
+      const key = enqueueSnackbar("", {
+        persist: true,
+        content: (key) => (
+          <NotifyMessage
+            username={username}
+            closeSnackbar={closeSnackbar}
+            snackbarKey={key}
+          />
+        ),
+      });
+
+      setTimeout(() => {
+        closeSnackbar(key);
+      }, 1500);
+
+      socket.emit("offlineMessage", message.receiver, message.conversationId);
     });
 
     socket.on("notify", (sender) => {
@@ -107,27 +119,55 @@ const HomeLayout = ({ children }) => {
     });
 
     socket.on("receiveCall", ({ callerName, callerId, calleeId, type }) => {
-      enqueueSnackbar(
-        (key) => (
+      const key = enqueueSnackbar("", {
+        persist: true,
+        content: (key) => (
           <NotifyCall
             callerId={callerId}
             callerName={callerName}
             type={type}
             handleAcceptCall={() => {
-              handleAcceptCall();
-              enqueueSnackbar("Call accepted", { variant: "success" });
+              socket.emit("acceptedCall", {
+                callerId,
+                calleeId,
+                type,
+              });
+              closeSnackbar(key);
             }}
             handleDeclineCall={() => {
-              handleDeclineCall();
-              enqueueSnackbar("Call declined", { variant: "error" });
+              socket.emit("declinedCall", {
+                callerId,
+              });
+              closeSnackbar(key);
             }}
+            closeSnackbar={closeSnackbar}
             socket={socket}
-            enqueueSnackbar={enqueueSnackbar}
+            snackbarKey={key}
           />
         ),
-        { persist: true }
-      );
+      });
+
+      setCurrentCallSnackbarKey(key);
+
+      setTimeout(() => {
+        closeSnackbar(key);
+        socket.emit("declinedCall", {
+          callerId,
+        });
+      }, 30000);
     });
+
+    const cancelCallHandler = () => {
+      if (currentCallSnackbarKey) {
+        closeSnackbar(currentCallSnackbarKey);
+      }
+
+      enqueueSnackbar(`📴 Call cancelled by the caller`, {
+        variant: "info",
+      });
+    };
+
+    socket.on("cancelledCall", cancelCallHandler);
 
     socket.on("onCallAccept", ({ callerId, calleeId, type }) => {
       navigate("/call", {
@@ -145,20 +185,6 @@ const HomeLayout = ({ children }) => {
         },
       });
     });
-    const handleAcceptCall = async (callerId, calleeId, type) => {
-      socket.emit("acceptedCall", {
-        callerId,
-        calleeId,
-        type,
-      });
-    };
-
-    const handleDeclineCall = (sender) => {
-      socket.emit("declinedCall", {
-        sender: userId,
-        receiver: sender,
-      });
-    };
 
     return () => {
       socket.off("receiveMsg");
@@ -168,6 +194,7 @@ const HomeLayout = ({ children }) => {
       socket.off("getOffer");
       socket.off("receiveCall");
       socket.off("onCallAccept");
+      socket.off("cancelledCall", cancelCallHandler);
     };
   }, [
     currentOpenedChat,
@@ -178,6 +205,8 @@ const HomeLayout = ({ children }) => {
     selectConversation,
     navigate,
     enqueueSnackbar,
+    closeSnackbar,
+    currentCallSnackbarKey,
   ]);
 
   return verified ? (
@@ -185,10 +214,10 @@ const HomeLayout = ({ children }) => {
       sx={{
         display: "grid",
         gridTemplateRows: "4rem auto",
-        gridTemplateColumns: "auto",
         height: "100vh",
         width: "100vw",
         background: "#181818",
+        overflowX: "hidden",
         "&::-webkit-scrollbar": {
           display: "none",
         },
@@ -221,19 +250,19 @@ const HomeLayout = ({ children }) => {
         }}
       >
         {/* Sidebar */}
-        <Box
-          sx={{
-            width: { md: "4rem", lg: "13rem" },
-            background: "#181818",
-          }}
-        >
-          <Box sx={{ display: { xs: "none", md: "block", lg: "none" } }}>
-            <MDSidebar />
+        {!isMobile ? (
+          <Box
+            sx={{
+              width: {
+                sm: "5rem",
+                lg: "14rem",
+              },
+              background: "#181818",
+            }}
+          >
+            {isTablet ? <MDSidebar /> : <LGSidebar />}
           </Box>
-          <Box sx={{ display: { xs: "none", lg: "block" } }}>
-            <LGSidebar />
-          </Box>
-        </Box>
+        ) : null}
 
         {/* Main Content */}
 
@@ -241,45 +270,29 @@ const HomeLayout = ({ children }) => {
           component="main"
           sx={{
             flex: 1,
-            paddingRight: { md: "1rem", lg: "2rem" },
-            paddingLeft: { md: "1rem", lg: "1rem" },
             background: "#181818",
+            minHeight: "100vh",
+            width: "100%",
+            mx: "auto",
           }}
         >
           {children}
         </Box>
 
-        {!isChatPage && (
+        {!isChatPage && !isMobile ? (
           <Box
             sx={{
-              width: { md: "4rem", lg: "13rem" },
+              width: { sm: "5rem", lg: "14rem" },
               background: "#181818",
               display: "flex",
               flexDirection: "column",
             }}
           >
-            <Box sx={{ display: { xs: "none", md: "block", lg: "none" } }}>
-              <MDQuickChat />
-            </Box>
-            <Box sx={{ display: { xs: "none", lg: "block" } }}>
-              <LGQuickChat />
-            </Box>
+            {isTablet ? <MDQuickChat /> : <LGQuickChat />}
           </Box>
-        )}
+        ) : null}
       </Box>
-      <ToastContainer
-        position="bottom-left"
-        autoClose={1500}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick={false}
-        rtl={false}
-        pauseOnFocusLoss
-        draggable={false}
-        pauseOnHover
-        theme="light"
-        transition={Flip}
-      />
+      {isMobile && <SimpleBottomNavigation />}
     </Box>
   ) : null;
 };

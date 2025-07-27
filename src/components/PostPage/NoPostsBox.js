@@ -5,8 +5,9 @@ const NoPostsBox = () => {
   return (
     <Box
       sx={{
-        height: "100vh",
-        width: "100vh",
+        width: "100%",
+        height: "85%", // Enough to center vertically without taking full height
+        px: { xs: 2, sm: 4 }, // Horizontal padding for small screens
         bgcolor: "#121212",
         borderRadius: 3,
         display: "flex",
@@ -14,6 +15,7 @@ const NoPostsBox = () => {
         alignItems: "center",
         justifyContent: "center",
         color: "#ccc",
+        textAlign: "center", // Improves small screen UX
       }}
     >
       <HourglassEmptyIcon sx={{ fontSize: 60, color: "#888", mb: 1 }} />

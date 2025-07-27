@@ -1,12 +1,19 @@
 import CallEndIcon from "@mui/icons-material/CallEnd";
 import { Avatar, Backdrop, Box, IconButton, Modal } from "@mui/material";
 import socket from "../../utils/socket";
+import { useEffect } from "react";
 
 const CallingModal = ({ calleeImage, open, onClose, callerId, calleeId }) => {
   const handleClose = () => {
-    socket.emit("endCall", { callerId, calleeId });
+    socket.emit("CancelCall", { callerId, calleeId });
     onClose();
   };
+
+  useEffect(() => {
+    socket.on("calldeclined", () => {
+      onClose();
+    });
+  });
 
   return (
     <Modal
@@ -55,7 +62,7 @@ const CallingModal = ({ calleeImage, open, onClose, callerId, calleeId }) => {
             }}
           />
           <IconButton
-            onClick={onClose}
+            onClick={handleClose}
             sx={{
               backgroundColor: "red",
               color: "white",

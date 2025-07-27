@@ -3,15 +3,35 @@ import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
-import WebStoriesOutlinedIcon from "@mui/icons-material/WebStoriesOutlined";
 import { Avatar, Badge, Box, Divider, styled } from "@mui/material";
 import Drawer from "@mui/material/Drawer";
 import * as React from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import UploadPost from "../uploadPost/UploadPost";
+import axiosInstance from "../../axiosInstance";
+import { selectHasUnreadMessages } from "../../redux/selectors/unreadSelector";
 
 const MDSidebar = () => {
   const navigate = useNavigate();
+  const user = useSelector((state) => state.user);
+  const hasUnread = useSelector(selectHasUnreadMessages);
+
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const handleLogout = async () => {
+    try {
+      const res = await axiosInstance.post("/auth/logout");
+      if (res.status) {
+        navigate("/signup");
+      }
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
+
   const Item = styled(Box)(({ theme }) => ({
     display: "flex",
     alignItems: "center",
@@ -29,18 +49,15 @@ const MDSidebar = () => {
     },
   }));
 
-  const [open, setOpen] = React.useState(false);
-  const handleClose = () => setOpen(false);
-
   return (
     <Drawer
       variant="permanent"
       sx={{
         flexShrink: 0,
         [`& .MuiDrawer-paper`]: {
-          height: "calc(100vh - 4rem)", // Adjust height to exclude navbar
-          marginTop: "4rem", // Push down to align below navbar
-          width: { md: "4rem", lg: "13rem" },
+          height: "calc(100vh - 4rem)",
+          marginTop: "4rem",
+          width: "4rem",
           borderTopRightRadius: "8px",
           borderTop: "1.5px solid #333",
           borderRight: "1.5px solid #333",
@@ -51,7 +68,7 @@ const MDSidebar = () => {
     >
       <Box
         sx={{
-          display: { xs: "none", md: "flex", lg: "none" },
+          display: "flex",
           flexDirection: "column",
           alignItems: "center",
           height: "100%",
@@ -67,11 +84,10 @@ const MDSidebar = () => {
               alignItems: "center",
               padding: 2,
               gap: 1,
-              borderBottom: "1px solid #ddd",
+              borderBottom: "1px solid #323232",
               cursor: "pointer",
               "&:hover": {
-                backgroundColor: "#f1f1f1",
-                color: "#000",
+                backgroundColor: "rgb(18, 25, 34)",
               },
               transition: "background-color 0.3s ease, color 0.3s ease",
             }}
@@ -80,9 +96,10 @@ const MDSidebar = () => {
             <Avatar
               alt="User Avatar"
               sx={{ width: 40, height: 40 }}
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8mcdA_uoJahxn3PQ-IC9WROV-GF2wuTl2FQ&s"
+              src={user.profileImage}
             />
           </Box>
+
           {/* Menu Items */}
           <Box>
             <Item onClick={() => navigate("/")}>
@@ -90,30 +107,34 @@ const MDSidebar = () => {
                 sx={{ fontSize: "2rem", color: "whitesmoke" }}
               />
             </Item>
+
             <Divider
               variant="middle"
               sx={{ bgcolor: "secondary.light", margin: "10px 0 0 7px" }}
             />
+
             <Item onClick={() => navigate("/chat")}>
-              <Badge badgeContent={2} color="error">
+              <Badge color={hasUnread ? "error" : "default"} variant="dot">
                 <ForumOutlinedIcon sx={{ color: "whitesmoke" }} />
               </Badge>
             </Item>
-            <Item onClick={() => navigate("/profile/friend")}>
+
+            <Item onClick={() => navigate("/profile/following")}>
               <GroupOutlinedIcon sx={{ color: "whitesmoke" }} />
             </Item>
-            <Item>
+
+            <Item onClick={handleOpen}>
               <AddBoxOutlinedIcon sx={{ color: "whitesmoke" }} />
-            </Item>
-            <Item>
-              <WebStoriesOutlinedIcon sx={{ color: "whitesmoke" }} />
             </Item>
           </Box>
         </Box>
+
+        {/* Upload Modal */}
         <UploadPost open={open} handleClose={handleClose} />
-        {/* Bottom Section */}
+
+        {/* Logout */}
         <Box>
-          <Item>
+          <Item onClick={handleLogout}>
             <LogoutOutlinedIcon sx={{ color: "whitesmoke" }} />
           </Item>
         </Box>

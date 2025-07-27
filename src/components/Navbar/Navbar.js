@@ -1,5 +1,5 @@
 import SearchIcon from "@mui/icons-material/Search";
-import { AppBar, Avatar, IconButton } from "@mui/material";
+import { AppBar, Avatar, IconButton, useMediaQuery } from "@mui/material";
 import Box from "@mui/material/Box";
 import InputBase from "@mui/material/InputBase";
 import { styled } from "@mui/material/styles";
@@ -10,52 +10,57 @@ import Icon from "../../assets/Icon.png";
 import Logo from "../../assets/Logo.png";
 import axiosInstance from "../../axiosInstance";
 import SearchDropdown from "./SearchDropdown";
-
-const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: 25,
-  backgroundColor: "rgb(18, 18, 18)",
-  margin: "0 16px",
-  height: "2.4rem",
-  width: "100%",
-  maxWidth: "45rem",
-  border: "1px solid #323232 ",
-  "&:hover": {
-    border: "1px solid rgb(41, 63, 89)",
-  },
-  "&:focus-within": {
-    border: "1px solid rgb(27, 103, 190)",
-  },
-}));
-
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    color: "whitesmoke",
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create("width"),
-    width: "100%",
-    [theme.breakpoints.up("sm")]: {
-      "&:focus": {
-        width: "10ch",
-      },
-    },
-  },
-}));
+import { useTheme } from "@mui/material/styles";
 
 const Navbar = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const Search = styled("div")(({ theme }) => ({
+    position: "relative",
+    borderRadius: 25,
+    backgroundColor: "rgb(18, 18, 18)",
+    margin: "0 8px",
+    mr: isMobile ? "5px" : "0px",
+    height: "2.4rem",
+    width: "100%",
+    maxWidth: "45rem",
+    border: "1px solid #323232 ",
+    "&:hover": {
+      border: "1px solid rgb(41, 63, 89)",
+    },
+    "&:focus-within": {
+      border: "1px solid rgb(27, 103, 190)",
+    },
+  }));
+
+  const SearchIconWrapper = styled("div")(({ theme }) => ({
+    padding: theme.spacing(0, 2),
+    height: "100%",
+    position: "absolute",
+    pointerEvents: "none",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }));
+
+  const StyledInputBase = styled(InputBase)(({ theme }) => ({
+    color: "inherit",
+    "& .MuiInputBase-input": {
+      padding: theme.spacing(1, 1, 1, 0),
+      color: "whitesmoke",
+      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+      transition: theme.transitions.create("width"),
+      width: "100%",
+      [theme.breakpoints.up("sm")]: {
+        "&:focus": {
+          width: "10ch",
+        },
+      },
+    },
+  }));
+
   const [searchResults, setSearchResults] = React.useState([]);
   const [openDropdown, setOpenDropdown] = React.useState(false);
   const [searchInput, setSearchInput] = React.useState("");
@@ -205,27 +210,29 @@ const Navbar = () => {
         </Box>
 
         {/* Notifications and Avatar */}
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          <IconButton size="large" aria-label="show avatar" color="inherit">
-            <Avatar
-              alt="Avatar"
-              sx={{
-                display: { xs: "none", sm: "block" },
-                width: { sm: "2.3rem", md: "2.4rem", lg: "2.5rem" },
-                height: { sm: "2.3rem", md: "2.4rem", lg: "2.5rem" },
-                border: "2px solid #0078FF",
-              }}
-              onClick={() => navigate("/profile/about")}
-              src={user.profileImage}
-            />
-          </IconButton>
-        </Box>
+        {!isMobile ? (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <IconButton size="large" aria-label="show avatar" color="inherit">
+              <Avatar
+                alt="Avatar"
+                sx={{
+                  display: { xs: "none", sm: "block" },
+                  width: { sm: "2.3rem", md: "2.4rem", lg: "2.5rem" },
+                  height: { sm: "2.3rem", md: "2.4rem", lg: "2.5rem" },
+                  border: "2px solid #0078FF",
+                }}
+                onClick={() => navigate("/profile/about")}
+                src={user.profileImage}
+              />
+            </IconButton>
+          </Box>
+        ) : null}
       </Box>
     </AppBar>
   );

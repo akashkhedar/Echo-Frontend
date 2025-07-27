@@ -27,7 +27,7 @@ const LGQuickChat = () => {
         "& .MuiDrawer-paper": {
           height: "calc(100vh - 20.5rem)",
           marginTop: "4rem",
-          width: { md: "4rem", lg: "14rem" },
+          width: "13rem",
           borderTopLeftRadius: "8px",
           borderBottomLeftRadius: "8px",
           borderTop: "1.5px solid #333",

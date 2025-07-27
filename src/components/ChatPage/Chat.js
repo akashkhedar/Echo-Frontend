@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, createTheme, useMediaQuery } from "@mui/material";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ChatBG from "../../assets/ChatBG.jpeg";
@@ -7,8 +7,26 @@ import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
 import ChatList from "./ChatList";
 import ChatSection from "./ChatSection";
+import { useTheme } from "@emotion/react";
+
+const theme = createTheme({
+  breakpoints: {
+    values: {
+      mobile: 0,
+      tablet: 640,
+      laptop: 1024,
+      desktop: 1200,
+    },
+  },
+});
 
 const ChatPage = () => {
+  const theme = useTheme();
+
+  const isTablet = useMediaQuery(
+    theme.breakpoints.between(theme.tablet, theme.laptop)
+  );
+
   const selectedChat = useSelector((state) => state.chat.chatId);
   const dispatch = useDispatch();
 
@@ -29,20 +47,22 @@ const ChatPage = () => {
       }}
     >
       <ChatList />
-      <Box
-        sx={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          height: "100%",
-          width: "100%",
-          overflow: "auto",
-        }}
-      >
-        {selectedChat === null ? null : <ChatHeader />}
-        <ChatSection />
-        {selectedChat === null ? null : <ChatInput />}
-      </Box>
+      {isTablet && (
+        <Box
+          sx={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            width: "100%",
+            overflow: "auto",
+          }}
+        >
+          {selectedChat === null ? null : <ChatHeader />}
+          <ChatSection />
+          {selectedChat === null ? null : <ChatInput />}
+        </Box>
+      )}
     </Box>
   );
 };

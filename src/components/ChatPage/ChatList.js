@@ -62,16 +62,6 @@ const ChatList = () => {
           zIndex: 1,
         }}
       >
-        <IconButton
-          onClick={() => navigate("/")}
-          sx={{
-            "&:hover": {
-              background: "#1e1e1f",
-            },
-          }}
-        >
-          <KeyboardBackspaceIcon sx={{ color: "whitesmoke" }} />
-        </IconButton>
         <Typography variant="h5" fontWeight="bold" ml={1}>
           Chats
         </Typography>

@@ -9,21 +9,21 @@ import NoPostsBox from "./NoPostsBox";
 const Post = () => {
   const navigate = useNavigate();
   const [posts, setPosts] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     const getPost = async () => {
       try {
-        const userPosts = await axiosInstance.get("/post/feed"); // Fetch posts
-        console.log(userPosts);
+        const userPosts = await axiosInstance.get("/post/feed");
         setPosts(userPosts.data.data);
       } catch (error) {
         navigate("/signup");
+      } finally {
+        setLoading(false);
       }
     };
     getPost();
-
-    // eslint-disable-next-line
-  }, []);
+  }, [navigate]);
 
   return (
     <Box
@@ -32,18 +32,31 @@ const Post = () => {
         flexDirection: "column",
         alignItems: "center",
         width: "100%",
+
         background: "#121212",
-        marginTop: -0.6,
+        mt: -0.6,
+        px: { sm: "0.5rem", md: "1.5rem" },
+        height: "100%",
       }}
     >
-      {Array.isArray(posts) ? (
-        posts.length > 0 ? (
-          posts.map((post) => <PostCard key={post._id} post={post} />)
-        ) : (
-          <NoPostsBox />
-        )
-      ) : (
+      {loading ? (
         <PostLoading />
+      ) : posts.length > 0 ? (
+        posts.map((post) => (
+          <Box
+            key={post._id}
+            sx={{
+              width: "100%",
+              mb: "1.5rem",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <PostCard post={post} />
+          </Box>
+        ))
+      ) : (
+        <NoPostsBox />
       )}
     </Box>
   );

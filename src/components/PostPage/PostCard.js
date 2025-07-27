@@ -146,10 +146,10 @@ const PostCard = ({ post, key, setPosts = null }) => {
         key={key}
         sx={{
           width: {
-            xs: "100%",
-            sm: "92%",
-            md: "67%",
-            lg: "52%",
+            xs: "97%",
+            sm: "80%",
+            md: "62%",
+            lg: "53%",
             xl: "40%",
           },
           marginBottom: 2,
