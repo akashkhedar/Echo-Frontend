@@ -51,10 +51,12 @@ const MessageSection = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log(chats);
     const fetchChats = async () => {
       try {
         setLoading(true);
         const res = await axiosInstance(`/chat/fetch/msg/${currentOpenedChat}`);
+        console.log(res.data);
         dispatch(setChat(res.data));
       } catch (error) {
         setLoading(false);
@@ -64,7 +66,7 @@ const MessageSection = () => {
     };
 
     fetchChats();
-  }, [currentOpenedChat, dispatch]);
+  }, [chats, currentOpenedChat, dispatch]);
 
   useEffect(() => {
     setTimeout(() => {

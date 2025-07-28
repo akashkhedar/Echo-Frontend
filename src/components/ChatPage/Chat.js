@@ -1,4 +1,5 @@
-import { Box, createTheme, useMediaQuery } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import { Box, useMediaQuery } from "@mui/material";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ChatBG from "../../assets/ChatBG.jpeg";
@@ -7,18 +8,6 @@ import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
 import ChatList from "./ChatList";
 import ChatSection from "./ChatSection";
-import { useTheme } from "@emotion/react";
-
-const theme = createTheme({
-  breakpoints: {
-    values: {
-      mobile: 0,
-      tablet: 640,
-      laptop: 1024,
-      desktop: 1200,
-    },
-  },
-});
 
 const ChatPage = () => {
   const theme = useTheme();

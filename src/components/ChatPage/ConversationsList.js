@@ -7,7 +7,6 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-import React from "react";
 import useConversationSelection from "../../hooks/useConversationSelection";
 import { useSelector } from "react-redux";
 

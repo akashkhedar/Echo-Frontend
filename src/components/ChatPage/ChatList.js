@@ -1,24 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { Box, IconButton, List, Typography } from "@mui/material";
-import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
+import { Box, List, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { selectConversations } from "../../redux/selectors/unreadSelector";
 import {
   setUserOffline,
   setUserOnline,
 } from "../../redux/slices/ConversationSlice/ConversationSlice";
 import socket from "../../utils/socket";
+import ChatListLoading from "./ChatListLoading";
 import ConversationsList from "./ConversationsList";
 import EmptyChatList from "./EmptyChatList";
 import ListSearch from "./ListSearch";
-import ChatListLoading from "./ChatListLoading";
-import { selectConversations } from "../../redux/selectors/unreadSelector";
 
 const ChatList = () => {
   const conversations = useSelector(selectConversations);
   const selectedChat = useSelector((state) => state.chat.chatId);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
 
