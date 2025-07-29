@@ -1,5 +1,5 @@
 import { Box, styled } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   markMessageRead,
@@ -21,7 +21,6 @@ const MessageContainer = styled(Box)({
 const MessageSection = () => {
   const outerDiv = useRef(null);
   const innerDiv = useRef(null);
-  const isUserAtBottom = useRef(true);
   const path = useLocation();
 
   useEffect(() => {
@@ -48,15 +47,15 @@ const MessageSection = () => {
   const chats = useSelector((state) => state.chat.chat);
   const currentOpenedChat = useSelector((state) => state.chat.chatId);
 
+  const scrollRef = useRef(null);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log(chats);
     const fetchChats = async () => {
       try {
         setLoading(true);
         const res = await axiosInstance(`/chat/fetch/msg/${currentOpenedChat}`);
-        console.log(res.data);
         dispatch(setChat(res.data));
       } catch (error) {
         setLoading(false);
@@ -66,61 +65,13 @@ const MessageSection = () => {
     };
 
     fetchChats();
-  }, [chats, currentOpenedChat, dispatch]);
+  }, [currentOpenedChat, dispatch]);
 
-  useEffect(() => {
-    setTimeout(() => {
-      if (outerDiv.current && innerDiv.current) {
-        outerDiv.current.scrollTo({
-          top: innerDiv.current.scrollHeight,
-          left: 0,
-          behavior: "auto",
-        });
-        isUserAtBottom.current = true;
-      }
-    }, 0);
-  }, [currentOpenedChat]);
-
-  useEffect(() => {
-    if (!outerDiv.current || !innerDiv.current) return;
-
-    const outerDivHeight = outerDiv.current.clientHeight;
-    const innerDivHeight = innerDiv.current.scrollHeight;
-    const outerDivScrollTop = outerDiv.current.scrollTop;
-
-    const nearBottom =
-      outerDivScrollTop >= innerDivHeight - outerDivHeight - 100;
-
-    isUserAtBottom.current = nearBottom;
-
-    if (nearBottom) {
-      outerDiv.current.scrollTo({
-        top: innerDivHeight - outerDivHeight + 30,
-        left: 0,
-        behavior: "smooth",
-      });
-    } else {
+  useLayoutEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "auto" });
     }
-  }, [chats]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!outerDiv.current || !innerDiv.current) return;
-
-      const outerDivHeight = outerDiv.current.clientHeight;
-      const innerDivHeight = innerDiv.current.scrollHeight;
-      const outerDivScrollTop = outerDiv.current.scrollTop;
-
-      const nearBottom =
-        outerDivScrollTop >= innerDivHeight - outerDivHeight - 100;
-
-      isUserAtBottom.current = nearBottom;
-    };
-
-    const scrollBox = outerDiv.current;
-    scrollBox?.addEventListener("scroll", handleScroll);
-    return () => scrollBox?.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [chats, currentOpenedChat]);
 
   useEffect(() => {
     const handleMessageRead = (messageId) => {
@@ -144,6 +95,7 @@ const MessageSection = () => {
           ) : (
             <NewMessage />
           )}
+          <div ref={scrollRef} />
         </MessageContainer>
       </StyledBox>
     </div>

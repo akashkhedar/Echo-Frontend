@@ -1,43 +1,31 @@
-import {
-  Box,
-  Card,
-  CardContent,
-  IconButton,
-  styled,
-  Typography,
-} from "@mui/material";
-import React, { useEffect, useRef } from "react";
 import DoneIcon from "@mui/icons-material/Done";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import ScheduleIcon from "@mui/icons-material/Schedule";
-import socket from "../../utils/socket";
+import { Box, Card, Typography, styled } from "@mui/material";
+import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
+import socket from "../../utils/socket";
 
-const ChatBubble = styled(Card)(({ align }) => ({
-  maxWidth: "60%",
-  display: "inline-flex",
-  alignSelf: align === "right" ? "flex-end" : "flex-start",
-  backgroundColor: align === "right" ? "rgb(43, 9, 48)" : "rgb(11, 9, 48)",
-  color: "rgb(199, 192, 192)",
-  wordWrap: "break-word",
-  borderRadius: "12px",
-  paddingTop: 0.5,
-  border: "1px solid",
-  borderColor: align === "right" ? "rgb(142, 64, 195)" : "rgb(77, 64, 195)",
-  marginBottom: 1.5,
-  textAlign: align === "right" ? "left" : "right",
-  justifyContent: align === "right" ? "flex-start" : "flex-end",
+const BubbleWrapper = styled(Box)(({ align }) => ({
+  display: "flex",
+  justifyContent: align === "right" ? "flex-end" : "flex-start",
+  padding: "4px 8px",
 }));
 
-const formatTime = (timestamp) => {
-  if (!timestamp) return "N/A"; // Prevent error when timestamp is undefined
-  const date = new Date(timestamp);
-  return date.toLocaleTimeString("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
-};
+const ChatBubble = styled(Card)(({ align }) => ({
+  maxWidth: "75%",
+  padding: "6px 10px",
+  borderRadius: "16px",
+  borderTopLeftRadius: align === "right" ? "16px" : "4px",
+  borderTopRightRadius: align === "right" ? "4px" : "16px",
+  color: "#e0e0e0",
+  wordBreak: "break-word",
+  boxShadow: "0 1px 1px rgba(0, 0, 0, 0.1)",
+  position: "relative",
+  border: "1px solid",
+  backgroundColor: align === "right" ? "rgb(43, 9, 48)" : "rgb(11, 9, 48)",
+  borderColor: align === "right" ? "rgb(142, 64, 195)" : "rgb(77, 64, 195)",
+}));
 
 const Message = ({ msg, userId }) => {
   const isSent = msg.sender === userId;
@@ -62,59 +50,59 @@ const Message = ({ msg, userId }) => {
       { threshold: 1 }
     );
 
-    if (messageRef.current) {
-      observer.observe(messageRef.current);
-    }
+    if (messageRef.current) observer.observe(messageRef.current);
     return () => observer.disconnect();
-  }, [msg, userId, roomId, conversationId]); // add conversationId for safety
+  }, [msg, userId, roomId, conversationId]);
+
+  const formatTime = (timestamp) => {
+    if (!timestamp) return "";
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+  };
+
+  const getTickIcon = () => {
+    if (msg.read)
+      return <DoneAllIcon sx={{ fontSize: 12, color: "#4fc3f7", ml: 0.5 }} />;
+    if (msg.delivered)
+      return <DoneAllIcon sx={{ fontSize: 12, color: "grey", ml: 0.5 }} />;
+    if (msg.sent)
+      return <DoneIcon sx={{ fontSize: 12, color: "grey", ml: 0.5 }} />;
+    return <ScheduleIcon sx={{ fontSize: 12, color: "grey", ml: 0.5 }} />;
+  };
 
   return (
-    <ChatBubble ref={messageRef} align={isSent ? "right" : "left"}>
-      <CardContent
-        sx={{
-          padding: "6px 10px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "2px",
-          marginBottom: -2,
-        }}
-      >
-        {/* Ensure message is always a string */}
-        <Typography>
+    <BubbleWrapper align={isSent ? "right" : "left"} ref={messageRef}>
+      <ChatBubble align={isSent ? "right" : "left"}>
+        <Typography
+          variant="body2"
+          sx={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}
+        >
           {typeof msg.message === "string"
             ? msg.message
             : JSON.stringify(msg.message)}
         </Typography>
 
-        {/* Timestamp alignment */}
+        {/* Time + Tick Row */}
         <Box
           sx={{
             display: "flex",
-            justifyContent: isSent ? "flex-end" : "flex-start",
+            justifyContent: "flex-end",
             alignItems: "center",
-            textAlign: isSent ? "right" : "left",
-            my: isSent ? -1 : null,
+            gap: "2px",
+            marginTop: "4px",
           }}
         >
-          <Typography variant="caption" color="gray" fontSize={10}>
+          <Typography variant="caption" sx={{ fontSize: 10, color: "gray" }}>
             {formatTime(msg.createdAt)}
           </Typography>
-          {isSent ? (
-            <IconButton>
-              {msg.read ? (
-                <DoneAllIcon sx={{ fontSize: 10, color: "blue" }} />
-              ) : msg.delivered ? (
-                <DoneAllIcon sx={{ fontSize: 10, color: "grey" }} />
-              ) : msg.sent ? (
-                <DoneIcon sx={{ fontSize: 10, color: "grey" }} />
-              ) : (
-                <ScheduleIcon sx={{ fontSize: 10, color: "grey" }} />
-              )}
-            </IconButton>
-          ) : null}
+          {isSent && getTickIcon()}
         </Box>
-      </CardContent>
-    </ChatBubble>
+      </ChatBubble>
+    </BubbleWrapper>
   );
 };
 

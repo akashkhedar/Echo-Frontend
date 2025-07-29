@@ -33,10 +33,11 @@ const ChatPage = () => {
         background: `url(${ChatBG}) no-repeat center center/cover`,
         backgroundSize: "cover",
         height: "90.8vh",
+        overflowY: "hidden",
       }}
     >
       <ChatList />
-      {isTablet && (
+      {!isTablet && (
         <Box
           sx={{
             flex: 1,
