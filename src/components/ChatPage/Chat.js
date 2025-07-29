@@ -1,4 +1,3 @@
-import { useTheme } from "@mui/material/styles";
 import { Box, useMediaQuery } from "@mui/material";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,11 +9,8 @@ import ChatList from "./ChatList";
 import ChatSection from "./ChatSection";
 
 const ChatPage = () => {
-  const theme = useTheme();
-
-  const isTablet = useMediaQuery(
-    theme.breakpoints.between(theme.tablet, theme.laptop)
-  );
+  const currentOpenedChat = useSelector((state) => state.chat.chatId);
+  const isTablet = useMediaQuery("(min-width:750px)");
 
   const selectedChat = useSelector((state) => state.chat.chatId);
   const dispatch = useDispatch();
@@ -34,10 +30,12 @@ const ChatPage = () => {
         backgroundSize: "cover",
         height: "90.8vh",
         overflowY: "hidden",
+        width: "100%",
       }}
     >
-      <ChatList />
-      {!isTablet && (
+      {isTablet || (!isTablet && !selectedChat) ? <ChatList /> : null}
+
+      {(isTablet && selectedChat) || (!isTablet && currentOpenedChat) ? (
         <Box
           sx={{
             flex: 1,
@@ -52,7 +50,7 @@ const ChatPage = () => {
           <ChatSection />
           {selectedChat === null ? null : <ChatInput />}
         </Box>
-      )}
+      ) : null}
     </Box>
   );
 };

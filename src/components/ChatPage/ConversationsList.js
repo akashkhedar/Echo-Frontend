@@ -2,27 +2,15 @@ import {
   Avatar,
   Badge,
   Box,
-  createTheme,
   ListItem,
   ListItemAvatar,
   ListItemText,
   Typography,
 } from "@mui/material";
-import useConversationSelection from "../../hooks/useConversationSelection";
 import { useSelector } from "react-redux";
-
-const theme = createTheme({
-  breakpoints: {
-    values: {
-      sm: 750,
-    },
-  },
-});
+import useConversationSelection from "../../hooks/useConversationSelection";
 
 const ConversationsList = ({ conversation, selectedChat }) => {
-  const isCollpased = theme.breakpoints.down(theme.sm);
-  const isExpanded = theme.breakpoints.up(theme.sm);
-
   const { _id } = useSelector((state) => state.user);
   const selectConversation = useConversationSelection();
   return (
@@ -53,17 +41,17 @@ const ConversationsList = ({ conversation, selectedChat }) => {
             <Avatar src={`${conversation.user.profileImage}`} alt={`user`} />
           </Badge>
         </ListItemAvatar>
-        {!isCollpased && (
-          <ListItemText
-            primary={`${conversation.user.fullname}`}
-            secondary={
-              <Typography variant="body2" color="rgba(255, 255, 255, 0.6)">
-                {conversation._id === 0 ? "Are you here?" : "Last message..."}
-              </Typography>
-            }
-            sx={{ color: "whitesmoke" }}
-          />
-        )}
+        {/* {!isCollpased && ( */}
+        <ListItemText
+          primary={`${conversation.user.fullname}`}
+          secondary={
+            <Typography variant="body2" color="rgba(255, 255, 255, 0.6)">
+              {conversation._id === 0 ? "Are you here?" : "Last message..."}
+            </Typography>
+          }
+          sx={{ color: "whitesmoke" }}
+        />
+        {/* )} */}
       </Box>
 
       {conversation.unread && (

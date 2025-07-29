@@ -1,4 +1,11 @@
-import { Box, List, Typography } from "@mui/material";
+import {
+  Box,
+  createTheme,
+  IconButton,
+  List,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectConversations } from "../../redux/selectors/unreadSelector";
@@ -11,13 +18,35 @@ import ChatListLoading from "./ChatListLoading";
 import ConversationsList from "./ConversationsList";
 import EmptyChatList from "./EmptyChatList";
 import ListSearch from "./ListSearch";
+import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
+import { useNavigate } from "react-router-dom";
+
+const theme = createTheme({
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 750,
+      md: 900,
+    },
+  },
+});
 
 const ChatList = () => {
+  const navigate = useNavigate();
   const conversations = useSelector(selectConversations);
   const selectedChat = useSelector((state) => state.chat.chatId);
   const dispatch = useDispatch();
 
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
+
+  const listWidth = isMobile ? "100%" : isTablet ? "30%" : "25%";
+
   const [loading, setLoading] = useState(true);
+
+  const handleBack = () => {
+    navigate("/");
+  };
 
   useEffect(() => {
     socket.on("userOnline", (userId) => dispatch(setUserOnline(userId)));
@@ -38,8 +67,7 @@ const ChatList = () => {
   return (
     <Box
       sx={{
-        width: { xs: "100%", sm: "30%", md: "25%" }, // Full width on small screens
-        height: { xs: "40vh", sm: "auto" },
+        width: listWidth,
         borderRight: { sm: "2px solid rgb(51, 51, 71)" },
         backgroundColor: "#1E1E2F",
         display: "flex",
@@ -59,6 +87,11 @@ const ChatList = () => {
           zIndex: 1,
         }}
       >
+        {isMobile && (
+          <IconButton onClick={handleBack}>
+            <ArrowBackIosRoundedIcon sx={{ color: "white", mr: 3, ml: -0.5 }} />
+          </IconButton>
+        )}
         <Typography variant="h5" fontWeight="bold" ml={1}>
           Chats
         </Typography>

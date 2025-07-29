@@ -271,7 +271,7 @@ const HomeLayout = ({ children }) => {
           sx={{
             flex: 1,
             background: "#181818",
-            minHeight: "100%",
+            minHeight: "100v%",
             width: "100%",
             mx: "auto",
           }}
