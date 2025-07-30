@@ -274,6 +274,7 @@ const HomeLayout = ({ children }) => {
             minHeight: "100v%",
             width: "100%",
             mx: "auto",
+            pb: isMobile && "56px",
           }}
         >
           {children}

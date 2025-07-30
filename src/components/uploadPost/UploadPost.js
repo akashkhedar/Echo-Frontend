@@ -12,6 +12,10 @@ const UploadPost = ({ open, handleClose }) => {
       aria-describedby="upload-post-description"
       open={open}
       onClose={handleClose}
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+      }}
       closeAfterTransition
       slots={{ backdrop: Backdrop }}
       slotProps={{
@@ -24,14 +28,14 @@ const UploadPost = ({ open, handleClose }) => {
         <Box
           sx={{
             height: "100dvh",
-            width: "100dvw",
+            width: "100dvh",
             backgroundColor: "rgba(26, 12, 12, 0.2)",
             backdropFilter: "blur(10px)",
             WebkitBackdropFilter: "blur(10px)",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            px: 2, // add padding for smaller devices
+            px: 1, // add padding for smaller devices
           }}
         >
           <UploadBox handleClose={handleClose} />

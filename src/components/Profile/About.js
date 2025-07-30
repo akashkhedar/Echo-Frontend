@@ -1,5 +1,4 @@
-import { Box, Divider, Grid, Typography } from "@mui/material";
-import React from "react";
+import { Box, Grid, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 
 const About = () => {
@@ -32,83 +31,64 @@ const About = () => {
       </Typography>
 
       {/* Details Grid */}
-      <Grid container spacing={3} mb={5}>
-        <Grid item xs={12} sm={6}>
-          <Typography
-            variant="subtitle2"
-            fontWeight="bold"
-            color={"secondary.light"}
+      <Box sx={{ gap: 2 }}>
+        <Typography
+          variant="subtitle2"
+          fontWeight="bold"
+          color={"secondary.light"}
+        >
+          Bio
+        </Typography>
+        <Typography variant="subtitle1">
+          {user.bio || "No bio available."}
+        </Typography>
+        <Typography
+          variant="subtitle2"
+          fontWeight="bold"
+          color={"secondary.light"}
+        >
+          Email
+        </Typography>
+        <Typography variant="body1">{user.email}</Typography>
+        <Typography
+          variant="subtitle2"
+          fontWeight="bold"
+          color={"secondary.light"}
+        >
+          Joined
+        </Typography>
+        <Typography variant="body1">{formatDate(user.createdAt)}</Typography>
+        <Typography
+          variant="subtitle2"
+          fontWeight="bold"
+          color={"secondary.light"}
+        >
+          Interests
+        </Typography>
+        <Typography variant="body1">
+          {user.interests && user.interests.length > 0
+            ? user.interests
+            : "No interests listed"}
+        </Typography>
+        <Typography
+          variant="subtitle2"
+          fontWeight="bold"
+          color={"secondary.light"}
+        >
+          Website
+        </Typography>
+        <Typography variant="body1" fontWeight="bold">
+          <a
+            href={user.website || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              textDecoration: "none",
+              color: "inherit",
+            }}
           >
-            Bio
-          </Typography>
-          <Typography variant="subtitle1">
-            {user.bio || "No bio available."}
-          </Typography>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <Typography
-            variant="subtitle2"
-            fontWeight="bold"
-            color={"secondary.light"}
-          >
-            Email
-          </Typography>
-          <Typography variant="body1">{user.email}</Typography>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <Typography
-            variant="subtitle2"
-            fontWeight="bold"
-            color={"secondary.light"}
-          >
-            Joined
-          </Typography>
-          <Typography variant="body1">{formatDate(user.createdAt)}</Typography>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <Typography
-            variant="subtitle2"
-            fontWeight="bold"
-            color={"secondary.light"}
-          >
-            Interests
-          </Typography>
-          <Typography variant="body1">
-            {user.interests && user.interests.length > 0
-              ? user.interests
-              : "No interests listed"}
-          </Typography>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <Typography
-            variant="subtitle2"
-            fontWeight="bold"
-            color={"secondary.light"}
-          >
-            Website
-          </Typography>
-          <Typography variant="body1" fontWeight="bold">
-            <a
-              href={user.website || "#"}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                textDecoration: "none",
-                color: "inherit",
-              }}
-            >
-              {user.website || "No website"}
-            </a>
-          </Typography>
-        </Grid>
-      </Grid>
-
-      <Divider sx={{ my: 2, bgcolor: "rgb(136, 79, 144)" }} />
-
-      {/* Footer */}
-      <Box>
-        <Typography variant="caption" color="whitesmoke">
-          * Details are based on the information provided by the user.
+            {user.website || "No website"}
+          </a>
         </Typography>
       </Box>
     </Box>

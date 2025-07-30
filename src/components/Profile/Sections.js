@@ -1,4 +1,5 @@
-import { Box, Button, ButtonGroup, Chip, Typography } from "@mui/material";
+import { Box, Chip, Tab, Tabs, Typography } from "@mui/material";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { selectFollowerCount } from "../../redux/selectors/followerSelector";
@@ -8,54 +9,91 @@ const Sections = () => {
   const followerCount = useSelector(selectFollowerCount);
   const followingCount = useSelector(selectFollowingCount);
   const navigate = useNavigate();
+
+  const [value, setValue] = useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+    switch (newValue) {
+      case 0:
+        navigate("/profile/about");
+        break;
+      case 1:
+        navigate("/profile/followers");
+        break;
+      case 2:
+        navigate("/profile/following");
+        break;
+      case 3:
+        navigate("/profile/post");
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <Box
       sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
     >
-      <ButtonGroup color="secondary" aria-label="Medium-sized button group">
-        <Button onClick={() => navigate("/profile/about")}>
-          <Typography fontWeight={800} fontSize={16}>
-            About
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/profile/followers")}>
-          <Typography fontWeight={800} fontSize={16}>
-            Followers
-            <Chip
-              label={followerCount}
-              size="small"
-              sx={{
-                marginLeft: 1,
-                height: 18,
-                backgroundColor: "rgb(83, 81, 81)",
-                color: "whitesmoke",
-                border: "1px solid rgb(135, 108, 137)",
-              }}
-            />
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/profile/following")}>
-          <Typography fontWeight={800} fontSize={16}>
-            Following
-            <Chip
-              label={followingCount}
-              size="small"
-              sx={{
-                marginLeft: 1,
-                height: 18,
-                backgroundColor: "rgb(83, 81, 81)",
-                color: "whitesmoke",
-                border: "1px solid rgb(135, 108, 137)",
-              }}
-            />
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/profile/post")}>
-          <Typography fontWeight={800} fontSize={16}>
-            Posts
-          </Typography>
-        </Button>
-      </ButtonGroup>
+      <Tabs
+        value={value}
+        onChange={handleChange}
+        variant="scrollable"
+        scrollButtons={false}
+        aria-label="scrollable prevent tabs example"
+      >
+        <Tab
+          label={
+            <Typography fontWeight={800} color="secondary" fontSize={16}>
+              About
+            </Typography>
+          }
+        />
+        <Tab
+          label={
+            <Typography fontWeight={800} color="secondary" fontSize={16}>
+              Followers
+              <Chip
+                label={followerCount}
+                size="small"
+                sx={{
+                  marginLeft: 1,
+                  height: 18,
+                  backgroundColor: "rgb(83, 81, 81)",
+                  color: "whitesmoke",
+                  border: "1px solid rgb(135, 108, 137)",
+                }}
+              />
+            </Typography>
+          }
+        />
+        <Tab
+          label={
+            <Typography fontWeight={800} color="secondary" fontSize={16}>
+              Following
+              <Chip
+                label={followingCount}
+                size="small"
+                sx={{
+                  marginLeft: 1,
+                  height: 18,
+                  backgroundColor: "rgb(83, 81, 81)",
+                  color: "whitesmoke",
+                  border: "1px solid rgb(135, 108, 137)",
+                }}
+              />
+            </Typography>
+          }
+        />
+        <Tab
+          label={
+            <Typography fontWeight={800} color="secondary" fontSize={16}>
+              Posts
+            </Typography>
+          }
+        />
+      </Tabs>
     </Box>
   );
 };

@@ -69,13 +69,13 @@ const UploadBox = ({ handleClose }) => {
       sx={{
         width: {
           xs: "100%", // mobile
-          sm: "95%", // small tablets
+          sm: "98%", // small tablets
           md: "70%",
-          lg: "55%",
-          xl: "40%",
+          lg: "80%",
+          xl: "75%",
         },
         height: {
-          xs: "95%",
+          xs: "93%",
           md: "90%",
         },
         overflowY: "auto", // support scroll on small devices
@@ -84,8 +84,9 @@ const UploadBox = ({ handleClose }) => {
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        py: 2,
-        px: { xs: 2, sm: 3 },
+        py: 1,
+        my: 1,
+        px: { xs: 1, sm: 3 },
       }}
     >
       <Box sx={{ mb: 2, width: "100%" }}>
