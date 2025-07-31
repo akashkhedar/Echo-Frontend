@@ -1,101 +1,94 @@
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid2";
 import React, { useState, useEffect } from "react";
-import UserList from "./UserList";
+import { Box, Grid, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import axiosInstance from "../../axiosInstance";
-import { Typography } from "@mui/material";
+import UserList from "./UserList";
 import LoadingFriends from "./LoadingFriends";
 
 const FriendsPage = ({ path }) => {
+  const userId = useSelector((state) => state.user._id);
+
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const userId = useSelector((state) => state.user._id);
+  const isFollowersView = path === "/profile/followers";
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchConnections = async () => {
       setLoading(true);
       try {
-        if (path === "/profile/followers") {
-          const res = await axiosInstance.get(
-            `/user/fetch/followers/${userId}`
-          );
-          setFollowers(res.data);
-        } else {
-          const res = await axiosInstance.get(
-            `/user/fetch/following/${userId}`
-          );
-          setFollowing(res.data);
-        }
+        const endpoint = isFollowersView
+          ? `/user/fetch/followers/${userId}`
+          : `/user/fetch/following/${userId}`;
+        const response = await axiosInstance.get(endpoint);
+        isFollowersView
+          ? setFollowers(response.data)
+          : setFollowing(response.data);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching user connections:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [path, userId]);
+    fetchConnections();
+  }, [userId, path, isFollowersView]);
 
-  const renderEmptyState = (message) => (
+  const renderEmptyMessage = (text) => (
     <Box
       sx={{
-        width: "100%",
-        height: "10rem",
-        textAlign: "center",
+        flexGrow: 1,
+        minHeight: "calc(100vh - 12rem)", // Adjust based on your header/nav height
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        textAlign: "center",
+        width: "100%",
       }}
     >
       <Typography variant="h6" fontWeight={600} color="whitesmoke">
-        {message}
+        {text}
       </Typography>
     </Box>
   );
 
-  const isFollowers = path === "/profile/followers";
+  const renderUserCards = (list, setter) =>
+    list.map((user) => (
+      <Grid item xs={12} sm={6} md={4} lg={3} key={user._id}>
+        <UserList
+          user={user}
+          {...(isFollowersView
+            ? { setFollowers: setter }
+            : { setFollowing: setter })}
+        />
+      </Grid>
+    ));
 
   return (
     <Box
       sx={{
+        flexGrow: 1,
+        display: "flex",
+        flexDirection: "column",
         width: "100%",
-        height: "100%",
-        marginBottom: 2,
+        minHeight: "calc(100vh - 50rem)", // Adjust based on the layout
+        mb: 2,
       }}
     >
-      <Grid
-        container
-        spacing={{ xs: 1 }}
-        columns={{ xs: 4, sm: 8, md: 12 }}
-        sx={{ borderRadius: 2 }}
-      >
+      <Grid container px={1} spacing={2}>
         {loading ? (
           <LoadingFriends />
-        ) : isFollowers ? (
+        ) : isFollowersView ? (
           followers.length > 0 ? (
-            followers.map((follower) => (
-              <UserList
-                key={follower._id}
-                user={follower}
-                setFollowers={setFollowers}
-              />
-            ))
+            renderUserCards(followers, setFollowers)
           ) : (
-            renderEmptyState("You have no followers!")
+            renderEmptyMessage("You have no followers!")
           )
         ) : following.length > 0 ? (
-          following.map((followee) => (
-            <UserList
-              key={followee._id}
-              user={followee}
-              setFollowing={setFollowing}
-            />
-          ))
+          renderUserCards(following, setFollowing)
         ) : (
-          renderEmptyState("You are not following anyone!")
+          renderEmptyMessage("You are not following anyone!")
         )}
       </Grid>
     </Box>

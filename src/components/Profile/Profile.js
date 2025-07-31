@@ -20,20 +20,18 @@ const Profile = () => {
         marginTop: -0.6,
       }}
     >
-      <Box width={"97%"}>
-        <ProfileHeader />
-        <Sections />
+      <ProfileHeader />
 
-        {currentPath === "/profile/about" ? (
-          <About />
-        ) : currentPath === "/profile/following" ? (
-          <FriendsPage path={"/profile/following"} />
-        ) : currentPath === "/profile/followers" ? (
-          <FriendsPage path={"/profile/followers"} />
-        ) : (
-          <PostMade />
-        )}
-      </Box>
+      <Sections />
+      {currentPath === "/profile/about" ? (
+        <About />
+      ) : currentPath === "/profile/following" ? (
+        <FriendsPage path={"/profile/following"} />
+      ) : currentPath === "/profile/followers" ? (
+        <FriendsPage path={"/profile/followers"} />
+      ) : (
+        <PostMade />
+      )}
     </Box>
   );
 };

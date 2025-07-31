@@ -1,10 +1,17 @@
-import PersonAddAlt1RoundedIcon from "@mui/icons-material/PersonAddAlt1Rounded";
-import PersonRemoveAlt1RoundedIcon from "@mui/icons-material/PersonRemoveAlt1Rounded";
-import QuestionAnswerRoundedIcon from "@mui/icons-material/QuestionAnswerRounded";
-import { Avatar, IconButton, Typography } from "@mui/material";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid2";
-import Paper from "@mui/material/Paper";
+import React, { useState } from "react";
+import {
+  Avatar,
+  IconButton,
+  Typography,
+  Box,
+  Paper,
+  useMediaQuery,
+} from "@mui/material";
+import {
+  PersonAddAlt1Rounded as AddIcon,
+  PersonRemoveAlt1Rounded as RemoveIcon,
+  QuestionAnswerRounded as MessageIcon,
+} from "@mui/icons-material";
 import { experimentalStyled as styled } from "@mui/material/styles";
 import debounce from "lodash.debounce";
 import {
@@ -13,9 +20,8 @@ import {
   usePopupState,
 } from "material-ui-popup-state/hooks";
 import HoverPopover from "material-ui-popup-state/HoverPopover";
-import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../axiosInstance";
 import {
   removeFollower,
@@ -25,153 +31,167 @@ import HoverCard from "./HoverCard";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: "rgb(21, 21, 35)",
-  border: "1px solid  rgb(64, 44, 71)",
-  ...theme.typography.body2,
+  border: "1px solid rgb(64, 44, 71)",
   padding: theme.spacing(2),
   color: theme.palette.text.secondary,
-  ...theme.applyStyles("dark", {
-    backgroundColor: "#1A2027",
-  }),
   borderRadius: 30,
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
+  gap: theme.spacing(2),
+  flexWrap: "wrap",
+  minHeight: "70px",
 }));
 
-const UserList = ({ key, user, setFollowers = null, setFollowing = null }) => {
+const UserList = ({ user, setFollowers = null, setFollowing = null }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-  const path = location.pathname;
   const [add, setAdd] = useState(true);
+  const isFollowersPage = location.pathname === "/profile/followers";
 
   const popupState = usePopupState({
     variant: "popover",
-    popupId: "demoPopover",
+    popupId: "user-hover-popover",
   });
 
-  const updateList = async (userIdToRemove) => {
-    if (path === "/profile/followers") {
-      setFollowers((prev) => prev.filter((u) => u._id !== userIdToRemove));
-      dispatch(removeFollower(userIdToRemove));
-    } else {
-      setFollowing((prev) => prev.filter((u) => u._id !== userIdToRemove));
-      dispatch(removeFollowing(userIdToRemove));
-    }
-    setAdd((prev) => !prev);
+  const updateList = async (userId) => {
     try {
-      if (path === "/profile/followers") {
-        await axiosInstance.put(`/user/remove/${userIdToRemove}`);
+      if (isFollowersPage) {
+        setFollowers?.((prev) => prev.filter((u) => u._id !== userId));
+        dispatch(removeFollower(userId));
+        await axiosInstance.put(`/user/remove/${userId}`);
       } else {
-        await axiosInstance.put(`/user/unfollow/${userIdToRemove}`);
+        setFollowing?.((prev) => prev.filter((u) => u._id !== userId));
+        dispatch(removeFollowing(userId));
+        await axiosInstance.put(`/user/unfollow/${userId}`);
       }
+      setAdd((prev) => !prev);
     } catch (err) {
-      console.log(err);
+      console.error("Failed to update follow status:", err);
     }
   };
 
-  const handleRemoveFollower = debounce(updateList, 300);
+  const handleRemoveFollower = debounce(() => updateList(user._id), 300);
 
   return (
-    <Grid size={{ xs: 2, sm: 4, md: 4 }}>
-      <Item key={key}>
+    <Item>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1.5,
+          minWidth: 0,
+          flex: 1,
+          flexWrap: "nowrap",
+        }}
+      >
+        <Avatar
+          src={user.profileImage}
+          {...bindHover(popupState)}
+          sx={{
+            cursor: "pointer",
+            bgcolor: "#303049ff",
+            flexShrink: 0,
+            width: 40,
+            height: 40,
+          }}
+          onClick={() => navigate(`/${user.username}`)}
+        />
+
+        <HoverPopover
+          {...bindPopover(popupState)}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          transformOrigin={{ vertical: "top", horizontal: "center" }}
+          disableRestoreFocus
+          disableAutoFocus
+          onMouseEnter={popupState.open}
+          onMouseLeave={popupState.close}
+        >
+          <HoverCard
+            username={user.username}
+            userProfilePhoto={user.profileImage}
+          />
+        </HoverPopover>
+
         <Box
           sx={{
             display: "flex",
-            alignItems: "center",
-            gap: 1,
-            color: "whitesmoke",
+            flexDirection: "column",
+            minWidth: 0,
+            overflow: "hidden",
           }}
         >
-          <Avatar
-            src={user.profileImage}
-            {...bindHover(popupState)}
-            sx={{ cursor: "pointer", bgcolor: "#303049ff" }}
-            onClick={() => navigate(`/${user.username}`)}
-          />
-
-          <HoverPopover
-            {...bindPopover(popupState)}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "center",
-            }}
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "center",
-            }}
-            disableRestoreFocus // Prevents focus-related issues
-            disableAutoFocus // Ensures popover doesn't steal focus
-            onMouseEnter={() => popupState.open()} // Keeps the popover open on hover
-            onMouseLeave={() => popupState.close()} // Closes the popover when the mouse leaves
-          >
-            <HoverCard
-              username={user.username}
-              userProfilePhoto={user.profileImage}
-            />
-          </HoverPopover>
-          <Box
+          <Typography
+            variant="subtitle2"
+            color="rgb(191, 0, 255)"
             sx={{
-              display: "flex",
-              flexDirection: "column",
+              fontWeight: 600,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: { xs: "140px", sm: "170px", md: "200px" },
             }}
           >
-            <Typography variant="subtitle2" color="rgb(191, 0, 255)">
-              {user.username}
-            </Typography>
-
-            <Typography variant="subtitle2" color="rgb(147, 139, 148)">
-              {user.fullname}
-            </Typography>
-          </Box>
+            {user.username}
+          </Typography>
+          <Typography
+            variant="caption"
+            color="rgb(147, 139, 148)"
+            sx={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: { xs: "140px", sm: "170px", md: "200px" },
+            }}
+          >
+            {user.fullname}
+          </Typography>
         </Box>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton>
-            <QuestionAnswerRoundedIcon
+      </Box>
+
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 0.5,
+          flexShrink: 0,
+        }}
+      >
+        <IconButton size="small">
+          <MessageIcon
+            sx={{
+              p: 1,
+              color: "whitesmoke",
+              borderRadius: "50%",
+              "&:hover": { backgroundColor: "rgb(48, 48, 62)" },
+            }}
+          />
+        </IconButton>
+
+        <IconButton size="small" onClick={handleRemoveFollower}>
+          {add ? (
+            <RemoveIcon
               sx={{
-                borderRadius: "50%",
-                cursor: "pointer",
                 p: 1,
-                color: "whitesmoke",
-                "&:hover": {
-                  backgroundColor: "rgb(48, 48, 62)",
-                },
+                color: "rgb(194, 49, 49)",
+                borderRadius: "50%",
+                "&:hover": { backgroundColor: "rgb(48, 48, 62)" },
               }}
             />
-          </IconButton>
-          <IconButton
-            sx={{ ml: -1.5 }}
-            onClick={() => handleRemoveFollower(user._id)}
-          >
-            {add ? (
-              <PersonRemoveAlt1RoundedIcon
-                sx={{
-                  borderRadius: "50%",
-                  cursor: "pointer",
-                  p: 1,
-                  color: "rgb(194, 49, 49)",
-                  "&:hover": {
-                    backgroundColor: "rgb(48, 48, 62)",
-                  },
-                }}
-              />
-            ) : (
-              <PersonAddAlt1RoundedIcon
-                sx={{
-                  borderRadius: "50%",
-                  cursor: "pointer",
-                  p: 1,
-                  color: "rgb(49, 194, 56)",
-                  "&:hover": {
-                    backgroundColor: "rgb(48, 48, 62)",
-                  },
-                }}
-              />
-            )}
-          </IconButton>
-        </Box>
-      </Item>
-    </Grid>
+          ) : (
+            <AddIcon
+              sx={{
+                p: 1,
+                color: "rgb(49, 194, 56)",
+                borderRadius: "50%",
+                "&:hover": { backgroundColor: "rgb(48, 48, 62)" },
+              }}
+            />
+          )}
+        </IconButton>
+      </Box>
+    </Item>
   );
 };
 
