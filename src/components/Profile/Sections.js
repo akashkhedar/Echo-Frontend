@@ -34,7 +34,12 @@ const Sections = () => {
 
   return (
     <Box
-      sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        maxWidth: "100%",
+      }}
     >
       <Tabs
         value={value}
@@ -44,6 +49,7 @@ const Sections = () => {
         aria-label="scrollable prevent tabs example"
       >
         <Tab
+          wrapped
           label={
             <Typography fontWeight={800} color="secondary" fontSize={16}>
               About
@@ -51,6 +57,7 @@ const Sections = () => {
           }
         />
         <Tab
+          wrapped
           label={
             <Typography fontWeight={800} color="secondary" fontSize={16}>
               Followers
@@ -69,6 +76,7 @@ const Sections = () => {
           }
         />
         <Tab
+          wrapped
           label={
             <Typography fontWeight={800} color="secondary" fontSize={16}>
               Following
@@ -87,6 +95,7 @@ const Sections = () => {
           }
         />
         <Tab
+          wrapped
           label={
             <Typography fontWeight={800} color="secondary" fontSize={16}>
               Posts

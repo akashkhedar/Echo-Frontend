@@ -1,5 +1,4 @@
-import { Box, Divider } from "@mui/material";
-import React from "react";
+import { Box } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import About from "./About";
 import FriendsPage from "./FriendsPage";
@@ -24,7 +23,7 @@ const Profile = () => {
       <Box width={"97%"}>
         <ProfileHeader />
         <Sections />
-        <Divider variant="middle" sx={{ bgcolor: "secondary.light", my: 2 }} />
+
         {currentPath === "/profile/about" ? (
           <About />
         ) : currentPath === "/profile/following" ? (

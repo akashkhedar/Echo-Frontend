@@ -29,7 +29,7 @@ const About = () => {
         backgroundColor: "#1E1E2F",
         color: "whitesmoke",
         borderRadius: 2,
-        mb: isMobile ? 10 : 4, // leaves space for bottom nav if present
+        mb: isMobile ? 2 : 4, // leaves space for bottom nav if present
         boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
       }}
     >

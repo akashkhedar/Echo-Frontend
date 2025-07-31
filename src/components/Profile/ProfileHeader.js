@@ -45,14 +45,14 @@ const ProfileHeader = () => {
         borderRadius: 2,
         marginBottom: 3,
         boxShadow: 3,
-        width: "100%",
+        flexGrow: 1,
         background: "#1E1E2F",
         color: "whitesmoke",
       }}
     >
       <Box
         sx={{
-          height: isMobile ? 200 : isTablet ? 250 : 320,
+          height: isMobile ? 200 : isTablet ? 250 : 290,
           backgroundImage:
             "url(https://static.vecteezy.com/system/resources/thumbnails/024/692/112/small_2x/ai-generated-ai-generative-beautiful-rhododendron-flowers-over-sunset-mountains-field-landscape-graphic-art-photo.jpg)",
           objectFit: "cover",
@@ -60,6 +60,7 @@ const ProfileHeader = () => {
       />
       <Box
         sx={{
+          width: "100%",
           display: "flex",
           alignItems: "center",
           padding: 2,
