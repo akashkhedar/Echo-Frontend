@@ -29,13 +29,13 @@ const UploadPost = ({ open, handleClose }) => {
           sx={{
             height: "100dvh",
             width: "100dvh",
-            backgroundColor: "rgba(26, 12, 12, 0.2)",
             backdropFilter: "blur(10px)",
             WebkitBackdropFilter: "blur(10px)",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            px: 1, // add padding for smaller devices
+            px: 1,
+            outline: "none", // <- this removes the border/focus ring
           }}
         >
           <UploadBox handleClose={handleClose} />

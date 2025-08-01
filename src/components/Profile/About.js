@@ -26,6 +26,7 @@ const About = () => {
       sx={{
         px: isMobile ? 2 : 4,
         py: 3,
+        width: "90%",
         backgroundColor: "#1E1E2F",
         color: "whitesmoke",
         borderRadius: 2,

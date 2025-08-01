@@ -1,27 +1,51 @@
-import { Box, TextField, Button, Typography } from "@mui/material";
-import axiosInstance from "../../../axiosInstance";
+import { Alert, Box, Button, TextField, Typography } from "@mui/material";
 import { useState } from "react";
+import axiosInstance from "../../../axiosInstance";
 
 const EmailStep = () => {
   const [loading, setLoading] = useState(false);
   const [detail, setDetail] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isError, setIsError] = useState(false);
+
   const handleSubmit = async () => {
     try {
       setLoading(true);
-      await axiosInstance.post("/auth/forget-password", {
+      const res = await axiosInstance.post("/auth/forget-password", {
         userInfo: detail,
       });
+
+      if (res.status === 200) {
+        setIsSuccess(true);
+        setTimeout(() => {
+          setIsSuccess(false);
+        }, 1000);
+      }
     } catch (error) {
+      setIsError(true);
+      setTimeout(() => {
+        setIsError(false);
+      }, 1000);
     } finally {
       setLoading(false);
       setDetail("");
     }
   };
+
   return (
     <Box>
+      {isSuccess && (
+        <Alert severity="success" sx={{ width: "100%" }}>
+          Please check your mail for password reset link
+        </Alert>
+      )}
+
+      {isError && <Alert severity="error">User not found</Alert>}
+
       <Typography variant="h6" color="white" mb={2}>
         Enter your detail
       </Typography>
+
       <TextField
         fullWidth
         type="text"
@@ -39,27 +63,29 @@ const EmailStep = () => {
           },
         }}
       />
+
       <Button
         variant="contained"
         sx={{
           mt: 3,
           bgcolor: "violet",
-          "&.Mui-disabled": {
-            backgroundColor: "rgba(102, 14, 125, 1)", // darker blue when loading
-            color: "#fff",
-          },
+
           backgroundColor: "#ad19d2ff",
           color: "white",
           "&:hover": {
             backgroundColor: "#82109eff",
           },
+          "&.Mui-disabled": {
+            backgroundColor: "rgba(102, 14, 125, 1)", // darker blue when loading
+            color: "#fff",
+          },
         }}
-        onClick={handleSubmit}
-        disabled={!detail && !loading}
         loading={loading}
         loadingPosition="end"
+        onClick={handleSubmit}
+        disabled={!detail}
       >
-        Send Code
+        {loading ? "Sending..." : "Send Code"}
       </Button>
     </Box>
   );

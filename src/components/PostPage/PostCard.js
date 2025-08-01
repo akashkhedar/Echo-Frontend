@@ -282,9 +282,9 @@ const PostCard = ({ post, key, setPosts = null }) => {
             sx={{
               height: 0,
               paddingTop:
-                post.aspectRatio === "16:9"
+                post.aspectRatio === "1.91"
                   ? "56.25%"
-                  : post.aspectRatio === "1.91:1"
+                  : post.aspectRatio === "0.8"
                     ? "52.36%"
                     : "100%",
             }}

@@ -855,7 +855,7 @@ const SignUpPage = () => {
               }}
             >
               {steps.map((label) => (
-                <Step key={label}>
+                <Step sx={{ ml: -1 }} key={label}>
                   <StepLabel>{label}</StepLabel>
                 </Step>
               ))}

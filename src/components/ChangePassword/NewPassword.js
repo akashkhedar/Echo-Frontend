@@ -7,7 +7,7 @@ const NewPassword = ({ open, handleClose }) => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: { xs: "90%", sm: 500 },
+    width: { xs: "90%", sm: 400 },
     bgcolor: "#121212",
     borderRadius: 3,
     boxShadow: 24,
@@ -31,7 +31,7 @@ const NewPassword = ({ open, handleClose }) => {
             container
             direction="column"
             justifyContent="space-between"
-            sx={{ minHeight: "70vh" }}
+            sx={{ minHeight: "65vh" }}
           >
             <Box mb={3}>
               <Typography

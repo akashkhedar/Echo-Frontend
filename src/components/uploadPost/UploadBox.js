@@ -42,7 +42,6 @@ const UploadBox = ({ handleClose }) => {
     const formData = new FormData();
     formData.append("file", image);
     formData.append("upload_preset", "preset_echo");
-    formData.append("context", `aspectRatio=${ratio}`);
     try {
       const res = await axios.post(
         "https://api.cloudinary.com/v1_1/dty9upcat/image/upload",
@@ -56,6 +55,7 @@ const UploadBox = ({ handleClose }) => {
       await axiosInstance.post("/post/upload", {
         media: res.data.secure_url,
         caption: about.caption,
+        ratio: ratio,
       });
       handleClose();
     } catch (error) {

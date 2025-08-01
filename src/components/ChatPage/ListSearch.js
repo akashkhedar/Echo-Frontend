@@ -97,7 +97,6 @@ const ListSearch = () => {
         padding: 1,
         position: "sticky",
         top: "48px", // Below the header
-        backgroundColor: "#1E1E2F",
         zIndex: 1,
       }}
       ref={searchRef}

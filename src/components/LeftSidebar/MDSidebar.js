@@ -10,7 +10,9 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import UploadPost from "../uploadPost/UploadPost";
 import axiosInstance from "../../axiosInstance";
+import PasswordIcon from "@mui/icons-material/Password";
 import { selectHasUnreadMessages } from "../../redux/selectors/unreadSelector";
+import NewPassword from "../ChangePassword/NewPassword";
 
 const MDSidebar = () => {
   const navigate = useNavigate();
@@ -20,6 +22,10 @@ const MDSidebar = () => {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const [passModal, setPassModal] = React.useState(false);
+  const openPassModal = () => setPassModal(true);
+  const closePassModal = () => setPassModal(false);
 
   const handleLogout = async () => {
     try {
@@ -134,10 +140,14 @@ const MDSidebar = () => {
 
         {/* Logout */}
         <Box>
+          <Item onClick={openPassModal}>
+            <PasswordIcon sx={{ color: "whitesmoke" }} />
+          </Item>
           <Item onClick={handleLogout}>
             <LogoutOutlinedIcon sx={{ color: "whitesmoke" }} />
           </Item>
         </Box>
+        <NewPassword open={passModal} handleClose={closePassModal} />
       </Box>
     </Drawer>
   );

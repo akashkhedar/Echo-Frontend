@@ -1,65 +1,27 @@
 import SearchIcon from "@mui/icons-material/Search";
-import { AppBar, Avatar, IconButton, useMediaQuery } from "@mui/material";
+import {
+  AppBar,
+  Avatar,
+  IconButton,
+  InputAdornment,
+  TextField,
+  useMediaQuery,
+} from "@mui/material";
 import Box from "@mui/material/Box";
-import InputBase from "@mui/material/InputBase";
-import { styled } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
 import * as React from "react";
+import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Icon from "../../assets/Icon.png";
 import Logo from "../../assets/Logo.png";
 import axiosInstance from "../../axiosInstance";
 import SearchDropdown from "./SearchDropdown";
-import { useTheme } from "@mui/material/styles";
 
 const Navbar = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
-  const Search = styled("div")(({ theme }) => ({
-    position: "relative",
-    borderRadius: 25,
-    backgroundColor: "rgb(18, 18, 18)",
-    margin: "0 8px",
-    mr: isMobile ? "5px" : "0px",
-    height: "2.4rem",
-    width: "100%",
-    maxWidth: "45rem",
-    border: "1px solid #323232 ",
-    "&:hover": {
-      border: "1px solid rgb(41, 63, 89)",
-    },
-    "&:focus-within": {
-      border: "1px solid rgb(27, 103, 190)",
-    },
-  }));
-
-  const SearchIconWrapper = styled("div")(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: "100%",
-    position: "absolute",
-    pointerEvents: "none",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  }));
-
-  const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: "inherit",
-    "& .MuiInputBase-input": {
-      padding: theme.spacing(1, 1, 1, 0),
-      color: "whitesmoke",
-      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-      transition: theme.transitions.create("width"),
-      width: "100%",
-      [theme.breakpoints.up("sm")]: {
-        "&:focus": {
-          width: "10ch",
-        },
-      },
-    },
-  }));
 
   const [searchResults, setSearchResults] = React.useState([]);
   const [openDropdown, setOpenDropdown] = React.useState(false);
@@ -74,15 +36,15 @@ const Navbar = () => {
     return function (...args) {
       clearTimeout(timer);
       timer = setTimeout(() => {
-        func.apply(this, args);
+        func(...args); // Use passed arguments directly
       }, delay);
     };
   }
 
-  const handleSearch = async (e) => {
+  const handleSearch = async (query) => {
     try {
-      if (searchInput.length > 0) {
-        const res = await axiosInstance.get(`/user/search?q=${searchInput}`);
+      if (query.length > 0) {
+        const res = await axiosInstance.get(`/user/search?q=${query}`);
         const result = res.data.filter((p) => p._id !== user._id);
         setSearchResults(result);
         setOpenDropdown(true);
@@ -96,7 +58,7 @@ const Navbar = () => {
     }
   };
 
-  const debouncedSearch = debounce(handleSearch, 200);
+  const debouncedSearch = useRef(debounce(handleSearch, 200)).current;
 
   React.useEffect(() => {
     const handleClickOutside = (event) => {
@@ -118,6 +80,11 @@ const Navbar = () => {
     };
   }, []);
 
+  const searchInputRef = useRef("");
+  useEffect(() => {
+    searchInputRef.current = searchInput;
+  }, [searchInput]);
+
   return (
     <AppBar position="fixed">
       <Box
@@ -125,7 +92,7 @@ const Navbar = () => {
         sx={{
           display: "flex",
           flexDirection: "row",
-          justifyContent: "space-around",
+          justifyContent: "space-between",
           alignItems: "center",
           height: { xs: "3.6rem", sm: "3.6rem", md: "3.7rem" },
           backgroundImage: "linear-gradient(#1E1E2F, #121212)",
@@ -174,30 +141,56 @@ const Navbar = () => {
         <Box
           sx={{
             flex: 1,
+            maxWidth: "500px",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            position: "relative",
           }}
           ref={searchRef}
         >
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon sx={{ color: "white" }} />
-            </SearchIconWrapper>
-            <StyledInputBase
-              sx={{ color: "white", width: "100%" }}
-              onChange={(e) => {
-                setSearchInput(e.target.value);
-                debouncedSearch();
-              }}
-              value={searchInput}
-              onFocus={() => setOpenDropdown(true)}
-              placeholder="Search…"
-              inputProps={{ "aria-label": "search" }}
-            />
-          </Search>
+          <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="Search…"
+            value={searchInput}
+            onChange={(e) => {
+              setSearchInput(e.target.value);
+              debouncedSearch(e.target.value);
+            }}
+            onFocus={() => setOpenDropdown(true)}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "25px",
+                backgroundColor: "#1E1E2F",
+                color: "white",
+                height: "2.5rem",
+                paddingLeft: 1,
+                border: "1px solid #2c2c2c",
+                transition: "border 0.2s ease",
+                "&:hover": {
+                  borderColor: "#3f3f3f",
+                },
+                "&.Mui-focused": {
+                  borderColor: "#0078FF",
+                  boxShadow: "0 0 0 2px rgba(0, 120, 255, 0.2)",
+                },
+              },
+              input: {
+                color: "white",
+                padding: "0 10px",
+              },
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ color: "white", ml: 1 }} />
+                </InputAdornment>
+              ),
+            }}
+          />
 
-          {/* DROPDOWN BELOW */}
+          {/* Dropdown Component */}
           <SearchDropdown
             results={searchResults}
             navigate={navigate}

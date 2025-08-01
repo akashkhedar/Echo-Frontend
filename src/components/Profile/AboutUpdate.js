@@ -3,9 +3,12 @@ import {
   Button,
   FormControl,
   Grid,
+  IconButton,
   MenuItem,
   TextField,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import Backdrop from "@mui/material/Backdrop";
 import Fade from "@mui/material/Fade";
@@ -24,27 +27,7 @@ import * as yup from "yup";
 import axiosInstance from "../../axiosInstance";
 import { setUser } from "../../redux/slices/AuthSlice/AuthSlice";
 import DeleteAccountModal from "./DeleteAccountModal";
-
-const style = {
-  position: "absolute",
-  overflowY: "auto",
-  height: "35rem",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: " #1e1e2f",
-  border: "2px solid #000",
-  boxShadow: 24,
-  borderRadius: 2,
-  px: 4,
-  py: 2,
-  "&::-webkit-scrollbar": {
-    display: "none",
-  },
-  "-ms-overflow-style": "none",
-  "scrollbar-width": "none",
-};
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 
 const usernameRegex = /^(?!.*[._]{2})[a-z0-9._]{4,25}$/;
 const usernameBoundaryRegex = /^(?![._])[a-z0-9._]+(?<![._])$/;
@@ -199,6 +182,9 @@ const AboutUpdate = ({ open, handleClose, user }) => {
   const closeDelModal = () => setDelModal(false);
   const handleLoading = () => setLoading(!loading);
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   return (
     <Modal
       aria-labelledby="transition-modal-title"
@@ -215,16 +201,65 @@ const AboutUpdate = ({ open, handleClose, user }) => {
     >
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Fade in={open}>
-          <Box sx={style}>
-            <Typography
-              id="transition-modal-title"
-              variant="h5"
-              fontWeight={800}
-              color="secondary.light"
-              pb={2}
+          <Box
+            sx={{
+              position: "absolute",
+              overflowY: "auto",
+              height: isMobile ? "90vh" : "35rem",
+              width: isMobile ? "90vw" : 400,
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              bgcolor: "#1e1e2f",
+              border: "2px solid #000",
+              boxShadow: 24,
+              borderRadius: 2,
+              px: isMobile ? 2 : 4,
+              py: 2,
+              "&::-webkit-scrollbar": {
+                display: "none",
+              },
+              "-ms-overflow-style": "none",
+              "scrollbar-width": "none",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 2,
+              }}
             >
-              Edit Profile
-            </Typography>
+              <Typography
+                id="transition-modal-title"
+                variant="h6"
+                fontWeight={700}
+                color="secondary.light"
+                sx={{
+                  flexGrow: 1,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                Edit Profile
+              </Typography>
+              <IconButton
+                onClick={handleClose}
+                sx={{
+                  color: "secondary.light",
+                  ml: 1,
+                  p: 0.5,
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  },
+                }}
+              >
+                <CloseRoundedIcon />
+              </IconButton>
+            </Box>
+
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -486,9 +521,14 @@ const AboutUpdate = ({ open, handleClose, user }) => {
                   },
                 }}
               />
-              <Grid container spacing={2} sx={{ marginBottom: 2 }}>
+              <Grid
+                container
+                spacing={isMobile ? 0 : 2}
+                direction={isMobile ? "column" : "row"}
+                sx={{ marginBottom: 2 }}
+              >
                 {/* Date of Birth */}
-                <Grid item xs={6} sm={6}>
+                <Grid item xs={12} sm={6}>
                   <DatePicker
                     value={
                       formikProfile.values.dob
@@ -540,7 +580,7 @@ const AboutUpdate = ({ open, handleClose, user }) => {
                 </Grid>
 
                 {/* Gender Selection */}
-                <Grid item xs={6} sm={6} margin="normal">
+                <Grid item xs={12} sm={6}>
                   <FormControl
                     fullWidth
                     sx={{
