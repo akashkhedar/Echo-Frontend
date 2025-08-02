@@ -140,6 +140,11 @@ const PostCard = ({ post, key, setPosts = null }) => {
     return `${day}-${month}-${year}`;
   }
 
+  const getPaddingTop = (aspectRatio) => {
+    if (!aspectRatio || isNaN(aspectRatio)) return "100%";
+    return `${(1 / aspectRatio) * 100}%`;
+  };
+
   return (
     <>
       <Card
@@ -281,12 +286,7 @@ const PostCard = ({ post, key, setPosts = null }) => {
             image={post.media}
             sx={{
               height: 0,
-              paddingTop:
-                post.aspectRatio === "1.91"
-                  ? "56.25%"
-                  : post.aspectRatio === "0.8"
-                    ? "52.36%"
-                    : "100%",
+              paddingTop: getPaddingTop(post.ratio),
             }}
             alt="user post"
           />
@@ -358,7 +358,7 @@ const PostCard = ({ post, key, setPosts = null }) => {
         </CardContent>
         <CardContent
           sx={{
-            marginBottom: -1.5,
+            marginBottom: -2.3,
             marginTop: -2.6,
             fontFamily: "Roboto",
             marginX: "-1rem",

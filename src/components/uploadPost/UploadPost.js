@@ -2,7 +2,6 @@ import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Fade from "@mui/material/Fade";
 import Modal from "@mui/material/Modal";
-import React from "react";
 import UploadBox from "./UploadBox";
 
 const UploadPost = ({ open, handleClose }) => {

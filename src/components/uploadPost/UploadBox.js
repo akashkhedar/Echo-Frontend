@@ -10,18 +10,9 @@ import axiosInstance from "../../axiosInstance";
 const UploadBox = ({ handleClose }) => {
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
-  const forward = () => {
-    setStep((prev) => prev + 1);
-  };
-  const backward = () => {
-    setStep((prev) => prev - 1);
-  };
-  const [file, setFile] = useState({
-    file: "",
-    coordinates: {},
-    ratio: 1,
-    croppedImage: "",
-  });
+
+  const [file, setFile] = useState(null); // This will store the File object
+  const [croppedFile, setCroppedFile] = useState(null); // This will store the cropped File
 
   const [about, setAbout] = useState({
     caption: "",
@@ -29,19 +20,25 @@ const UploadBox = ({ handleClose }) => {
     mentions: "",
   });
 
+  const forward = () => {
+    setStep((prev) => prev + 1);
+  };
+
+  const backward = () => {
+    setStep((prev) => prev - 1);
+  };
+
   const handlePost = async () => {
-    setLoading(true);
-    const ratio = file.ratio;
-    const croppedImage = file.croppedImage;
-    if (!croppedImage) {
-      throw new Error("No Blob to upload");
+    if (!croppedFile) {
+      console.error("No cropped image to upload");
+      return;
     }
-    const image = new File([croppedImage], "cropped-image.jpg", {
-      type: "image/jpeg",
-    });
+
+    setLoading(true);
     const formData = new FormData();
-    formData.append("file", image);
+    formData.append("file", croppedFile);
     formData.append("upload_preset", "preset_echo");
+
     try {
       const res = await axios.post(
         "https://api.cloudinary.com/v1_1/dty9upcat/image/upload",
@@ -52,6 +49,9 @@ const UploadBox = ({ handleClose }) => {
           },
         }
       );
+
+      const ratio = res.data.width / res.data.height;
+
       await axiosInstance.post("/post/upload", {
         media: res.data.secure_url,
         caption: about.caption,
@@ -64,12 +64,13 @@ const UploadBox = ({ handleClose }) => {
       setLoading(false);
     }
   };
+
   return (
     <Box
       sx={{
         width: {
-          xs: "100%", // mobile
-          sm: "98%", // small tablets
+          xs: "100%",
+          sm: "98%",
           md: "70%",
           lg: "80%",
           xl: "75%",
@@ -78,7 +79,7 @@ const UploadBox = ({ handleClose }) => {
           xs: "93%",
           md: "90%",
         },
-        overflowY: "auto", // support scroll on small devices
+        overflowY: "auto",
         backgroundColor: "rgb(32, 32, 40)",
         borderRadius: 3,
         display: "flex",
@@ -102,7 +103,7 @@ const UploadBox = ({ handleClose }) => {
         }}
       >
         {step === 0 ? (
-          <ImageCropper file={file} setFile={setFile} />
+          <ImageCropper file={file} setCroppedFile={setCroppedFile} />
         ) : (
           <PostCreator about={about} setAbout={setAbout} />
         )}
@@ -110,13 +111,14 @@ const UploadBox = ({ handleClose }) => {
 
       <Box sx={{ mt: 3, width: "100%" }}>
         <Controls
-          file={file}
           setFile={setFile}
           forward={forward}
           backward={backward}
           step={step}
           handlePost={handlePost}
           loading={loading}
+          hasFile={!!file}
+          hasCroppedFile={!!croppedFile}
         />
       </Box>
     </Box>

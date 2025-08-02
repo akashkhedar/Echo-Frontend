@@ -8,19 +8,17 @@ import { Box } from "@mui/system";
 const Controls = ({
   forward,
   backward,
-  file,
   setFile,
   step,
   handlePost,
   loading,
+  hasFile,
+  hasCroppedFile,
 }) => {
   const handleFile = (e) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
-      setFile((prev) => ({
-        ...prev,
-        file: URL.createObjectURL(selectedFile), // Store the actual File object, not a preview URL
-      }));
+      setFile(selectedFile); // Store the actual File object
     }
   };
 
@@ -42,26 +40,27 @@ const Controls = ({
             id="file-upload"
             name="file"
             onChange={handleFile}
+            accept="image/*"
             style={{ display: "none" }}
           />
           <Button
             variant="contained"
             color="primary"
-            fullWidth={true} // for xs screens
-            sx={{ minWidth: "unset" }} // override MUI default
+            fullWidth
+            sx={{ minWidth: "unset" }}
             component="span"
             startIcon={<PhotoSizeSelectActualRoundedIcon />}
           >
             <Typography variant="body1" fontWeight={700}>
-              {file.file ? "Change" : "Upload"}
+              {hasFile ? "Change" : "Upload"}
             </Typography>
           </Button>
         </label>
       ) : (
         <Button
           variant="contained"
-          fullWidth={true} // for xs screens
-          sx={{ minWidth: "unset" }} // override MUI default
+          fullWidth
+          sx={{ minWidth: "unset" }}
           color="success"
           onClick={backward}
           startIcon={<ArrowBackIcon />}
@@ -76,15 +75,15 @@ const Controls = ({
           variant="contained"
           color="success"
           onClick={forward}
-          disabled={!file.file}
+          disabled={!hasCroppedFile}
           endIcon={<ArrowForwardIcon />}
-          fullWidth={true} // for xs screens
-          sx={{ minWidth: "unset" }} // override MUI default
+          fullWidth
+          sx={{ minWidth: "unset" }}
         >
           <Typography
             variant="body1"
             fontWeight={700}
-            color={file.file ? "whitesmoke" : "rgb(58, 58, 60)"}
+            color={hasCroppedFile ? "whitesmoke" : "rgb(58, 58, 60)"}
           >
             Continue
           </Typography>
@@ -94,8 +93,8 @@ const Controls = ({
           variant="contained"
           color="secondary"
           onClick={handlePost}
-          disabled={!file.file && loading}
-          fullWidth={true} // for xs screens
+          disabled={!hasCroppedFile || loading}
+          fullWidth
           startIcon={<CheckCircleRoundedIcon />}
           sx={{
             backgroundColor: "#ad19d2ff",
@@ -104,20 +103,18 @@ const Controls = ({
               backgroundColor: "#82109eff",
             },
             "&.Mui-disabled": {
-              backgroundColor: "rgba(102, 14, 125, 1)", // darker blue when loading
+              backgroundColor: "rgba(102, 14, 125, 1)",
               color: "#fff",
             },
             minWidth: "unset",
           }}
-          loading={loading}
-          loadingPosition="end"
         >
           <Typography
             variant="body1"
             fontWeight={700}
-            color={file.file ? "whitesmoke" : "rgb(58, 58, 60)"}
+            color={hasCroppedFile ? "whitesmoke" : "rgb(58, 58, 60)"}
           >
-            Upload
+            {loading ? "Uploading..." : "Upload"}
           </Typography>
         </Button>
       )}
