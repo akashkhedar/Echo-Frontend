@@ -1,4 +1,5 @@
 import { Phone, Videocam } from "@mui/icons-material";
+import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 import {
   Avatar,
   Box,
@@ -9,11 +10,10 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectChatUser } from "../../redux/selectors/statusSelector";
+import useSelectedChatUser from "../../hooks/useSelectedChatUser";
+import { clearChat } from "../../redux/slices/ChatSlice/ChatSlice";
 import socket from "../../utils/socket";
 import CallingModal from "./CallingModal";
-import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
-import { clearChat } from "../../redux/slices/ChatSlice/ChatSlice";
 
 const theme = createTheme({
   breakpoints: {
@@ -34,7 +34,7 @@ const ChatHeader = () => {
     dispatch(clearChat());
   };
 
-  const user = useSelector(selectChatUser);
+  const user = useSelectedChatUser();
   const callerId = useSelector((state) => state.user?._id);
   const calleeId = user?._id;
 
@@ -74,6 +74,7 @@ const ChatHeader = () => {
             <ArrowBackIosRoundedIcon sx={{ color: "white", mr: 3, ml: -0.5 }} />
           </IconButton>
         )}
+
         <Avatar
           src={user.profileImage}
           alt={user.username}

@@ -2,11 +2,23 @@ import { Box, Chip, Tab, Tabs, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import * as React from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Sections = () => {
   const navigate = useNavigate();
-  const [value, setValue] = React.useState(0);
+  const location = useLocation();
+  const path = location.pathname;
+
+  const pathMap = {
+    "/profile/about": 0,
+    "/profile/followers": 1,
+    "/profile/following": 2,
+    "/profile/post": 3,
+  };
+
+  const initalPath = pathMap[path] ?? 0;
+
+  const [value, setValue] = React.useState(initalPath);
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };

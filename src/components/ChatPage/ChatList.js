@@ -1,3 +1,4 @@
+import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 import {
   Box,
   createTheme,
@@ -8,7 +9,8 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectConversations } from "../../redux/selectors/unreadSelector";
+import { useNavigate } from "react-router-dom";
+import useConversationList from "../../hooks/useConversationList";
 import {
   setUserOffline,
   setUserOnline,
@@ -18,8 +20,6 @@ import ChatListLoading from "./ChatListLoading";
 import ConversationsList from "./ConversationsList";
 import EmptyChatList from "./EmptyChatList";
 import ListSearch from "./ListSearch";
-import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
-import { useNavigate } from "react-router-dom";
 
 const theme = createTheme({
   breakpoints: {
@@ -33,7 +33,8 @@ const theme = createTheme({
 
 const ChatList = () => {
   const navigate = useNavigate();
-  const conversations = useSelector(selectConversations);
+  const { userId } = useSelector((state) => state.user);
+  const { data: conversations } = useConversationList(userId);
   const selectedChat = useSelector((state) => state.chat.chatId);
   const dispatch = useDispatch();
 

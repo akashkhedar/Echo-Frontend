@@ -1,6 +1,7 @@
 import { useMediaQuery } from "@mui/material";
 import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material/styles";
+import { QueryClient, useQuery } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,7 +10,6 @@ import axiosInstance from "../axiosInstance";
 import useConversationSelection from "../hooks/useConversationSelection";
 import { selectConversations } from "../redux/selectors/unreadSelector";
 import { clearChat, setChat } from "../redux/slices/ChatSlice/ChatSlice";
-import { setConversations } from "../redux/slices/ConversationSlice/ConversationSlice";
 import socket from "../utils/socket";
 import SimpleBottomNavigation from "./BottomNavigation/BottomNavigation";
 import LGSidebar from "./LeftSidebar/LGSidebar";
@@ -18,9 +18,11 @@ import Navbar from "./Navbar/Navbar";
 import NotifyCall from "./NotifyCall";
 import NotifyMessage, { default as NotifyMsg } from "./NotifyMessage";
 import LGQuickChat from "./RightSidebar/LGQuickChat";
+import { useQueryClient } from "@tanstack/react-query";
 import MDQuickChat from "./RightSidebar/MDQuickChat";
 
 const HomeLayout = ({ children }) => {
+  const queryClient = useQueryClient();
   const theme = useTheme();
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -41,17 +43,26 @@ const HomeLayout = ({ children }) => {
   const currentOpenedChat = useSelector((state) => state.chat.chatId);
   const convo = useSelector(selectConversations);
 
+  const { data: conversations } = useQuery({
+    queryKey: ["conversations", userId],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/chat/list");
+      return res.data;
+    },
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  });
+
   const [verified, setVerified] = useState(false);
 
   const [currentCallSnackbarKey, setCurrentCallSnackbarKey] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const joinRooms = async () => {
       try {
         socket.emit("joinChat", userId);
-        const res = await axiosInstance.get("/chat/list");
-        dispatch(setConversations(res.data));
-        const rooms = res.data.map((convo) => convo.roomId);
+
+        const rooms = conversations?.map((convo) => convo.roomId) || [];
         socket.emit("joinAllRooms", rooms);
         setVerified(true);
       } catch (error) {
@@ -61,7 +72,9 @@ const HomeLayout = ({ children }) => {
       }
     };
 
-    fetchData();
+    if (conversations) {
+      joinRooms();
+    }
 
     const handleBeforeUnload = () => {
       socket.emit("leaveChat", userId);
@@ -74,7 +87,36 @@ const HomeLayout = ({ children }) => {
       socket.off("leaveChat");
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [dispatch, navigate, userId]);
+  }, [conversations, dispatch, navigate, userId]);
+
+  useEffect(() => {
+    socket.on("userOnline", (id) => {
+      console.log("online", id);
+      queryClient.setQueryData(["conversations", userId], (old) =>
+        old?.map((convo) =>
+          convo.user._id === id
+            ? { ...convo, user: { ...convo.user, isOnline: true } }
+            : convo
+        )
+      );
+    });
+
+    socket.on("userOffline", (id) => {
+      console.log("offline", id);
+      queryClient.setQueryData(["conversations", userId], (old) =>
+        old?.map((convo) =>
+          convo.user._id === id
+            ? { ...convo, user: { ...convo.user, isOnline: false } }
+            : convo
+        )
+      );
+    });
+
+    return () => {
+      socket.off("userOnline");
+      socket.off("userOffline");
+    };
+  }, [userId]);
 
   useEffect(() => {
     socket.on("receiveMsg", (message, username) => {
@@ -113,7 +155,12 @@ const HomeLayout = ({ children }) => {
     });
 
     socket.on("newConvo", (newConvo) => {
-      dispatch(setConversations([...convo, newConvo]));
+      QueryClient.setQueryData(["conversations", userId], (old = []) => {
+        const exists = old.some((c) => c._id === newConvo._id);
+        return exists ? old : [newConvo, ...old];
+      });
+
+      // Auto-select the conversation
       selectConversation(newConvo, userId);
       navigate("/chat");
     });

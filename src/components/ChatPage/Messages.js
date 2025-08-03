@@ -1,95 +1,70 @@
 import { Box, styled } from "@mui/material";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  markMessageRead,
-  setChat,
-} from "../../redux/slices/ChatSlice/ChatSlice";
-import socket from "../../utils/socket";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
+import { useSelector } from "react-redux";
 import Message from "./Message";
 import NewMessage from "./NewMessage";
 import QuickChat from "../../assets/QuickChat.jpg";
 import { useLocation } from "react-router-dom";
-import axiosInstance from "../../axiosInstance";
 import LoadingChats from "./LoadingChats";
+import useChatMessages from "../../hooks/useChatMessages";
 
 const MessageContainer = styled(Box)({
   display: "flex",
   flexDirection: "column",
 });
 
-const MessageSection = () => {
+const StyledBox = styled(Box)({
+  padding: "12px",
+  height: "100%",
+  overflowY: "auto",
+  flexGrow: 1,
+  "&::-webkit-scrollbar": { display: "none" },
+  scrollbarWidth: "none",
+  display: "flex",
+  flexDirection: "column",
+  "-ms-overflow-style": "none",
+});
+
+const Messages = () => {
   const outerDiv = useRef(null);
-  const innerDiv = useRef(null);
+  const scrollRef = useRef(null);
   const path = useLocation();
 
-  useEffect(() => {
-    if (path.pathname === "/") {
-      outerDiv.current.style.background = `url(${QuickChat}) no-repeat center center/cover`;
-    }
-  });
-
-  const StyledBox = styled(Box)({
-    padding: "12px",
-    height: "100%",
-    overflowY: "auto",
-    flexGrow: 1,
-    "&::-webkit-scrollbar": { display: "none" },
-    scrollbarWidth: "none",
-
-    display: "flex",
-    flexDirection: "column",
-    "-ms-overflow-style": "none",
-  });
-
-  const dispatch = useDispatch();
   const userId = useSelector((state) => state.user._id);
-  const chats = useSelector((state) => state.chat.chat);
   const currentOpenedChat = useSelector((state) => state.chat.chatId);
 
-  const scrollRef = useRef(null);
-
-  const [loading, setLoading] = useState(true);
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useChatMessages(currentOpenedChat);
 
   useEffect(() => {
-    const fetchChats = async () => {
-      try {
-        setLoading(true);
-        const res = await axiosInstance(`/chat/fetch/msg/${currentOpenedChat}`);
-        dispatch(setChat(res.data));
-      } catch (error) {
-        setLoading(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchChats();
-  }, [currentOpenedChat, dispatch]);
+    if (path.pathname === "/" && outerDiv.current) {
+      outerDiv.current.style.background = `url(${QuickChat}) no-repeat center center/cover`;
+    }
+  }, [path]);
 
   useLayoutEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "auto" });
     }
-  }, [chats, currentOpenedChat]);
+  }, [data]);
 
-  useEffect(() => {
-    const handleMessageRead = (messageId) => {
-      dispatch(markMessageRead(messageId));
-    };
+  const handleScroll = (e) => {
+    const scrollTop = e.target.scrollTop;
+    if (scrollTop === 0 && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
 
-    socket.on("receiverRead", handleMessageRead);
-    return () => socket.off("receiverRead", handleMessageRead);
-  }, [dispatch]);
+  const messages = data?.pages?.flat() || [];
 
   return (
     <div style={{ position: "relative", height: "100%" }}>
-      <StyledBox ref={outerDiv}>
-        <MessageContainer ref={innerDiv}>
-          {loading ? (
+      <StyledBox ref={outerDiv} onScroll={handleScroll}>
+        <MessageContainer>
+          {isLoading ? (
             <LoadingChats />
-          ) : chats.length > 0 ? (
-            chats.map((msg) => (
+          ) : messages.length > 0 ? (
+            messages.map((msg) => (
               <Message msg={msg} userId={userId} key={msg._id} />
             ))
           ) : (
@@ -102,4 +77,4 @@ const MessageSection = () => {
   );
 };
 
-export default MessageSection;
+export default Messages;

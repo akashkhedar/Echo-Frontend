@@ -9,14 +9,19 @@ import {
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import useConversationSelection from "../../hooks/useConversationSelection";
+import { useNavigate } from "react-router-dom";
 
 const ConversationsList = ({ conversation, selectedChat }) => {
+  const navigate = useNavigate();
   const { _id } = useSelector((state) => state.user);
   const selectConversation = useConversationSelection();
   return (
     <ListItem
       key={conversation._id}
-      onClick={() => selectConversation(conversation, _id)}
+      onClick={async () => {
+        await selectConversation(conversation, _id);
+        navigate("/chat"); // <- move navigation only after selection is done
+      }}
       sx={{
         display: "flex",
         alignItems: "center",
