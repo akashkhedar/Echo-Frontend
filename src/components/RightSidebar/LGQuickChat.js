@@ -9,10 +9,11 @@ import QuickMessages from "./QuickMessages";
 import UserTabs from "./UserTabs";
 import ListLoading from "./ListLoading";
 import EmptyChatList from "./EmptyChatList";
-import { selectConversations } from "../../redux/selectors/unreadSelector";
+import useConversationList from "../../hooks/useConversationList";
 
 const LGQuickChat = () => {
-  const conversations = useSelector(selectConversations);
+  const { userId } = useSelector((state) => state.user);
+  const { data: conversations } = useConversationList(userId);
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);

@@ -1,5 +1,4 @@
-import React from "react";
-import { Skeleton, Box, Grid, useTheme } from "@mui/material";
+import { Box, Grid, Skeleton } from "@mui/material";
 
 const LoadingFriends = () => {
   return (

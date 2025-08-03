@@ -11,14 +11,12 @@ import { useNavigate } from "react-router-dom";
 import UploadPost from "../uploadPost/UploadPost";
 import axiosInstance from "../../axiosInstance";
 import PasswordIcon from "@mui/icons-material/Password";
-import { selectHasUnreadMessages } from "../../redux/selectors/unreadSelector";
 import NewPassword from "../ChangePassword/NewPassword";
 
 const MDSidebar = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
-  const hasUnread = useSelector(selectHasUnreadMessages);
-
+  const hasUnread = true;
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);

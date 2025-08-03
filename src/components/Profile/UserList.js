@@ -1,17 +1,9 @@
-import React, { useState } from "react";
-import {
-  Avatar,
-  IconButton,
-  Typography,
-  Box,
-  Paper,
-  useMediaQuery,
-} from "@mui/material";
 import {
   PersonAddAlt1Rounded as AddIcon,
-  PersonRemoveAlt1Rounded as RemoveIcon,
   QuestionAnswerRounded as MessageIcon,
+  PersonRemoveAlt1Rounded as RemoveIcon,
 } from "@mui/icons-material";
+import { Avatar, Box, IconButton, Paper, Typography } from "@mui/material";
 import { experimentalStyled as styled } from "@mui/material/styles";
 import debounce from "lodash.debounce";
 import {
@@ -20,8 +12,9 @@ import {
   usePopupState,
 } from "material-ui-popup-state/hooks";
 import HoverPopover from "material-ui-popup-state/HoverPopover";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axiosInstance from "../../axiosInstance";
 import {
   removeFollower,

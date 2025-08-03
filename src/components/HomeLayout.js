@@ -8,7 +8,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import axiosInstance from "../axiosInstance";
 import useConversationSelection from "../hooks/useConversationSelection";
-import { selectConversations } from "../redux/selectors/unreadSelector";
 import { clearChat, setChat } from "../redux/slices/ChatSlice/ChatSlice";
 import socket from "../utils/socket";
 import SimpleBottomNavigation from "./BottomNavigation/BottomNavigation";
@@ -41,7 +40,6 @@ const HomeLayout = ({ children }) => {
   const chats = useSelector((state) => state.chat.chat);
   const userId = useSelector((state) => state.user._id);
   const currentOpenedChat = useSelector((state) => state.chat.chatId);
-  const convo = useSelector(selectConversations);
 
   const { data: conversations } = useQuery({
     queryKey: ["conversations", userId],
@@ -116,7 +114,7 @@ const HomeLayout = ({ children }) => {
       socket.off("userOnline");
       socket.off("userOffline");
     };
-  }, [userId]);
+  }, [queryClient, userId]);
 
   useEffect(() => {
     socket.on("receiveMsg", (message, username) => {
@@ -149,7 +147,7 @@ const HomeLayout = ({ children }) => {
     });
 
     socket.on("redirectConvo", (id) => {
-      const selectedConvo = convo.find((c) => c._id === id);
+      const selectedConvo = conversations.find((c) => c._id === id);
       selectConversation(selectedConvo, userId);
       navigate("/chat");
     });
@@ -246,7 +244,6 @@ const HomeLayout = ({ children }) => {
   }, [
     currentOpenedChat,
     userId,
-    convo,
     dispatch,
     chats,
     selectConversation,
@@ -254,6 +251,7 @@ const HomeLayout = ({ children }) => {
     enqueueSnackbar,
     closeSnackbar,
     currentCallSnackbarKey,
+    conversations,
   ]);
 
   return verified ? (

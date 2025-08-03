@@ -10,13 +10,12 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../axiosInstance";
 import UploadPost from "../uploadPost/UploadPost";
-import { selectHasUnreadMessages } from "../../redux/selectors/unreadSelector";
 import PasswordIcon from "@mui/icons-material/Password";
 import NewPassword from "../ChangePassword/NewPassword";
 
 const LGSidebar = () => {
-  const hasUnread = useSelector(selectHasUnreadMessages);
   const navigate = useNavigate();
+  const hasUnread = true;
 
   const Item = styled(Box)(({ theme }) => ({
     display: "flex",

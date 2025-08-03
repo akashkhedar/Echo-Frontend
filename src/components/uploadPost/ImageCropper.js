@@ -144,6 +144,7 @@ const ImageCropper = ({ file, setCroppedFile }) => {
     }, 100);
 
     return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [completedCrop, imageLoaded]);
 
   return (
