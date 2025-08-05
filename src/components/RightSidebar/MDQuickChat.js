@@ -1,19 +1,20 @@
-import * as React from "react";
+import Diversity1OutlinedIcon from "@mui/icons-material/Diversity1Outlined";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
-import List from "@mui/material/List";
 import IconButton from "@mui/material/IconButton";
-import Diversity1OutlinedIcon from "@mui/icons-material/Diversity1Outlined";
+import List from "@mui/material/List";
+import * as React from "react";
 import { useSelector } from "react-redux";
-import UserTabs from "./UserTabs";
-import QuickMessages from "./QuickMessages";
-import ListLoading from "./ListLoading";
-import EmptyChatList from "./EmptyChatList";
 import useConversationList from "../../hooks/useConversationList";
+import EmptyChatList from "./EmptyChatList";
+import ListLoading from "./ListLoading";
+import QuickMessages from "./QuickMessages";
+import UserTabs from "./UserTabs";
 
 const MDQuickChat = () => {
-  const { userId } = useSelector((state) => state.user);
+  const userId = useSelector((state) => state.user._id);
   const { data: conversations } = useConversationList(userId);
+
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);

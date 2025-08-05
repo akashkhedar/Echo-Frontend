@@ -14,7 +14,6 @@ import {
 
 import AuthSlice from "./slices/AuthSlice/AuthSlice";
 import ChatSlice from "./slices/ChatSlice/ChatSlice";
-import ConversationSlice from "./slices/ConversationSlice/ConversationSlice";
 
 const authPersistConfig = {
   key: "auth",
@@ -31,7 +30,6 @@ const chatPersistConfig = {
 const rootReducer = combineReducers({
   user: persistReducer(authPersistConfig, AuthSlice),
   chat: persistReducer(chatPersistConfig, ChatSlice),
-  convo: persistReducer(chatPersistConfig, ConversationSlice),
 });
 
 export const store = configureStore({

@@ -1,12 +1,12 @@
 import { useMediaQuery } from "@mui/material";
 import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material/styles";
-import { QueryClient, useQuery } from "@tanstack/react-query";
+import { QueryClient, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import axiosInstance from "../axiosInstance";
+import useConversationList from "../hooks/useConversationList";
 import useConversationSelection from "../hooks/useConversationSelection";
 import { clearChat, setChat } from "../redux/slices/ChatSlice/ChatSlice";
 import socket from "../utils/socket";
@@ -17,7 +17,6 @@ import Navbar from "./Navbar/Navbar";
 import NotifyCall from "./NotifyCall";
 import NotifyMessage, { default as NotifyMsg } from "./NotifyMessage";
 import LGQuickChat from "./RightSidebar/LGQuickChat";
-import { useQueryClient } from "@tanstack/react-query";
 import MDQuickChat from "./RightSidebar/MDQuickChat";
 
 const HomeLayout = ({ children }) => {
@@ -41,15 +40,7 @@ const HomeLayout = ({ children }) => {
   const userId = useSelector((state) => state.user._id);
   const currentOpenedChat = useSelector((state) => state.chat.chatId);
 
-  const { data: conversations } = useQuery({
-    queryKey: ["conversations", userId],
-    queryFn: async () => {
-      const res = await axiosInstance.get("/chat/list");
-      return res.data;
-    },
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-  });
+  const { data: conversations } = useConversationList(userId);
 
   const [verified, setVerified] = useState(false);
 
@@ -89,7 +80,6 @@ const HomeLayout = ({ children }) => {
 
   useEffect(() => {
     socket.on("userOnline", (id) => {
-      console.log("online", id);
       queryClient.setQueryData(["conversations", userId], (old) =>
         old?.map((convo) =>
           convo.user._id === id
@@ -100,7 +90,6 @@ const HomeLayout = ({ children }) => {
     });
 
     socket.on("userOffline", (id) => {
-      console.log("offline", id);
       queryClient.setQueryData(["conversations", userId], (old) =>
         old?.map((convo) =>
           convo.user._id === id

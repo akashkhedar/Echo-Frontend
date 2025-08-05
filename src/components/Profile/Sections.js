@@ -3,6 +3,7 @@ import { useTheme } from "@mui/material/styles";
 import * as React from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
+import useConnections from "../../hooks/useConnections";
 
 const Sections = () => {
   const navigate = useNavigate();
@@ -19,13 +20,15 @@ const Sections = () => {
   const initalPath = pathMap[path] ?? 0;
 
   const [value, setValue] = React.useState(initalPath);
-  const handleChange = (event, newValue) => {
+  const handleChange = (newValue) => {
     setValue(newValue);
   };
 
-  const user = useSelector((state) => state.user);
-  const followerCount = user.follower.length;
-  const followingCount = user.following.length;
+  const userId = useSelector((state) => state.user._id);
+
+  const { data: followers = [] } = useConnections(userId, "followers");
+
+  const { data: following = [] } = useConnections(userId, "following");
 
   const theme = useTheme();
 
@@ -105,7 +108,7 @@ const Sections = () => {
           label={
             <Box sx={labelStyle}>
               Followers
-              <Chip label={followerCount} size="small" sx={chipStyle} />
+              <Chip label={followers.length} size="small" sx={chipStyle} />
             </Box>
           }
           sx={tabStyle}
@@ -117,7 +120,7 @@ const Sections = () => {
           label={
             <Box sx={labelStyle}>
               Following
-              <Chip label={followingCount} size="small" sx={chipStyle} />
+              <Chip label={following.length} size="small" sx={chipStyle} />
             </Box>
           }
           sx={tabStyle}

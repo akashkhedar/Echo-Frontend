@@ -35,6 +35,7 @@ const ChatHeader = () => {
   };
 
   const user = useSelectedChatUser();
+  console.log(user);
   const callerId = useSelector((state) => state.user?._id);
   const calleeId = user?._id;
 

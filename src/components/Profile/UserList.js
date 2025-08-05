@@ -16,10 +16,6 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import axiosInstance from "../../axiosInstance";
-import {
-  removeFollower,
-  removeFollowing,
-} from "../../redux/slices/AuthSlice/AuthSlice";
 import HoverCard from "./HoverCard";
 
 const Item = styled(Paper)(({ theme }) => ({

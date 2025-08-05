@@ -1,28 +1,12 @@
-import React, { useEffect, useState } from "react";
-import axiosInstance from "../../axiosInstance";
 import { Box, Typography } from "@mui/material";
+import { useSelector } from "react-redux";
+import usePost from "../../hooks/usePost";
 import PostCard from "../PostPage/PostCard";
 import PostLoading from "../PostPage/PostLoading";
 
 const PostMade = () => {
-  const [postMade, setPostMade] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchPosts = async () => {
-    try {
-      setLoading(true);
-      const res = await axiosInstance.get("/post/fetch");
-      setPostMade(res.data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchPosts();
-  }, []);
+  const userId = useSelector((state) => state.user._id);
+  const { data: posts, isLoading } = usePost(userId);
 
   return (
     <Box
@@ -35,10 +19,10 @@ const PostMade = () => {
         marginTop: -0.6,
       }}
     >
-      {!loading ? (
-        postMade && postMade.length > 0 ? (
-          postMade.map((post) => (
-            <PostCard key={post._id} post={post} setPosts={setPostMade} />
+      {!isLoading ? (
+        posts && posts.length > 0 ? (
+          posts.map((post) => (
+            <PostCard key={post._id} post={post} setPosts={posts} />
           ))
         ) : (
           <Box

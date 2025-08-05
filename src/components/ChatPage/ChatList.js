@@ -11,10 +11,6 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import useConversationList from "../../hooks/useConversationList";
-import {
-  setUserOffline,
-  setUserOnline,
-} from "../../redux/slices/ConversationSlice/ConversationSlice";
 import socket from "../../utils/socket";
 import ChatListLoading from "./ChatListLoading";
 import ConversationsList from "./ConversationsList";

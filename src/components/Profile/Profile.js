@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import About from "./About";
-import FriendsPage from "./FriendsPage";
+import Connections from "./Connections";
 import PostMade from "./PostMade";
 import ProfileHeader from "./ProfileHeader";
 import Sections from "./Sections";
@@ -26,9 +26,9 @@ const Profile = () => {
       {currentPath === "/profile/about" ? (
         <About />
       ) : currentPath === "/profile/following" ? (
-        <FriendsPage path={"/profile/following"} />
+        <Connections path={"/profile/following"} />
       ) : currentPath === "/profile/followers" ? (
-        <FriendsPage path={"/profile/followers"} />
+        <Connections path={"/profile/followers"} />
       ) : (
         <PostMade />
       )}

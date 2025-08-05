@@ -4,16 +4,18 @@ import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import SendIcon from "@mui/icons-material/Send";
 import { useSelector } from "react-redux";
 import { useState } from "react";
+import useConnections from "../../hooks/useConnections";
 
 const SearchList = ({ user, handleMessage, handleFollow, handleUnfollow }) => {
-  const follower = useSelector((state) => state.user.follower);
-  const [inList, setinList] = useState(follower.includes(user._id));
+  const userId = useSelector((state) => state.user._id);
+  const following = useConnections(userId, "following");
+  const [inList, setinList] = useState(following.includes(user._id));
 
   const handleButton = () => {
     setinList(!inList);
     if (inList) {
       handleUnfollow(user._id);
-      follower.filter((u) => (u._id = user._id));
+      following.filter((u) => (u._id = user._id));
     } else {
       handleFollow(user._id);
     }

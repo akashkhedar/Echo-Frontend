@@ -7,16 +7,8 @@ const AuthSlice = createSlice({
     setUser: (state, action) => {
       return action.payload;
     },
-    removeFollowing: (state, action) => {
-      const userIdToRemove = action.payload;
-      state.following = state.following.filter((id) => id !== userIdToRemove);
-    },
-    removeFollower: (state, action) => {
-      const userIdToRemove = action.payload;
-      state.followers = state.follower.filter((id) => id !== userIdToRemove);
-    },
   },
 });
 
-export const { setUser, removeFollower, removeFollowing } = AuthSlice.actions;
+export const { setUser } = AuthSlice.actions;
 export default AuthSlice.reducer;
