@@ -7,8 +7,9 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import useConversationList from "../../hooks/useConversationList";
 import socket from "../../utils/socket";
@@ -28,11 +29,11 @@ const theme = createTheme({
 });
 
 const ChatList = () => {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { userId } = useSelector((state) => state.user);
   const { data: conversations } = useConversationList(userId);
   const selectedChat = useSelector((state) => state.chat.chatId);
-  const dispatch = useDispatch();
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
@@ -46,14 +47,32 @@ const ChatList = () => {
   };
 
   useEffect(() => {
-    socket.on("userOnline", (userId) => dispatch(setUserOnline(userId)));
-    socket.on("userOffline", (userId) => dispatch(setUserOffline(userId)));
+    socket.on("userOnline", (id) => {
+      console.log(id);
+      queryClient.setQueryData(["conversations", userId], (old) =>
+        old?.map((convo) =>
+          convo.user._id === id
+            ? { ...convo, user: { ...convo.user, isOnline: true } }
+            : convo
+        )
+      );
+    });
+
+    socket.on("userOffline", (id) => {
+      queryClient.setQueryData(["conversations", userId], (old) =>
+        old?.map((convo) =>
+          convo.user._id === id
+            ? { ...convo, user: { ...convo.user, isOnline: false } }
+            : convo
+        )
+      );
+    });
 
     return () => {
       socket.off("userOnline");
       socket.off("userOffline");
     };
-  }, [dispatch]);
+  }, [queryClient, userId]);
 
   useEffect(() => {
     // Simulate loading delay — replace with real loading logic

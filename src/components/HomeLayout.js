@@ -65,21 +65,14 @@ const HomeLayout = ({ children }) => {
       joinRooms();
     }
 
-    const handleBeforeUnload = () => {
-      socket.emit("leaveChat", userId);
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
     return () => {
       dispatch(clearChat());
-      socket.off("leaveChat");
-      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [conversations, dispatch, navigate, userId]);
 
   useEffect(() => {
     socket.on("userOnline", (id) => {
+      console.log(id + "online");
       queryClient.setQueryData(["conversations", userId], (old) =>
         old?.map((convo) =>
           convo.user._id === id
@@ -90,6 +83,7 @@ const HomeLayout = ({ children }) => {
     });
 
     socket.on("userOffline", (id) => {
+      console.log(id + "offline");
       queryClient.setQueryData(["conversations", userId], (old) =>
         old?.map((convo) =>
           convo.user._id === id
@@ -107,6 +101,7 @@ const HomeLayout = ({ children }) => {
 
   useEffect(() => {
     socket.on("receiveMsg", (message, username) => {
+      console.log(message, username);
       if (message.conversationId === currentOpenedChat) {
         dispatch(setChat([...chats, message]));
         return;
