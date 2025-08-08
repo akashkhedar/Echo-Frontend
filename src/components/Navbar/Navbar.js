@@ -195,7 +195,7 @@ const Navbar = () => {
             results={searchResults}
             navigate={navigate}
             isOpen={openDropdown}
-            userId={user._id}
+            userId={user.userId}
             dropdownRef={dropdownRef}
             setOpenDropdown={setOpenDropdown}
             setSearchInput={setSearchInput}

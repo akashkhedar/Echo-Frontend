@@ -17,18 +17,17 @@ const Sections = () => {
     "/profile/post": 3,
   };
 
-  const initalPath = pathMap[path] ?? 0;
+  const initialPath = pathMap[path] ?? 0;
 
-  const [value, setValue] = React.useState(initalPath);
-  const handleChange = (newValue) => {
-    setValue(newValue);
-  };
+  const [value, setValue] = React.useState(initialPath);
+  const handleChange = (newValue) => setValue(newValue);
 
-  const userId = useSelector((state) => state.user._id);
+  const userId = useSelector((state) => state.user.userId);
 
   const { data: followers = [] } = useConnections(userId, "followers");
-
+  console.log(followers);
   const { data: following = [] } = useConnections(userId, "following");
+  console.log(following);
 
   const theme = useTheme();
 
@@ -75,12 +74,12 @@ const Sections = () => {
         },
         borderRadius: 10,
         my: 2,
-        bgcolor: " #590d74ff",
+        bgcolor: "#590d74ff",
       }}
     >
       <Tabs
         value={value}
-        onChange={handleChange}
+        onChange={(_, newValue) => handleChange(newValue)}
         variant="scrollable"
         scrollButtons={false}
         aria-label="scrollable tabs"
@@ -95,16 +94,12 @@ const Sections = () => {
         }}
       >
         <Tab
-          onClick={() => {
-            navigate("/profile/about");
-          }}
+          onClick={() => navigate("/profile/about")}
           label={<Typography sx={labelStyle}>About</Typography>}
           sx={tabStyle}
         />
         <Tab
-          onClick={() => {
-            navigate("/profile/followers");
-          }}
+          onClick={() => navigate("/profile/followers")}
           label={
             <Box sx={labelStyle}>
               Followers
@@ -114,9 +109,7 @@ const Sections = () => {
           sx={tabStyle}
         />
         <Tab
-          onClick={() => {
-            navigate("/profile/following");
-          }}
+          onClick={() => navigate("/profile/following")}
           label={
             <Box sx={labelStyle}>
               Following
@@ -126,9 +119,7 @@ const Sections = () => {
           sx={tabStyle}
         />
         <Tab
-          onClick={() => {
-            navigate("/profile/post");
-          }}
+          onClick={() => navigate("/profile/post")}
           label={<Typography sx={labelStyle}>Posts</Typography>}
           sx={tabStyle}
         />

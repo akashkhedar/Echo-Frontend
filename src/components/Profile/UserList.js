@@ -1,21 +1,16 @@
 import {
-  PersonAddAlt1Rounded as AddIcon,
   QuestionAnswerRounded as MessageIcon,
   PersonRemoveAlt1Rounded as RemoveIcon,
 } from "@mui/icons-material";
 import { Avatar, Box, IconButton, Paper, Typography } from "@mui/material";
 import { experimentalStyled as styled } from "@mui/material/styles";
-import debounce from "lodash.debounce";
 import {
   bindHover,
   bindPopover,
   usePopupState,
 } from "material-ui-popup-state/hooks";
 import HoverPopover from "material-ui-popup-state/HoverPopover";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
-import axiosInstance from "../../axiosInstance";
+import { useNavigate } from "react-router-dom";
 import HoverCard from "./HoverCard";
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -32,36 +27,12 @@ const Item = styled(Paper)(({ theme }) => ({
   minHeight: "70px",
 }));
 
-const UserList = ({ user, setFollowers = null, setFollowing = null }) => {
+const UserList = ({ user, onRemove }) => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const dispatch = useDispatch();
-  const [add, setAdd] = useState(true);
-  const isFollowersPage = location.pathname === "/profile/followers";
-
   const popupState = usePopupState({
     variant: "popover",
     popupId: "user-hover-popover",
   });
-
-  const updateList = async (userId) => {
-    try {
-      if (isFollowersPage) {
-        setFollowers?.((prev) => prev.filter((u) => u._id !== userId));
-        dispatch(removeFollower(userId));
-        await axiosInstance.put(`/user/remove/${userId}`);
-      } else {
-        setFollowing?.((prev) => prev.filter((u) => u._id !== userId));
-        dispatch(removeFollowing(userId));
-        await axiosInstance.put(`/user/unfollow/${userId}`);
-      }
-      setAdd((prev) => !prev);
-    } catch (err) {
-      console.error("Failed to update follow status:", err);
-    }
-  };
-
-  const handleRemoveFollower = debounce(() => updateList(user._id), 300);
 
   return (
     <Item>
@@ -147,7 +118,10 @@ const UserList = ({ user, setFollowers = null, setFollowing = null }) => {
           flexShrink: 0,
         }}
       >
-        <IconButton size="small">
+        <IconButton
+          size="small"
+          onClick={() => navigate(`/messages/${user._id}`)}
+        >
           <MessageIcon
             sx={{
               p: 1,
@@ -158,26 +132,20 @@ const UserList = ({ user, setFollowers = null, setFollowing = null }) => {
           />
         </IconButton>
 
-        <IconButton size="small" onClick={handleRemoveFollower}>
-          {add ? (
-            <RemoveIcon
-              sx={{
-                p: 1,
-                color: "rgb(194, 49, 49)",
-                borderRadius: "50%",
-                "&:hover": { backgroundColor: "rgb(48, 48, 62)" },
-              }}
-            />
-          ) : (
-            <AddIcon
-              sx={{
-                p: 1,
-                color: "rgb(49, 194, 56)",
-                borderRadius: "50%",
-                "&:hover": { backgroundColor: "rgb(48, 48, 62)" },
-              }}
-            />
-          )}
+        <IconButton
+          size="small"
+          onClick={() => {
+            onRemove(user._id);
+          }}
+        >
+          <RemoveIcon
+            sx={{
+              p: 1,
+              color: "rgb(194, 49, 49)",
+              borderRadius: "50%",
+              "&:hover": { backgroundColor: "rgb(48, 48, 62)" },
+            }}
+          />
         </IconButton>
       </Box>
     </Item>

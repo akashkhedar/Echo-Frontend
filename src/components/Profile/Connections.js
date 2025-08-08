@@ -1,17 +1,36 @@
-// FriendsPage.jsx
 import React from "react";
 import { Box, Grid, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
+import { useQueryClient } from "@tanstack/react-query";
 import useConnections from "../../hooks/useConnections";
 import UserList from "./UserList";
 import LoadingFriends from "./LoadingFriends";
+import axiosInstance from "../../axiosInstance";
 
-const FriendsPage = ({ path }) => {
-  const userId = useSelector((state) => state.user._id);
+const Connections = ({ path }) => {
+  const queryClient = useQueryClient();
+  const userId = useSelector((state) => state.user.userId);
   const isFollowersView = path === "/profile/followers";
   const type = isFollowersView ? "followers" : "following";
 
   const { data: users = [], isLoading, isError } = useConnections(userId, type);
+
+  const handleRemoveConnection = async (userIdToRemove) => {
+    try {
+      queryClient.setQueryData(["connections", userId, type], (oldData) =>
+        (oldData || []).filter((user) => user._id !== userIdToRemove)
+      );
+
+      await axiosInstance.delete(
+        isFollowersView
+          ? `/user/remove/${userIdToRemove}`
+          : `/user/unfollow/${userIdToRemove}`
+      );
+    } catch (error) {
+      queryClient.invalidateQueries(["connections", userId, type]);
+      console.error("Failed to remove connection:", error);
+    }
+  };
 
   const renderEmptyMessage = (text) => (
     <Box
@@ -31,17 +50,22 @@ const FriendsPage = ({ path }) => {
     </Box>
   );
 
-  const renderUserCards = (list) =>
-    list.map((user) => (
+  const renderUserCards = (list) => {
+    if (!Array.isArray(list)) {
+      console.error("Expected array but got:", list);
+      return renderEmptyMessage("Invalid data format");
+    }
+
+    return list.map((user) => (
       <Grid item xs={12} sm={6} md={4} lg={3} key={user._id}>
         <UserList
           user={user}
-          {...(isFollowersView
-            ? { setFollowers: () => {} }
-            : { setFollowing: () => {} })}
+          onRemove={handleRemoveConnection}
+          isFollowersView={isFollowersView}
         />
       </Grid>
     ));
+  };
 
   return (
     <Box
@@ -71,4 +95,4 @@ const FriendsPage = ({ path }) => {
   );
 };
 
-export default FriendsPage;
+export default Connections;

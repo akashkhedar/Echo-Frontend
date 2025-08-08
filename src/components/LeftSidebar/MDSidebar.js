@@ -12,11 +12,14 @@ import UploadPost from "../uploadPost/UploadPost";
 import axiosInstance from "../../axiosInstance";
 import PasswordIcon from "@mui/icons-material/Password";
 import NewPassword from "../ChangePassword/NewPassword";
+import useConversationList from "../../hooks/useConversationList";
 
 const MDSidebar = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
-  const hasUnread = true;
+  const { userId } = useSelector((state) => state.user);
+  const { data: conversations = [] } = useConversationList(userId);
+  const hasUnread = conversations.some((c) => c.unread);
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);

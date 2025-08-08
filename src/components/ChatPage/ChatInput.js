@@ -6,7 +6,7 @@ import socket from "../../utils/socket";
 
 const ChatInput = () => {
   const selectedUser = useSelector((state) => state.chat.chatUserId);
-  const userId = useSelector((state) => state.user._id);
+  const userId = useSelector((state) => state.user.userId);
   const username = useSelector((state) => state.user.username);
 
   const [inputMessage, setInputMessage] = useState("");

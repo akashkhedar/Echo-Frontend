@@ -1,29 +1,43 @@
-import { Avatar, Box, IconButton, Typography } from "@mui/material";
-import PersonRemoveAlt1Icon from "@mui/icons-material/PersonRemoveAlt1";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
+import PersonRemoveAlt1Icon from "@mui/icons-material/PersonRemoveAlt1";
 import SendIcon from "@mui/icons-material/Send";
+import { Avatar, Box, IconButton, Tooltip, Typography } from "@mui/material";
+import { useState, useMemo } from "react";
 import { useSelector } from "react-redux";
-import { useState } from "react";
 import useConnections from "../../hooks/useConnections";
 
 const SearchList = ({ user, handleMessage, handleFollow, handleUnfollow }) => {
-  const userId = useSelector((state) => state.user._id);
-  const following = useConnections(userId, "following");
-  const [inList, setinList] = useState(following.includes(user._id));
+  const userId = useSelector((state) => state.user.userId);
+  const { data: following = [] } = useConnections(userId, "following");
 
-  const handleButton = () => {
-    setinList(!inList);
-    if (inList) {
-      handleUnfollow(user._id);
-      following.filter((u) => (u._id = user._id));
-    } else {
-      handleFollow(user._id);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const isFollowing = useMemo(() => {
+    return following?.some((u) => u._id === user._id);
+  }, [following, user._id]);
+
+  const handleFollowAction = async () => {
+    setIsProcessing(true);
+    try {
+      await handleFollow(user._id);
+    } catch (error) {
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleUnfollowAction = async () => {
+    setIsProcessing(true);
+    try {
+      await handleUnfollow(user._id);
+    } catch (error) {
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   return (
     <Box
-      key={user._id}
       sx={{
         display: "flex",
         alignItems: "center",
@@ -32,6 +46,7 @@ const SearchList = ({ user, handleMessage, handleFollow, handleUnfollow }) => {
         p: 1.5,
         borderBottom: "1px solid #2a2a2a",
         "&:hover": { backgroundColor: "#1e1e1e", cursor: "pointer" },
+        transition: "background-color 0.2s ease",
       }}
     >
       <Box
@@ -39,29 +54,63 @@ const SearchList = ({ user, handleMessage, handleFollow, handleUnfollow }) => {
           display: "flex",
           alignItems: "center",
           gap: 2,
+          minWidth: 0,
         }}
+        onClick={() => window.open(`/${user.username}`, "_blank")}
       >
-        <Avatar src={user.profileImage} alt={user.username} />
+        <Avatar
+          src={user.profileImage}
+          alt={user.username}
+          sx={{ width: 40, height: 40 }}
+        />
 
-        <Box>
-          <Typography color="whitesmoke">{user.username}</Typography>
-          <Typography color="gray" fontSize="0.8rem">
+        <Box sx={{ minWidth: 0 }}>
+          <Typography color="whitesmoke" noWrap sx={{ fontWeight: 500 }}>
+            {user.username}
+          </Typography>
+          <Typography color="text.secondary" fontSize="0.8rem" noWrap>
             {user.fullname}
           </Typography>
         </Box>
       </Box>
-      <Box>
-        <IconButton onClick={() => handleMessage(user._id)}>
-          <SendIcon sx={{ color: "whitesmoke" }} />
-        </IconButton>
-        {inList ? (
-          <IconButton onClick={handleButton}>
-            <PersonRemoveAlt1Icon sx={{ color: "red" }} />
+
+      <Box sx={{ display: "flex", gap: 0.5 }}>
+        <Tooltip title="Send message">
+          <IconButton
+            onClick={(e) => {
+              e.stopPropagation();
+              handleMessage(user._id);
+            }}
+            disabled={isProcessing}
+          >
+            <SendIcon sx={{ color: "whitesmoke" }} />
           </IconButton>
+        </Tooltip>
+
+        {isFollowing ? (
+          <Tooltip title="Unfollow">
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation();
+                handleUnfollowAction();
+              }}
+              disabled={isProcessing}
+            >
+              <PersonRemoveAlt1Icon sx={{ color: "error.main" }} />
+            </IconButton>
+          </Tooltip>
         ) : (
-          <IconButton onClick={handleButton}>
-            <PersonAddAlt1Icon sx={{ color: "green" }} />
-          </IconButton>
+          <Tooltip title="Follow">
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation();
+                handleFollowAction();
+              }}
+              disabled={isProcessing}
+            >
+              <PersonAddAlt1Icon sx={{ color: "success.main" }} />
+            </IconButton>
+          </Tooltip>
         )}
       </Box>
     </Box>

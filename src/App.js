@@ -44,12 +44,11 @@ function App() {
 
         if (oldAuth?.userId !== newAuth?.userId) {
           window.location.reload(); // or dispatch logout
+          return () =>
+            window.removeEventListener("storage", handleStorageChange);
         }
       }
     };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
   return (

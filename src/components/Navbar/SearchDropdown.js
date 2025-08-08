@@ -1,4 +1,5 @@
 import { Box, Typography } from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../../axiosInstance";
 import socket from "../../utils/socket";
 import SearchList from "./SearchList";
@@ -11,22 +12,46 @@ const SearchDropdown = ({
   setOpenDropdown,
   setSearchInput,
 }) => {
+  const queryClient = useQueryClient();
   if (!isOpen) return null;
 
   const handleFollow = async (id) => {
     try {
       await axiosInstance.put(`/user/follow/${id}`);
+
+      // find the user from the search results
+      const followedUser = results.find((u) => u._id === id);
+      if (!followedUser) return;
+
+      queryClient.setQueryData(
+        ["connections", userId, "following"],
+        (oldData = []) => {
+          const alreadyExists = oldData.some((u) => u._id === id);
+          return alreadyExists ? oldData : [...oldData, followedUser];
+        }
+      );
+
       setOpenDropdown(false);
       setSearchInput("");
-    } catch (error) {}
+    } catch (error) {
+      console.error("Follow failed:", error);
+    }
   };
 
   const handleUnfollow = async (id) => {
     try {
       await axiosInstance.put(`/user/unfollow/${id}`);
+
+      queryClient.setQueryData(
+        ["connections", userId, "following"],
+        (oldData = []) => oldData.filter((u) => u._id !== id)
+      );
+
       setOpenDropdown(false);
       setSearchInput("");
-    } catch (error) {}
+    } catch (error) {
+      console.error("Unfollow failed:", error);
+    }
   };
 
   const handleMessage = (id) => {
@@ -45,8 +70,8 @@ const SearchDropdown = ({
         position: "absolute",
         top: "3.5rem",
         left: "50%",
-        transform: "translateX(-50%)", // Perfectly centers on all screens
-        width: "90%", // Responsive width on mobile
+        transform: "translateX(-50%)",
+        width: "90%",
         maxWidth: "45rem",
         backgroundColor: "#121212",
         borderRadius: "10px",

@@ -101,7 +101,7 @@ const HomeLayout = ({ children }) => {
 
   useEffect(() => {
     socket.on("receiveMsg", (message, username) => {
-      console.log(message, username);
+      console.log(currentOpenedChat);
       if (message.conversationId === currentOpenedChat) {
         dispatch(setChat([...chats, message]));
         return;

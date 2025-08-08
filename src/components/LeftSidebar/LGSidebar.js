@@ -12,10 +12,13 @@ import axiosInstance from "../../axiosInstance";
 import UploadPost from "../uploadPost/UploadPost";
 import PasswordIcon from "@mui/icons-material/Password";
 import NewPassword from "../ChangePassword/NewPassword";
+import useConversationList from "../../hooks/useConversationList";
 
 const LGSidebar = () => {
   const navigate = useNavigate();
-  const hasUnread = true;
+  const { userId } = useSelector((state) => state.u);
+  const { data: conversations = [] } = useConversationList(userId);
+  const hasUnread = conversations.some((c) => c.unread);
 
   const Item = styled(Box)(({ theme }) => ({
     display: "flex",
