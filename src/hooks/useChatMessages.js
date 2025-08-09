@@ -1,4 +1,3 @@
-// hooks/useChatMessages.js
 import { useInfiniteQuery } from "@tanstack/react-query";
 import axiosInstance from "../axiosInstance";
 
@@ -14,8 +13,12 @@ const useChatMessages = (chatId) => {
     queryKey: ["chatMessages", chatId],
     queryFn: ({ pageParam = 0 }) => fetchMessages({ pageParam, chatId }),
     getNextPageParam: (lastPage, allPages) =>
-      lastPage.length < 30 ? undefined : allPages.flat().length,
+      lastPage.length < 30
+        ? undefined
+        : allPages.reduce((acc, page) => acc + page.length, 0),
     enabled: !!chatId,
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60, // Cache for 1 min to prevent refetch spam
   });
 };
 

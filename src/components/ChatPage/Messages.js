@@ -1,5 +1,5 @@
 import { Box, styled } from "@mui/material";
-import React, { useEffect, useLayoutEffect, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import Message from "./Message";
 import NewMessage from "./NewMessage";
@@ -29,8 +29,9 @@ const Messages = () => {
   const outerDiv = useRef(null);
   const scrollRef = useRef(null);
   const path = useLocation();
+  const [initialLoad, setInitialLoad] = useState(true);
 
-  const userId = useSelector((state) => state.user._id);
+  const userId = useSelector((state) => state.user.userId);
   const currentOpenedChat = useSelector((state) => state.chat.chatId);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
@@ -42,11 +43,13 @@ const Messages = () => {
     }
   }, [path]);
 
+  // Scroll to bottom only for initial load
   useLayoutEffect(() => {
-    if (scrollRef.current) {
+    if (scrollRef.current && initialLoad && data?.pages?.length > 0) {
       scrollRef.current.scrollIntoView({ behavior: "auto" });
+      setInitialLoad(false);
     }
-  }, [data]);
+  }, [data, initialLoad]);
 
   const handleScroll = (e) => {
     const scrollTop = e.target.scrollTop;

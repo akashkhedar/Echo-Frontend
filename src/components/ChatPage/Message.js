@@ -34,7 +34,8 @@ const Message = ({ msg, userId }) => {
   const messageRef = useRef(null);
 
   useEffect(() => {
-    if (msg.sender === userId && msg.read) return;
+    if (!conversationId || conversationId !== msg.conversationId) return;
+    if (msg.sender === userId || msg.read) return;
 
     const observer = new IntersectionObserver(
       (entries) => {

@@ -16,7 +16,7 @@ import useConversationList from "../../hooks/useConversationList";
 
 const LGSidebar = () => {
   const navigate = useNavigate();
-  const { userId } = useSelector((state) => state.u);
+  const { userId } = useSelector((state) => state.user);
   const { data: conversations = [] } = useConversationList(userId);
   const hasUnread = conversations.some((c) => c.unread);
 

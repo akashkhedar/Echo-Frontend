@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import useConversationList from "../hooks/useConversationList";
 import useConversationSelection from "../hooks/useConversationSelection";
-import { clearChat, setChat } from "../redux/slices/ChatSlice/ChatSlice";
+import { clearChat } from "../redux/slices/ChatSlice/ChatSlice";
 import socket from "../utils/socket";
 import SimpleBottomNavigation from "./BottomNavigation/BottomNavigation";
 import LGSidebar from "./LeftSidebar/LGSidebar";
@@ -72,7 +72,6 @@ const HomeLayout = ({ children }) => {
 
   useEffect(() => {
     socket.on("userOnline", (id) => {
-      console.log(id + "online");
       queryClient.setQueryData(["conversations", userId], (old) =>
         old?.map((convo) =>
           convo.user._id === id
@@ -100,12 +99,23 @@ const HomeLayout = ({ children }) => {
   }, [queryClient, userId]);
 
   useEffect(() => {
-    socket.on("receiveMsg", (message, username) => {
-      console.log(currentOpenedChat);
+    const handler = (message, username) => {
       if (message.conversationId === currentOpenedChat) {
-        dispatch(setChat([...chats, message]));
+        // Append message into the existing infinite query cache
+        queryClient.setQueryData(["chatMessages", currentOpenedChat], (old) => {
+          if (!old) return { pages: [[message]], pageParams: [0] };
+          return {
+            ...old,
+            pages: [
+              ...old.pages.slice(0, -1),
+              [...old.pages[old.pages.length - 1], message],
+            ],
+          };
+        });
         return;
       }
+
+      // Show notification for other conversation
       const key = enqueueSnackbar("", {
         persist: true,
         content: (key) => (
@@ -121,8 +131,32 @@ const HomeLayout = ({ children }) => {
         closeSnackbar(key);
       }, 1500);
 
-      socket.emit("offlineMessage", message.receiver, message.conversationId);
-    });
+      if (message.conversationId !== currentOpenedChat) {
+        socket.emit("offlineMessage", message.receiver, message.conversationId);
+      }
+    };
+
+    socket.on("receiveMsg", handler);
+
+    const handleReceiverRead = (msgId) => {
+      console.log(msgId);
+      queryClient.setQueriesData(
+        { queryKey: ["chatMessages", currentOpenedChat], exact: false }, // match all chats
+        (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            pages: old.pages.map((page) =>
+              page.map((msg) =>
+                msg._id === msgId ? { ...msg, read: true } : msg
+              )
+            ),
+          };
+        }
+      );
+    };
+
+    socket.on("receiverRead", handleReceiverRead);
 
     socket.on("notify", (sender) => {
       enqueueSnackbar((key) => <NotifyMsg sender={sender} />, {
@@ -222,6 +256,7 @@ const HomeLayout = ({ children }) => {
       socket.off("redirectConvo");
       socket.off("getOffer");
       socket.off("receiveCall");
+      socket.off("receiverRead");
       socket.off("onCallAccept");
       socket.off("cancelledCall", cancelCallHandler);
     };
@@ -236,6 +271,7 @@ const HomeLayout = ({ children }) => {
     closeSnackbar,
     currentCallSnackbarKey,
     conversations,
+    queryClient,
   ]);
 
   return verified ? (

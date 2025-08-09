@@ -32,24 +32,28 @@ export default function PostCreator({ about, setAbout }) {
           InputLabelProps={{
             sx: {
               color: "whitesmoke",
-              "&.Mui-focused": { color: "lightgray" }, // Label color on focus
-              "&:hover": { color: "#d3d3d3" }, // Label color on hover
+              "&.Mui-focused": { color: "lightgray" },
+              "&:hover": { color: "#d3d3d3" },
+            },
+          }}
+          InputProps={{
+            sx: {
+              color: "white", // <-- Text color
             },
           }}
           sx={{
             backgroundColor: "#292929",
             borderRadius: "8px",
-            input: { color: "#fff" },
             mb: 2,
             "& .MuiOutlinedInput-root": {
               "& fieldset": {
-                borderColor: "rgb(50, 50, 56)", // Default border color
+                borderColor: "rgb(50, 50, 56)",
               },
               "&:hover fieldset": {
-                borderColor: "rgb(80, 44, 96)", // Border color on hover
+                borderColor: "rgb(80, 44, 96)",
               },
               "&.Mui-focused fieldset": {
-                borderColor: "secondary.main", // Border color when focused (or use a custom purple shade like "#9c27b0")
+                borderColor: "secondary.main",
               },
             },
           }}
