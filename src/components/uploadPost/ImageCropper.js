@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactCrop, { centerCrop, makeAspectCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
-import { Button, ButtonGroup, styled } from "@mui/material";
+import { Box, Button, ButtonGroup, styled } from "@mui/material";
 
 // Styled ratio buttons
 const RatioButton = styled(Button)(({ theme, active }) => ({
@@ -56,7 +56,18 @@ const ImageCropper = ({ file, setCroppedFile }) => {
     imgRef.current = e.currentTarget;
     const { width, height } = e.currentTarget;
 
-    const newCrop = centerAspectCrop(width, height, aspectRatio);
+    let newCrop;
+    if (aspectRatio === null) {
+      newCrop = {
+        unit: "px",
+        x: 0,
+        y: 0,
+        width: width,
+        height: height,
+      };
+    } else {
+      newCrop = centerAspectCrop(width, height, aspectRatio);
+    }
 
     setCrop(newCrop);
     setCompletedCrop(newCrop);
@@ -70,9 +81,22 @@ const ImageCropper = ({ file, setCroppedFile }) => {
 
     if (imgRef.current && imageLoaded) {
       const { width, height } = imgRef.current;
-      const newCrop = centerAspectCrop(width, height, ratio);
-      setCrop(newCrop);
-      setCompletedCrop(newCrop);
+      if (ratio === null) {
+        // For free ratio, set a crop that covers the entire image
+        const fullCrop = {
+          unit: "px",
+          x: 0,
+          y: 0,
+          width: width,
+          height: height,
+        };
+        setCrop(fullCrop);
+        setCompletedCrop(fullCrop); // Also update completed crop
+      } else {
+        const newCrop = centerAspectCrop(width, height, ratio);
+        setCrop(newCrop);
+        setCompletedCrop(newCrop);
+      }
     }
   };
 
@@ -148,15 +172,29 @@ const ImageCropper = ({ file, setCroppedFile }) => {
   }, [completedCrop, imageLoaded]);
 
   return (
-    <div style={{ width: "100%", maxWidth: "800px", margin: "0 auto" }}>
+    <Box
+      sx={{
+        width: "100%",
+        maxWidth: "800px",
+        margin: "0 auto",
+        overflowX: "hidden",
+      }}
+    >
       {src && (
         <>
-          <div style={{ marginBottom: "24px", position: "relative" }}>
+          <div
+            style={{
+              marginBottom: "24px",
+              position: "relative",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
             <ReactCrop
               crop={crop}
               onChange={(c) => setCrop(c)}
               onComplete={(c) => setCompletedCrop(c)}
-              aspect={aspectRatio}
+              aspect={aspectRatio || undefined} // Only set aspect when not null
               minWidth={100}
               style={{ maxHeight: "70vh" }}
             >
@@ -228,14 +266,24 @@ const ImageCropper = ({ file, setCroppedFile }) => {
           />
         </>
       )}
-    </div>
+    </Box>
   );
 };
 
 // Center crop function
 function centerAspectCrop(width, height, aspect) {
-  const cropWidth = Math.min(width, height * (aspect || 1));
-  const cropHeight = Math.min(height, width / (aspect || 1));
+  if (aspect === null || isNaN(aspect)) {
+    return {
+      unit: "px",
+      x: 0,
+      y: 0,
+      width: width,
+      height: height,
+    };
+  }
+
+  const cropWidth = Math.min(width, height * aspect);
+  const cropHeight = Math.min(height, width / aspect);
 
   return centerCrop(
     makeAspectCrop(
@@ -244,7 +292,7 @@ function centerAspectCrop(width, height, aspect) {
         width: cropWidth,
         height: cropHeight,
       },
-      aspect || NaN,
+      aspect,
       width,
       height
     ),
@@ -252,5 +300,4 @@ function centerAspectCrop(width, height, aspect) {
     height
   );
 }
-
 export default ImageCropper;

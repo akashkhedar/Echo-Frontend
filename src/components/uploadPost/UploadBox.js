@@ -1,11 +1,12 @@
 import { Box } from "@mui/system";
-import React, { useState } from "react";
+import axios from "axios";
+import { useState } from "react";
+import axiosInstance from "../../axiosInstance";
+import socket from "../../utils/socket";
 import BoxHead from "./BoxHead";
 import Controls from "./Controls";
 import ImageCropper from "./ImageCropper";
 import PostCreator from "./PostCreator";
-import axios from "axios";
-import axiosInstance from "../../axiosInstance";
 
 const UploadBox = ({ handleClose }) => {
   const [step, setStep] = useState(0);
@@ -52,11 +53,14 @@ const UploadBox = ({ handleClose }) => {
 
       const ratio = res.data.width / res.data.height;
 
-      await axiosInstance.post("/post/upload", {
+      const response = await axiosInstance.post("/post/upload", {
         media: res.data.secure_url,
         caption: about.caption,
         ratio: ratio,
       });
+
+      socket.emit("newPost", response.data.post);
+
       handleClose();
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -69,14 +73,14 @@ const UploadBox = ({ handleClose }) => {
     <Box
       sx={{
         width: {
-          xs: "100%",
-          sm: "98%",
-          md: "70%",
+          xs: "80%",
+          sm: "65%",
+          md: "65%",
           lg: "80%",
           xl: "75%",
         },
         height: {
-          xs: "93%",
+          xs: "95%",
           md: "90%",
         },
         overflowY: "auto",
@@ -88,6 +92,11 @@ const UploadBox = ({ handleClose }) => {
         py: 1,
         my: 1,
         px: { xs: 1, sm: 3 },
+        "&::-webkit-scrollbar": {
+          display: "none",
+        },
+        "-ms-overflow-style": "none",
+        "scrollbar-width": "none",
       }}
     >
       <Box sx={{ mb: 2, width: "100%" }}>

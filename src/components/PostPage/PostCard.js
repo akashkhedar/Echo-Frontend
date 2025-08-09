@@ -29,6 +29,8 @@ import axiosInstance from "../../axiosInstance";
 import HoverCard from "../Profile/HoverCard";
 import CommentSection from "./CommentSection";
 import ShareModal from "./ShareModal";
+import { useQueryClient } from "@tanstack/react-query";
+import socket from "../../utils/socket";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -41,7 +43,8 @@ const ExpandMore = styled((props) => {
   transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
 }));
 
-const PostCard = ({ post, key, setPosts = null }) => {
+const PostCard = ({ post, setPosts = null }) => {
+  const queryClient = useQueryClient();
   const [expanded, setExpanded] = React.useState(false);
 
   const [isReported, setisReported] = React.useState(false);
@@ -53,7 +56,7 @@ const PostCard = ({ post, key, setPosts = null }) => {
   const countComment = post.comments.length;
   const [commentCount, setCommentCount] = React.useState(countComment);
 
-  const id = useSelector((state) => state.user._id);
+  const id = useSelector((state) => state.user.userId);
 
   const hasLiked = post.likes.includes(id);
 
@@ -115,9 +118,23 @@ const PostCard = ({ post, key, setPosts = null }) => {
     try {
       const res = await axiosInstance.delete(`/post/delete/${post._id}`);
       if (res.status === 200) {
-        setPosts((prev) => prev.filter((p) => p._id !== post._id));
+        socket.emit("postDeleted", { postId: post._id, userId: id });
+
+        queryClient.setQueryData(["posts", id], (oldData) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) => ({
+              ...page,
+              posts: page.posts.filter((p) => p._id !== post._id),
+            })),
+          };
+        });
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const toggleComment = () => {
@@ -148,7 +165,7 @@ const PostCard = ({ post, key, setPosts = null }) => {
   return (
     <>
       <Card
-        key={key}
+        key={post._id}
         sx={{
           width: {
             xs: "97%",
