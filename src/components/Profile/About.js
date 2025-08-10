@@ -7,9 +7,12 @@ import {
   useTheme,
 } from "@mui/material";
 import { useSelector } from "react-redux";
+import useUser from "../../hooks/useUser";
 
 const About = () => {
-  const user = useSelector((state) => state.user);
+  const userId = useSelector((state) => state.user.userId);
+  const { data: user } = useUser();
+  console.log(user);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -64,7 +67,7 @@ const About = () => {
           >
             Email
           </Typography>
-          <Typography variant="body1">{user.email}</Typography>
+          <Typography variant="body1">{user?.email}</Typography>
         </Grid>
 
         <Grid item xs={12} sm={6}>
@@ -75,7 +78,7 @@ const About = () => {
           >
             Joined
           </Typography>
-          <Typography variant="body1">{formatDate(user.createdAt)}</Typography>
+          <Typography variant="body1">{formatDate(user?.createdAt)}</Typography>
         </Grid>
 
         <Grid item xs={12} sm={6}>
@@ -87,7 +90,7 @@ const About = () => {
             Interests
           </Typography>
           <Typography variant="body1">
-            {user.interests?.length ? user.interests : "No interests listed"}
+            {user?.interests?.length ? user?.interests : "No interests listed"}
           </Typography>
         </Grid>
 
@@ -101,7 +104,7 @@ const About = () => {
           </Typography>
           <Typography variant="body1" fontWeight="bold">
             <a
-              href={user.website || "#"}
+              href={user?.website || "#"}
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -109,7 +112,7 @@ const About = () => {
                 color: "inherit",
               }}
             >
-              {user.website || "No website"}
+              {user?.website || "No website"}
             </a>
           </Typography>
         </Grid>

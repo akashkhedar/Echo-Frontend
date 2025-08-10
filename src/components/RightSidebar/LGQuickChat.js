@@ -13,7 +13,7 @@ import useConversationList from "../../hooks/useConversationList";
 
 const LGQuickChat = () => {
   const userId = useSelector((state) => state.user._id);
-  const { data: conversations } = useConversationList(userId);
+  const { data: conversations = [] } = useConversationList(userId);
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);

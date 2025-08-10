@@ -1,5 +1,5 @@
 import { Box, styled } from "@mui/material";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import Message from "./Message";
 import NewMessage from "./NewMessage";
@@ -11,6 +11,8 @@ import useChatMessages from "../../hooks/useChatMessages";
 const MessageContainer = styled(Box)({
   display: "flex",
   flexDirection: "column",
+  width: "100%",
+  gap: "4px",
 });
 
 const StyledBox = styled(Box)({
@@ -18,24 +20,34 @@ const StyledBox = styled(Box)({
   height: "100%",
   overflowY: "auto",
   flexGrow: 1,
-  "&::-webkit-scrollbar": { display: "none" },
-  scrollbarWidth: "none",
   display: "flex",
   flexDirection: "column",
-  "-ms-overflow-style": "none",
+  "&::-webkit-scrollbar": {
+    width: "8px",
+  },
+  "&::-webkit-scrollbar-track": {
+    background: "rgba(0, 0, 0, 0.1)",
+    borderRadius: "4px",
+  },
+  "&::-webkit-scrollbar-thumb": {
+    background: "rgba(255, 255, 255, 0.2)",
+    borderRadius: "4px",
+    "&:hover": {
+      background: "rgba(255, 255, 255, 0.3)",
+    },
+  },
 });
 
 const Messages = () => {
   const outerDiv = useRef(null);
-  const scrollRef = useRef(null);
+  const messagesEndRef = useRef(null);
+  const scrollContainerRef = useRef(null);
   const path = useLocation();
-  const [initialLoad, setInitialLoad] = useState(true);
 
   const userId = useSelector((state) => state.user.userId);
   const currentOpenedChat = useSelector((state) => state.chat.chatId);
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useChatMessages(currentOpenedChat);
+  const { data: messages = [], isLoading } = useChatMessages(currentOpenedChat);
 
   useEffect(() => {
     if (path.pathname === "/" && outerDiv.current) {
@@ -43,37 +55,31 @@ const Messages = () => {
     }
   }, [path]);
 
-  // Scroll to bottom only for initial load
   useLayoutEffect(() => {
-    if (scrollRef.current && initialLoad && data?.pages?.length > 0) {
-      scrollRef.current.scrollIntoView({ behavior: "auto" });
-      setInitialLoad(false);
+    if (!isLoading && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "auto" });
     }
-  }, [data, initialLoad]);
-
-  const handleScroll = (e) => {
-    const scrollTop = e.target.scrollTop;
-    if (scrollTop === 0 && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
-    }
-  };
-
-  const messages = data?.pages?.flat() || [];
+  }, [messages, isLoading]);
 
   return (
-    <div style={{ position: "relative", height: "100%" }}>
-      <StyledBox ref={outerDiv} onScroll={handleScroll}>
+    <div
+      style={{ position: "relative", height: "100%", overflow: "hidden" }}
+      ref={outerDiv}
+    >
+      <StyledBox ref={scrollContainerRef}>
         <MessageContainer>
           {isLoading ? (
             <LoadingChats />
           ) : messages.length > 0 ? (
-            messages.map((msg) => (
-              <Message msg={msg} userId={userId} key={msg._id} />
-            ))
+            <>
+              {messages.map((msg) => (
+                <Message msg={msg} userId={userId} key={msg._id} />
+              ))}
+              <div ref={messagesEndRef} style={{ height: 1 }} />
+            </>
           ) : (
             <NewMessage />
           )}
-          <div ref={scrollRef} />
         </MessageContainer>
       </StyledBox>
     </div>

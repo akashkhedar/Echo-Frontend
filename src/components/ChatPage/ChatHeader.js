@@ -35,7 +35,7 @@ const ChatHeader = () => {
   };
 
   const user = useSelectedChatUser();
-  const callerId = useSelector((state) => state.user?._id);
+  const callerId = useSelector((state) => state.user?.userId);
   const calleeId = user?._id;
 
   const handleVideoCall = async () => {

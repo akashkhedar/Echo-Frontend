@@ -9,7 +9,6 @@ import ChatList from "./ChatList";
 import ChatSection from "./ChatSection";
 
 const ChatPage = () => {
-  const currentOpenedChat = useSelector((state) => state.chat.chatId);
   const selectedChat = useSelector((state) => state.chat.chatId);
   const dispatch = useDispatch();
   const isTablet = useMediaQuery("(min-width:750px)");
@@ -36,7 +35,7 @@ const ChatPage = () => {
       {isTablet || (!isTablet && !selectedChat) ? <ChatList /> : null}
 
       {/* Chat Area */}
-      {(isTablet && selectedChat) || (!isTablet && currentOpenedChat) ? (
+      {(isTablet && selectedChat) || (!isTablet && selectedChat) ? (
         <Box
           sx={{
             flex: 1,

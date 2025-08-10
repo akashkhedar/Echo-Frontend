@@ -4,6 +4,7 @@ import ScheduleIcon from "@mui/icons-material/Schedule";
 import { Box, Card, Typography, styled } from "@mui/material";
 import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
+import { useQueryClient } from "@tanstack/react-query";
 import socket from "../../utils/socket";
 
 const BubbleWrapper = styled(Box)(({ align }) => ({
@@ -32,6 +33,7 @@ const Message = ({ msg, userId }) => {
   const conversationId = useSelector((state) => state.chat.chatId);
   const roomId = useSelector((state) => state.chat.roomId);
   const messageRef = useRef(null);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!conversationId || conversationId !== msg.conversationId) return;
@@ -40,20 +42,41 @@ const Message = ({ msg, userId }) => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          socket.emit("readMsg", {
-            msgId: msg._id,
-            chatId: conversationId,
-            roomId: roomId,
-          });
+          if (!msg.read) {
+            socket.emit("readMsg", {
+              msgId: msg._id,
+              chatId: conversationId,
+              roomId,
+              senderId: msg.sender,
+            });
+
+            queryClient.setQueryData(
+              ["chatMessages", conversationId],
+              (old) => {
+                if (!old) return old;
+                return {
+                  ...old,
+                  pages: old.pages.map((page) =>
+                    page.map((m) =>
+                      m._id === msg._id ? { ...m, read: true } : m
+                    )
+                  ),
+                };
+              }
+            );
+          }
           observer.disconnect();
         }
       },
-      { threshold: 1 }
+      {
+        threshold: 0.5,
+        rootMargin: "0px",
+      }
     );
 
     if (messageRef.current) observer.observe(messageRef.current);
     return () => observer.disconnect();
-  }, [msg, userId, roomId, conversationId]);
+  }, [msg, userId, roomId, conversationId, queryClient]);
 
   const formatTime = (timestamp) => {
     if (!timestamp) return "";
@@ -87,7 +110,6 @@ const Message = ({ msg, userId }) => {
             : JSON.stringify(msg.message)}
         </Typography>
 
-        {/* Time + Tick Row */}
         <Box
           sx={{
             display: "flex",

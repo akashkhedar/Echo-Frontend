@@ -12,7 +12,7 @@ import QuickMessages from "./QuickMessages";
 import UserTabs from "./UserTabs";
 
 const MDQuickChat = () => {
-  const userId = useSelector((state) => state.user._id);
+  const userId = useSelector((state) => state.user.userId);
   const { data: conversations } = useConversationList(userId);
 
   const [open, setOpen] = React.useState(false);
@@ -74,9 +74,9 @@ const MDQuickChat = () => {
           sx={{
             overflowY: "auto",
             overflowX: "hidden",
-            scrollbarWidth: "none", // Firefox
+            scrollbarWidth: "none",
             "&::-webkit-scrollbar": {
-              display: "none", // Chrome, Safari, Edge
+              display: "none",
             },
           }}
         >

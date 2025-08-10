@@ -8,10 +8,16 @@ import Paper from "@mui/material/Paper";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UploadPost from "../uploadPost/UploadPost";
+import { useSelector } from "react-redux";
+import useConversationList from "../../hooks/useConversationList";
+import { Badge } from "@mui/material";
 
 export default function FixedBottomNavigation() {
   const [value, setValue] = useState(0);
   const [open, setOpen] = useState(false);
+  const { userId } = useSelector((state) => state.user);
+  const { data: conversations = [] } = useConversationList(userId);
+  const hasUnread = conversations.some((c) => c.unread);
 
   const handleClose = () => setOpen(false);
   const handleOpen = () => setOpen(true);
@@ -49,7 +55,15 @@ export default function FixedBottomNavigation() {
           onClick={() => {
             navigate("/chat");
           }}
-          icon={<ForumRoundedIcon sx={{ color: getIconColor(1) }} />}
+          icon={
+            <>
+              <Badge
+                color={hasUnread ? "error" : "default"}
+                variant="dot"
+              ></Badge>
+              <ForumRoundedIcon sx={{ color: getIconColor(1) }} />
+            </>
+          }
         />
         <BottomNavigationAction
           onClick={handleOpen}
