@@ -1,17 +1,27 @@
-import { useSelector } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
 
+const SELECTED_CONVERSATION_KEY = ["selectedConversation"];
+
 const useSelectedChatUser = () => {
-  const userId = useSelector((state) => state.chat.chatUserId);
-  const authUser = useSelector((state) => state.user.userId);
   const queryClient = useQueryClient();
 
-  const conversations = queryClient.getQueryData(["conversations", authUser]);
+  const saveConversation = (conversation) => {
+    queryClient.setQueryData(SELECTED_CONVERSATION_KEY, conversation);
+  };
 
-  if (!conversations || !userId) return null;
+  const clearConversation = () => {
+    queryClient.setQueryData(SELECTED_CONVERSATION_KEY, null);
+  };
 
-  const convo = conversations.find((c) => c.user._id === userId);
-  return convo ? convo.user : null;
+  const conversation =
+    queryClient.getQueryData(SELECTED_CONVERSATION_KEY) || null;
+
+  return {
+    saveConversation,
+    clearConversation,
+    conversation,
+    isSelected: !!conversation,
+  };
 };
 
 export default useSelectedChatUser;

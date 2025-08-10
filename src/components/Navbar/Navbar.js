@@ -11,11 +11,11 @@ import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material/styles";
 import * as React from "react";
 import { useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Icon from "../../assets/Icon.png";
 import Logo from "../../assets/Logo.png";
 import axiosInstance from "../../axiosInstance";
+import useUser from "../../hooks/useUser";
 import SearchDropdown from "./SearchDropdown";
 
 const Navbar = () => {
@@ -26,7 +26,7 @@ const Navbar = () => {
   const [searchResults, setSearchResults] = React.useState([]);
   const [openDropdown, setOpenDropdown] = React.useState(false);
   const [searchInput, setSearchInput] = React.useState("");
-  const user = useSelector((state) => state.user);
+  const { data: user } = useUser();
 
   const searchRef = React.useRef(null);
   const dropdownRef = React.useRef(null);
@@ -195,7 +195,7 @@ const Navbar = () => {
             results={searchResults}
             navigate={navigate}
             isOpen={openDropdown}
-            userId={user.userId}
+            userId={user._id}
             dropdownRef={dropdownRef}
             setOpenDropdown={setOpenDropdown}
             setSearchInput={setSearchInput}

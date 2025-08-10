@@ -7,20 +7,21 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-import { useSelector } from "react-redux";
 import useConversationSelection from "../../hooks/useConversationSelection";
-import { useNavigate } from "react-router-dom";
+import useUser from "../../hooks/useUser";
+import useSelectedChatUser from "../../hooks/useSelectedChatUser";
 
 const ConversationsList = ({ conversation, selectedChat }) => {
-  const navigate = useNavigate();
-  const { userId } = useSelector((state) => state.user);
+  const { data: user } = useUser();
+
   const selectConversation = useConversationSelection();
+  const { saveConversation } = useSelectedChatUser();
   return (
     <ListItem
       key={conversation._id}
       onClick={async () => {
-        await selectConversation(conversation, userId);
-        navigate("/chat"); // <- move navigation only after selection is done
+        saveConversation(conversation);
+        await selectConversation(conversation, user._id);
       }}
       sx={{
         display: "flex",

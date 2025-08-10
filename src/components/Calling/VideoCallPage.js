@@ -5,8 +5,8 @@ import VideocamIcon from "@mui/icons-material/Videocam";
 import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 import { Box, Grid, IconButton, Paper, Stack } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
+import useUser from "../../hooks/useUser";
 import socket from "../../utils/socket";
 import {
   acceptCall,
@@ -24,7 +24,7 @@ const VideoCallPage = () => {
   const localVideoRef = useRef();
   const remoteVideoRef = useRef();
   const hasCalledRef = useRef(false);
-  const userId = useSelector((state) => state.user._id);
+  const { data: user } = useUser();
 
   const { state } = useLocation();
   const { callerId, calleeId, offer, type } = state || {};
@@ -56,7 +56,7 @@ const VideoCallPage = () => {
       try {
         if (!hasCalledRef.current) {
           hasCalledRef.current = true;
-          if (userId === callerId) {
+          if (user._id === callerId) {
             await makeCall(
               callerId,
               calleeId,
@@ -113,13 +113,13 @@ const VideoCallPage = () => {
   const handleMic = async () => {
     let receiver;
     setMicOn((prev) => !prev);
-    if (userId !== calleeId) {
+    if (user._id !== calleeId) {
       receiver = calleeId;
     } else {
       receiver = callerId;
     }
     await toggleMic({
-      sender: userId,
+      sender: user._id,
       receiver: receiver,
     });
   };
@@ -127,13 +127,13 @@ const VideoCallPage = () => {
   const handleCamera = async () => {
     let receiver;
     setCameraOn((prev) => !prev);
-    if (userId !== calleeId) {
+    if (user._id !== calleeId) {
       receiver = calleeId;
     } else {
       receiver = callerId;
     }
     await toggleCamera({
-      sender: userId,
+      sender: user._id,
       receiver: receiver,
     });
   };

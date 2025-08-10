@@ -1,9 +1,9 @@
 import { Alert, Box, Button, TextField, Typography } from "@mui/material";
 import { useFormik } from "formik";
 import { useState } from "react";
-import { useSelector } from "react-redux";
 import * as yup from "yup";
 import axiosInstance from "../../../axiosInstance";
+import useUser from "../../../hooks/useUser";
 
 const passwordValidation = yup
   .string()
@@ -73,12 +73,12 @@ const LoggedNewPass = () => {
     },
   };
 
-  const email = useSelector((state) => state.user.email);
+  const { data: user } = useUser();
 
   const handleForgetPassword = async () => {
     try {
       const res = await axiosInstance.post("/auth/forget-password", {
-        userInfo: email,
+        userInfo: user.email,
       });
 
       if (res.status === 200) {
@@ -132,8 +132,8 @@ const LoggedNewPass = () => {
             fontSize: "1rem",
             fontWeight: 600,
             color: "rgb(191, 13, 214)",
-            minWidth: "unset", // removes default min width
-            textTransform: "none", // keeps natural casing
+            minWidth: "unset",
+            textTransform: "none",
             "&:hover": {
               color: "#d05ce3",
               backgroundColor: "transparent",
@@ -195,7 +195,7 @@ const LoggedNewPass = () => {
             backgroundColor: "#82109eff",
           },
           "&.Mui-disabled": {
-            backgroundColor: "rgba(102, 14, 125, 1)", // darker blue when loading
+            backgroundColor: "rgba(102, 14, 125, 1)",
             color: "#fff",
           },
 

@@ -2,9 +2,9 @@ import DoneIcon from "@mui/icons-material/Done";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import { Box, Card, Typography, styled } from "@mui/material";
-import { useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
+import useSelectedChatUser from "../../hooks/useSelectedChatUser";
 import socket from "../../utils/socket";
 
 const BubbleWrapper = styled(Box)(({ align }) => ({
@@ -30,13 +30,12 @@ const ChatBubble = styled(Card)(({ align }) => ({
 
 const Message = ({ msg, userId }) => {
   const isSent = msg.sender === userId;
-  const conversationId = useSelector((state) => state.chat.chatId);
-  const roomId = useSelector((state) => state.chat.roomId);
+  const { conversation } = useSelectedChatUser();
   const messageRef = useRef(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (!conversationId || conversationId !== msg.conversationId) return;
+    if (!conversation?._id || conversation?._id !== msg.conversationId) return;
     if (msg.sender === userId || msg.read) return;
 
     const observer = new IntersectionObserver(
@@ -45,13 +44,13 @@ const Message = ({ msg, userId }) => {
           if (!msg.read) {
             socket.emit("readMsg", {
               msgId: msg._id,
-              chatId: conversationId,
-              roomId,
+              chatId: conversation?._id,
+              roomId: conversation?.roomId,
               senderId: msg.sender,
             });
 
             queryClient.setQueryData(
-              ["chatMessages", conversationId],
+              ["chatMessages", conversation?._id],
               (old) => {
                 if (!old) return old;
                 return {
@@ -76,7 +75,7 @@ const Message = ({ msg, userId }) => {
 
     if (messageRef.current) observer.observe(messageRef.current);
     return () => observer.disconnect();
-  }, [msg, userId, roomId, conversationId, queryClient]);
+  }, [msg, userId, conversation.roomId, conversation._id, queryClient]);
 
   const formatTime = (timestamp) => {
     if (!timestamp) return "";

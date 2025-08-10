@@ -6,10 +6,9 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
-import * as React from "react";
 import { useNavigate } from "react-router-dom";
+import useUser from "../../hooks/useUser";
 import socket from "../../utils/socket";
-import { useSelector } from "react-redux";
 
 export default function HoverCard({
   id,
@@ -19,7 +18,7 @@ export default function HoverCard({
   following,
 }) {
   const navigate = useNavigate();
-  const userId = useSelector((state) => state.user._id);
+  const { data: user } = useUser();
 
   return (
     <Card
@@ -92,7 +91,7 @@ export default function HoverCard({
               }}
               onClick={() => {
                 socket.emit("redirectConvo", {
-                  sender: userId,
+                  sender: user._id,
                   receiver: id,
                 });
               }}

@@ -1,18 +1,15 @@
 import {
   Box,
-  Typography,
-  Grid,
   Divider,
+  Grid,
+  Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { useSelector } from "react-redux";
 import useUser from "../../hooks/useUser";
 
 const About = () => {
-  const userId = useSelector((state) => state.user.userId);
   const { data: user } = useUser();
-  console.log(user);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 

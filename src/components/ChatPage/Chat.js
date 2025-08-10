@@ -1,21 +1,19 @@
 import { Box, useMediaQuery } from "@mui/material";
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import ChatBG from "../../assets/ChatBG.jpeg";
-import { clearChat } from "../../redux/slices/ChatSlice/ChatSlice";
+import useSelectedChatUser from "../../hooks/useSelectedChatUser";
 import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
 import ChatList from "./ChatList";
 import ChatSection from "./ChatSection";
 
 const ChatPage = () => {
-  const selectedChat = useSelector((state) => state.chat.chatId);
-  const dispatch = useDispatch();
+  const { conversation, clearConversation } = useSelectedChatUser();
   const isTablet = useMediaQuery("(min-width:750px)");
 
   useEffect(() => {
     return () => {
-      dispatch(clearChat());
+      clearConversation();
     };
     // eslint-disable-next-line
   }, []);
@@ -32,10 +30,10 @@ const ChatPage = () => {
       }}
     >
       {/* Sidebar (Chat List) */}
-      {isTablet || (!isTablet && !selectedChat) ? <ChatList /> : null}
+      {isTablet || (!isTablet && !conversation?.["_id"]) ? <ChatList /> : null}
 
-      {/* Chat Area */}
-      {(isTablet && selectedChat) || (!isTablet && selectedChat) ? (
+      {(isTablet && conversation?.["_id"]) ||
+      (!isTablet && conversation?.["_id"]) ? (
         <Box
           sx={{
             flex: 1,
@@ -46,13 +44,13 @@ const ChatPage = () => {
           }}
         >
           {/* Sticky Chat Header */}
-          {selectedChat !== null && (
+          {conversation?.["_id"] && (
             <Box
               sx={{
                 position: "sticky",
                 top: 0,
                 zIndex: 10,
-                backgroundColor: "#1e1e2f", // or same as modal/bg color
+                backgroundColor: "#1e1e2f",
               }}
             >
               <ChatHeader />
@@ -70,7 +68,7 @@ const ChatPage = () => {
           </Box>
 
           {/* Chat Input at Bottom */}
-          {selectedChat !== null && <ChatInput />}
+          {conversation?.["_id"] && <ChatInput />}
         </Box>
       ) : null}
     </Box>

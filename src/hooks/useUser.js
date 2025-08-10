@@ -3,13 +3,13 @@ import axiosInstance from "../axiosInstance";
 
 const useUser = () => {
   return useQuery({
-    queryKey: ["user"],
+    queryKey: ["userDetails"],
     queryFn: async () => {
-      const res = await axiosInstance.get("/user/about");
-      console.log(res);
-      return res.data;
+      const { data } = await axiosInstance.get(`/user/about`);
+      return data.data;
     },
-    staleTime: 60_000,
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
   });
 };
 

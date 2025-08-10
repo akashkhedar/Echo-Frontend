@@ -1,71 +1,39 @@
 import { Box, Typography } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
-import usePost from "../../hooks/usePost";
+import { useEffect } from "react";
+import { usePost } from "../../hooks/usePost";
+import useUser from "../../hooks/useUser";
 import socket from "../../utils/socket";
 import PostCard from "../PostPage/PostCard";
 import PostLoading from "../PostPage/PostLoading";
 
 const PostMade = () => {
-  const userId = useSelector((state) => state.user.userId);
+  const { data: user } = useUser();
+
   const queryClient = useQueryClient();
-  const containerRef = useRef(null);
+  const { data: posts, isLoading } = usePost(user._id);
 
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    usePost(userId);
-
-  const posts = data?.pages.flatMap((page) => page.posts) || [];
-
-  // Listen for new posts via socket
   useEffect(() => {
     socket.on("newPostMade", (post) => {
-      queryClient.setQueryData(["posts", userId], (old) => {
-        if (!old)
-          return {
-            pages: [{ posts: [post], nextCursor: null }],
-            pageParams: [null],
-          };
+      queryClient.setQueryData(["posts", user._id], (old) =>
+        old ? [post, ...old] : [post]
+      );
+    });
 
-        return {
-          ...old,
-          pages: [
-            {
-              ...old.pages[0],
-              posts: [post, ...old.pages[0].posts],
-            },
-            ...old.pages.slice(1),
-          ],
-        };
-      });
+    socket.on("postDeleted", (postId) => {
+      queryClient.setQueryData(["posts", user._id], (old) =>
+        old ? old.filter((p) => p._id !== postId) : []
+      );
     });
 
     return () => {
-      socket.off("getNewPost");
+      socket.off("newPostMade");
+      socket.off("postDeleted");
     };
-  }, [queryClient, userId]);
-
-  // Infinite scroll
-  // In PostMade component
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!containerRef.current || !hasNextPage || isFetchingNextPage) return;
-
-      const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
-      // More conservative threshold (20% of viewport height from bottom)
-      if (scrollHeight - scrollTop <= clientHeight * 1.2) {
-        fetchNextPage();
-      }
-    };
-
-    const container = containerRef.current;
-    container?.addEventListener("scroll", handleScroll);
-    return () => container?.removeEventListener("scroll", handleScroll);
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [queryClient, user._id]);
 
   return (
     <Box
-      ref={containerRef}
       sx={{
         display: "flex",
         flexDirection: "column",
@@ -79,13 +47,8 @@ const PostMade = () => {
     >
       {isLoading ? (
         <PostLoading />
-      ) : posts.length > 0 ? (
-        <>
-          {posts.map((post) => (
-            <PostCard post={post} />
-          ))}
-          {isFetchingNextPage && <PostLoading />}
-        </>
+      ) : posts?.length > 0 ? (
+        posts.map((post) => <PostCard key={post._id} post={post} />)
       ) : (
         <Box
           sx={{

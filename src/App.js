@@ -1,6 +1,5 @@
 import { SnackbarProvider } from "notistack";
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "./App.css";
 import VideoCallPage from "./components/Calling/VideoCallPage";
@@ -13,16 +12,19 @@ import LogInPage from "./components/Login/Login";
 import Post from "./components/PostPage/Post";
 import Profile from "./components/Profile/Profile";
 import SignupPage from "./components/Signup/Signup";
+import useUser from "./hooks/useUser";
 import socket from "./utils/socket";
 
 function App() {
-  const { userId } = useSelector((state) => state.user);
+  const { data: user, isLoading } = useUser();
 
   useEffect(() => {
-    socket.emit("online", userId);
+    console.log(user);
+    if (!user) return;
+    socket.emit("online", user._id);
 
     const handleBeforeUnload = () => {
-      socket.emit("offline", userId);
+      socket.emit("offline", user._id);
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
@@ -31,25 +33,11 @@ function App() {
       socket.off("offline");
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  });
+  }, [user]);
 
-  // Somewhere in App.js or a `useEffect` at the root level
-  useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === "persist:auth") {
-        const newAuth = JSON.parse(e.newValue || "{}");
-        const oldAuth = JSON.parse(
-          localStorage.getItem("persist:auth") || "{}"
-        );
-
-        if (oldAuth?.userId !== newAuth?.userId) {
-          window.location.reload(); // or dispatch logout
-          return () =>
-            window.removeEventListener("storage", handleStorageChange);
-        }
-      }
-    };
-  }, []);
+  if (isLoading) {
+    return;
+  }
 
   return (
     <SnackbarProvider

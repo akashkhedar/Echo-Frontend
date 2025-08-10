@@ -4,16 +4,17 @@ import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import * as React from "react";
-import { useSelector } from "react-redux";
 import useConversationList from "../../hooks/useConversationList";
+import useUser from "../../hooks/useUser";
 import EmptyChatList from "./EmptyChatList";
 import ListLoading from "./ListLoading";
 import QuickMessages from "./QuickMessages";
 import UserTabs from "./UserTabs";
 
 const MDQuickChat = () => {
-  const userId = useSelector((state) => state.user.userId);
-  const { data: conversations } = useConversationList(userId);
+  const { data: user } = useUser();
+
+  const { data: conversations } = useConversationList(user._id);
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);

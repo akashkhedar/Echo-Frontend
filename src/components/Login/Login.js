@@ -7,14 +7,13 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import LoginImg from "../../assets/Login.jpg";
 import axiosInstance from "../../axiosInstance";
-import { setUser } from "../../redux/slices/AuthSlice/AuthSlice";
 
 const validationSchema = yup.object({
   user: yup.string().required("Field is required"),
@@ -25,7 +24,7 @@ const LogInPage = () => {
   const [error, setError] = useState(false);
   const [loadingLogin, setLoadingLogin] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const { values, errors, touched, handleBlur, handleSubmit, handleChange } =
     useFormik({
       initialValues: {
@@ -41,7 +40,7 @@ const LogInPage = () => {
             userPassword: values.password,
           });
           if (res.status === 200) {
-            dispatch(setUser(res.data.user));
+            queryClient.setQueryData(["userDetails"], res.data.user);
             navigate("/");
           }
         } catch (error) {

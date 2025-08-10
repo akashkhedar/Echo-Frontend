@@ -1,9 +1,9 @@
 import { Box, Chip, Tab, Tabs, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import * as React from "react";
-import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import useConnections from "../../hooks/useConnections";
+import useUser from "../../hooks/useUser";
 
 const Sections = () => {
   const navigate = useNavigate();
@@ -22,11 +22,11 @@ const Sections = () => {
   const [value, setValue] = React.useState(initialPath);
   const handleChange = (newValue) => setValue(newValue);
 
-  const userId = useSelector((state) => state.user.userId);
+  const { data: user } = useUser();
 
-  const { data: followers = [] } = useConnections(userId, "followers");
+  const { data: followers = [] } = useConnections(user._id, "followers");
   console.log(followers);
-  const { data: following = [] } = useConnections(userId, "following");
+  const { data: following = [] } = useConnections(user._id, "following");
   console.log(following);
 
   const theme = useTheme();

@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../axiosInstance";
 import ChatSearchDropdown from "./ChatSearchDropdown";
+import useUser from "../../hooks/useUser";
 
 const SearchInput = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
@@ -49,13 +50,13 @@ const ListSearch = () => {
     };
   }
 
-  const userId = useSelector((state) => state.user._id);
+  const { data: user } = useUser();
 
   const handleSearch = async (e) => {
     try {
       if (searchInput.length > 0) {
         const res = await axiosInstance.get(`/user/search?q=${searchInput}`);
-        const result = res.data.filter((p) => p._id !== userId);
+        const result = res.data.filter((p) => p._id !== user._id);
         setSearchResults(result);
         setOpenDropdown(true);
       } else {

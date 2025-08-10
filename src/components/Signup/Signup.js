@@ -12,18 +12,17 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import imageCompression from "browser-image-compression";
 import { useFormik } from "formik";
-import React, { useState } from "react";
+import { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { Link, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import SignupImg from "../../assets/Signup.jpg";
 import axiosInstance from "../../axiosInstance";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import imageCompression from "browser-image-compression";
-import { setUser } from "../../redux/slices/AuthSlice/AuthSlice";
-import { useDispatch } from "react-redux";
 
 const usernameRegex = /^(?!.*[._]{2})[a-z0-9._]{4,25}$/;
 const usernameBoundaryRegex = /^(?![._])[a-z0-9._]+(?<![._])$/;
@@ -105,7 +104,8 @@ const SignUpPage = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [error, setError] = useState(false);
 
-  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
+
   const navigate = useNavigate();
 
   const formikEmail = useFormik({
@@ -195,7 +195,7 @@ const SignUpPage = () => {
           formikProfile.setFieldError("username", "Username already taken");
         }
         if (res.status === 200) {
-          dispatch(setUser(res.data.user));
+          queryClient.setQueryData(["userDetails"], res.data.user);
           navigate("/");
         }
       } catch (error) {

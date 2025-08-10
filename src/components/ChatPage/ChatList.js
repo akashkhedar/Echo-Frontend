@@ -9,9 +9,10 @@ import {
 } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import useConversationList from "../../hooks/useConversationList";
+import useSelectedChatUser from "../../hooks/useSelectedChatUser";
+import useUser from "../../hooks/useUser";
 import socket from "../../utils/socket";
 import ChatListLoading from "./ChatListLoading";
 import ConversationsList from "./ConversationsList";
@@ -31,9 +32,9 @@ const theme = createTheme({
 const ChatList = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { userId } = useSelector((state) => state.user);
-  const { data: conversations } = useConversationList(userId);
-  const selectedChat = useSelector((state) => state.chat.chatId);
+  const { data: user } = useUser();
+  const { data: conversations } = useConversationList(user._id);
+  const { conversation } = useSelectedChatUser();
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
@@ -49,7 +50,7 @@ const ChatList = () => {
   useEffect(() => {
     socket.on("userOnline", (id) => {
       console.log(id);
-      queryClient.setQueryData(["conversations", userId], (old) =>
+      queryClient.setQueryData(["conversations", user._id], (old) =>
         old?.map((convo) =>
           convo.user._id === id
             ? { ...convo, user: { ...convo.user, isOnline: true } }
@@ -59,7 +60,7 @@ const ChatList = () => {
     });
 
     socket.on("userOffline", (id) => {
-      queryClient.setQueryData(["conversations", userId], (old) =>
+      queryClient.setQueryData(["conversations", user._id], (old) =>
         old?.map((convo) =>
           convo.user._id === id
             ? { ...convo, user: { ...convo.user, isOnline: false } }
@@ -72,7 +73,7 @@ const ChatList = () => {
       socket.off("userOnline");
       socket.off("userOffline");
     };
-  }, [queryClient, userId]);
+  }, [queryClient, user._id]);
 
   useEffect(() => {
     // Simulate loading delay — replace with real loading logic
@@ -145,11 +146,11 @@ const ChatList = () => {
           {loading ? (
             <ChatListLoading />
           ) : conversations && conversations.length > 0 ? (
-            conversations.map((conversation) => (
+            conversations.map((convo) => (
               <ConversationsList
-                key={conversation._id}
-                conversation={conversation}
-                selectedChat={selectedChat}
+                key={convo._id}
+                conversation={convo}
+                selectedChat={conversation?._id}
               />
             ))
           ) : (

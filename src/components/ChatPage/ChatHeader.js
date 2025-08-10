@@ -9,9 +9,8 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import useSelectedChatUser from "../../hooks/useSelectedChatUser";
-import { clearChat } from "../../redux/slices/ChatSlice/ChatSlice";
+import useUser from "../../hooks/useUser";
 import socket from "../../utils/socket";
 import CallingModal from "./CallingModal";
 
@@ -28,15 +27,16 @@ const theme = createTheme({
 const ChatHeader = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const dispatch = useDispatch();
+  const { data: user } = useUser();
+
+  const { conversation, clearConversation } = useSelectedChatUser();
 
   const handleBack = () => {
-    dispatch(clearChat());
+    clearConversation();
   };
 
-  const user = useSelectedChatUser();
-  const callerId = useSelector((state) => state.user?.userId);
-  const calleeId = user?._id;
+  const callerId = user?._id;
+  const calleeId = conversation?.user._id;
 
   const handleVideoCall = async () => {
     setOpen(true);
@@ -76,8 +76,8 @@ const ChatHeader = () => {
         )}
 
         <Avatar
-          src={user.profileImage}
-          alt={user.username}
+          src={conversation?.user.profileImage}
+          alt={conversation?.user.username}
           sx={{ border: "2px solid rgba(255, 255, 255, 0.1)" }}
         />
         <Box sx={{ marginLeft: 2 }}>
@@ -85,9 +85,9 @@ const ChatHeader = () => {
             variant="h6"
             sx={{ fontWeight: "bold", color: "whitesmoke" }}
           >
-            {user.fullname}
+            {conversation?.user.fullname}
           </Typography>
-          {user.isOnline ? (
+          {conversation?.user.isOnline ? (
             <Typography variant="body2" sx={{ color: "rgb(82, 203, 71)" }}>
               Online
             </Typography>
@@ -120,7 +120,7 @@ const ChatHeader = () => {
       <CallingModal
         open={open}
         onClose={handleClose}
-        calleeImage={user.profileImage}
+        calleeImage={conversation?.user.profileImage}
         callerId={callerId}
         calleeId={calleeId}
       />

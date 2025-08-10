@@ -3,22 +3,22 @@ import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
+import PasswordIcon from "@mui/icons-material/Password";
 import { Avatar, Badge, Box, Divider, styled } from "@mui/material";
 import Drawer from "@mui/material/Drawer";
 import * as React from "react";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import UploadPost from "../uploadPost/UploadPost";
 import axiosInstance from "../../axiosInstance";
-import PasswordIcon from "@mui/icons-material/Password";
-import NewPassword from "../ChangePassword/NewPassword";
 import useConversationList from "../../hooks/useConversationList";
+import useUser from "../../hooks/useUser";
+import NewPassword from "../ChangePassword/NewPassword";
+import UploadPost from "../uploadPost/UploadPost";
 
 const MDSidebar = () => {
   const navigate = useNavigate();
-  const user = useSelector((state) => state.user);
-  const { userId } = useSelector((state) => state.user);
-  const { data: conversations = [] } = useConversationList(userId);
+  const { data: user } = useUser();
+
+  const { data: conversations = [] } = useConversationList(user._id);
   const hasUnread = conversations.some((c) => c.unread);
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);

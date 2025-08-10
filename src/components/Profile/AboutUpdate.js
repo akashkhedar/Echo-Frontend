@@ -1,3 +1,4 @@
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import {
   Box,
   Button,
@@ -16,18 +17,16 @@ import Modal from "@mui/material/Modal";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider/LocalizationProvider";
+import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import imageCompression from "browser-image-compression";
 import dayjs from "dayjs";
 import { useFormik } from "formik";
 import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import { useDispatch } from "react-redux";
 import * as yup from "yup";
 import axiosInstance from "../../axiosInstance";
-import { setUser } from "../../redux/slices/AuthSlice/AuthSlice";
 import DeleteAccountModal from "./DeleteAccountModal";
-import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 
 const usernameRegex = /^(?!.*[._]{2})[a-z0-9._]{4,25}$/;
 const usernameBoundaryRegex = /^(?![._])[a-z0-9._]+(?<![._])$/;
@@ -101,8 +100,7 @@ const AboutUpdate = ({ open, handleClose, user }) => {
   const [profileImage, setProfileImage] = useState(user.profileImage);
   // eslint-disable-next-line no-unused-vars
   const [error, setError] = useState(false);
-
-  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
@@ -164,7 +162,7 @@ const AboutUpdate = ({ open, handleClose, user }) => {
           updatedFields
         );
         if (res.status === 200) {
-          dispatch(setUser(res.data.user));
+          queryClient.setQueryData(["userDetails"], res.data.user);
           handleClose();
         }
       } catch (err) {

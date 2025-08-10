@@ -15,6 +15,7 @@ import CardMedia from "@mui/material/CardMedia";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
+import { useQueryClient } from "@tanstack/react-query";
 import debounce from "lodash.debounce";
 import HoverPopover from "material-ui-popup-state/HoverPopover";
 import {
@@ -23,14 +24,13 @@ import {
   usePopupState,
 } from "material-ui-popup-state/hooks";
 import * as React from "react";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../axiosInstance";
+import useUser from "../../hooks/useUser";
+import socket from "../../utils/socket";
 import HoverCard from "../Profile/HoverCard";
 import CommentSection from "./CommentSection";
 import ShareModal from "./ShareModal";
-import { useQueryClient } from "@tanstack/react-query";
-import socket from "../../utils/socket";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -56,9 +56,9 @@ const PostCard = ({ post, setPosts = null }) => {
   const countComment = post.comments.length;
   const [commentCount, setCommentCount] = React.useState(countComment);
 
-  const id = useSelector((state) => state.user.userId);
+  const { data: user } = useUser();
 
-  const hasLiked = post.likes.includes(id);
+  const hasLiked = post.likes.includes(user._id);
 
   const [liked, setLiked] = React.useState(hasLiked);
 
@@ -118,19 +118,11 @@ const PostCard = ({ post, setPosts = null }) => {
     try {
       const res = await axiosInstance.delete(`/post/delete/${post._id}`);
       if (res.status === 200) {
-        socket.emit("postDeleted", { postId: post._id, userId: id });
+        socket.emit("postDeleted", { postId: post._id, userId: user._id });
 
-        queryClient.setQueryData(["posts", id], (oldData) => {
-          if (!oldData) return oldData;
-
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => ({
-              ...page,
-              posts: page.posts.filter((p) => p._id !== post._id),
-            })),
-          };
-        });
+        queryClient.setQueryData(["posts", user._id], (old) =>
+          old ? old.filter((p) => p._id !== post._id) : []
+        );
       }
     } catch (error) {
       console.error(error);
@@ -243,7 +235,7 @@ const PostCard = ({ post, setPosts = null }) => {
                 <MenuItem onClick={handleReport} sx={{ color: "red" }}>
                   Report Post
                 </MenuItem>
-                {post.userId._id === id ? (
+                {post.userId._id === user._id ? (
                   <MenuItem onClick={handleDeletePost}>Delete Post</MenuItem>
                 ) : null}
               </Menu>

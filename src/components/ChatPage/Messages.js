@@ -1,12 +1,13 @@
 import { Box, styled } from "@mui/material";
-import React, { useEffect, useLayoutEffect, useRef } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useLayoutEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
+import QuickChat from "../../assets/QuickChat.jpg";
+import useChatMessages from "../../hooks/useChatMessages";
+import useSelectedChatUser from "../../hooks/useSelectedChatUser";
+import useUser from "../../hooks/useUser";
+import LoadingChats from "./LoadingChats";
 import Message from "./Message";
 import NewMessage from "./NewMessage";
-import QuickChat from "../../assets/QuickChat.jpg";
-import { useLocation } from "react-router-dom";
-import LoadingChats from "./LoadingChats";
-import useChatMessages from "../../hooks/useChatMessages";
 
 const MessageContainer = styled(Box)({
   display: "flex",
@@ -44,10 +45,11 @@ const Messages = () => {
   const scrollContainerRef = useRef(null);
   const path = useLocation();
 
-  const userId = useSelector((state) => state.user.userId);
-  const currentOpenedChat = useSelector((state) => state.chat.chatId);
+  const { data: user } = useUser();
 
-  const { data: messages = [], isLoading } = useChatMessages(currentOpenedChat);
+  const { conversation } = useSelectedChatUser();
+
+  const { data: messages = [], isLoading } = useChatMessages(conversation?._id);
 
   useEffect(() => {
     if (path.pathname === "/" && outerDiv.current) {
@@ -73,7 +75,7 @@ const Messages = () => {
           ) : messages.length > 0 ? (
             <>
               {messages.map((msg) => (
-                <Message msg={msg} userId={userId} key={msg._id} />
+                <Message msg={msg} userId={user._id} key={msg._id} />
               ))}
               <div ref={messagesEndRef} style={{ height: 1 }} />
             </>

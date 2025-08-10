@@ -2,24 +2,25 @@ import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import PersonRemoveAlt1Icon from "@mui/icons-material/PersonRemoveAlt1";
 import SendIcon from "@mui/icons-material/Send";
 import { Avatar, Box, IconButton, Tooltip, Typography } from "@mui/material";
-import { useState, useMemo } from "react";
-import { useSelector } from "react-redux";
+import { useMemo, useState } from "react";
 import useConnections from "../../hooks/useConnections";
+import useUser from "../../hooks/useUser";
 
-const SearchList = ({ user, handleMessage, handleFollow, handleUnfollow }) => {
-  const userId = useSelector((state) => state.user.userId);
-  const { data: following = [] } = useConnections(userId, "following");
+const SearchList = ({ res, handleMessage, handleFollow, handleUnfollow }) => {
+  const { data: user } = useUser();
+
+  const { data: following = [] } = useConnections(user._id, "following");
 
   const [isProcessing, setIsProcessing] = useState(false);
 
   const isFollowing = useMemo(() => {
-    return following?.some((u) => u._id === user._id);
-  }, [following, user._id]);
+    return following?.some((u) => u._id === res._id);
+  }, [following, res._id]);
 
   const handleFollowAction = async () => {
     setIsProcessing(true);
     try {
-      await handleFollow(user._id);
+      await handleFollow(res._id);
     } catch (error) {
     } finally {
       setIsProcessing(false);
@@ -29,7 +30,7 @@ const SearchList = ({ user, handleMessage, handleFollow, handleUnfollow }) => {
   const handleUnfollowAction = async () => {
     setIsProcessing(true);
     try {
-      await handleUnfollow(user._id);
+      await handleUnfollow(res._id);
     } catch (error) {
     } finally {
       setIsProcessing(false);
@@ -56,20 +57,20 @@ const SearchList = ({ user, handleMessage, handleFollow, handleUnfollow }) => {
           gap: 2,
           minWidth: 0,
         }}
-        onClick={() => window.open(`/${user.username}`, "_blank")}
+        onClick={() => window.open(`/${res.username}`, "_blank")}
       >
         <Avatar
-          src={user.profileImage}
-          alt={user.username}
+          src={res.profileImage}
+          alt={res.username}
           sx={{ width: 40, height: 40 }}
         />
 
         <Box sx={{ minWidth: 0 }}>
           <Typography color="whitesmoke" noWrap sx={{ fontWeight: 500 }}>
-            {user.username}
+            {res.username}
           </Typography>
           <Typography color="text.secondary" fontSize="0.8rem" noWrap>
-            {user.fullname}
+            {res.fullname}
           </Typography>
         </Box>
       </Box>
@@ -79,7 +80,7 @@ const SearchList = ({ user, handleMessage, handleFollow, handleUnfollow }) => {
           <IconButton
             onClick={(e) => {
               e.stopPropagation();
-              handleMessage(user._id);
+              handleMessage(res._id);
             }}
             disabled={isProcessing}
           >

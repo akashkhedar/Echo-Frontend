@@ -1,10 +1,11 @@
-import React, { useState } from "react";
 import { Avatar, Box, Button, TextField } from "@mui/material";
+import { useState } from "react";
 import axiosInstance from "../../axiosInstance";
-import { useSelector } from "react-redux";
+import useUser from "../../hooks/useUser";
 
 const AddComment = ({ postId, setComments, setCommentCount }) => {
-  const userProfile = useSelector((state) => state.user.profileImage);
+  const { data: user } = useUser();
+
   const [comment, setComment] = useState("");
 
   const handleSubmit = async () => {
@@ -35,7 +36,7 @@ const AddComment = ({ postId, setComments, setCommentCount }) => {
     >
       {/* Profile Image */}
       <Avatar
-        src={userProfile}
+        src={user.userProfile}
         alt="User Avatar"
         sx={{ width: 40, height: 40 }}
       />

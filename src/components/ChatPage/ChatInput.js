@@ -1,13 +1,13 @@
 import { Send } from "@mui/icons-material";
 import { Box, IconButton, InputBase } from "@mui/material";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import useSelectedChatUser from "../../hooks/useSelectedChatUser";
+import useUser from "../../hooks/useUser";
 import socket from "../../utils/socket";
 
 const ChatInput = () => {
-  const selectedUser = useSelector((state) => state.chat.chatUserId);
-  const userId = useSelector((state) => state.user.userId);
-  const username = useSelector((state) => state.user.username);
+  const { conversation } = useSelectedChatUser();
+  const { data: user } = useUser();
 
   const [inputMessage, setInputMessage] = useState("");
   const wordLimit = 250;
@@ -35,10 +35,10 @@ const ChatInput = () => {
 
       if (trimmedMessage) {
         socket.emit("sendMessage", {
-          senderId: userId,
-          receiverId: selectedUser,
+          senderId: user._id,
+          receiverId: conversation?.user._id,
           message: inputMessage,
-          username: username,
+          username: user.username,
         });
         setInputMessage("");
       }

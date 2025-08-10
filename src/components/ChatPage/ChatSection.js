@@ -1,6 +1,5 @@
 import { Box, styled } from "@mui/material";
-import React from "react";
-import { useSelector } from "react-redux";
+import useSelectedChatUser from "../../hooks/useSelectedChatUser";
 import EmptyChat from "./EmptyChat";
 import Messages from "./Messages";
 
@@ -17,14 +16,16 @@ const StyledBox = styled(Box)(({ theme }) => ({
   scrollbarWidth: "none",
   "-ms-overflow-style": "none",
   flex: 1,
-  overflow: "hidden", // prevent extra scrolls
+  overflow: "hidden",
   width: "100%",
 }));
 
 const ChatSection = () => {
-  const chatId = useSelector((state) => state.chat.chatId);
+  const { conversation } = useSelectedChatUser();
 
-  return <StyledBox>{!chatId ? <EmptyChat /> : <Messages />}</StyledBox>;
+  return (
+    <StyledBox>{!conversation._id ? <EmptyChat /> : <Messages />}</StyledBox>
+  );
 };
 
 export default ChatSection;

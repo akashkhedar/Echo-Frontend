@@ -1,5 +1,6 @@
 import { Box, Typography, Avatar } from "@mui/material";
 import socket from "../../utils/socket";
+import useUser from "../../hooks/useUser";
 
 const ChatSearchDropdown = ({
   results,
@@ -8,9 +9,8 @@ const ChatSearchDropdown = ({
   selector,
   setOpenDropdown,
 }) => {
+  const { data: user } = useUser();
   if (!isOpen) return null;
-
-  const userId = selector((state) => state.user._id);
 
   return (
     <Box
@@ -34,16 +34,16 @@ const ChatSearchDropdown = ({
           No results found
         </Typography>
       ) : (
-        results.map((user) => (
+        results.map((res) => (
           <Box
             onClick={() => {
               socket.emit("redirectConvo", {
-                sender: userId,
-                receiver: user._id,
+                sender: user._id,
+                receiver: res._id,
               });
               setOpenDropdown(false);
             }}
-            key={user._id}
+            key={res._id}
             sx={{
               display: "flex",
               alignItems: "center",
@@ -53,11 +53,11 @@ const ChatSearchDropdown = ({
               "&:hover": { backgroundColor: "#1e1e1e", cursor: "pointer" },
             }}
           >
-            <Avatar src={user.profileImage} alt={user.username} />
+            <Avatar src={res.profileImage} alt={res.username} />
             <Box>
-              <Typography color="whitesmoke">{user.username}</Typography>
+              <Typography color="whitesmoke">{res.username}</Typography>
               <Typography color="gray" fontSize="0.8rem">
-                {user.fullname}
+                {res.fullname}
               </Typography>
             </Box>
           </Box>

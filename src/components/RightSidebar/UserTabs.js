@@ -6,18 +6,19 @@ import {
   ListItemText,
 } from "@mui/material";
 import React from "react";
-import { useSelector } from "react-redux";
 import useConversationSelection from "../../hooks/useConversationSelection";
+import useUser from "../../hooks/useUser";
 
 const UserTabs = ({ conversation, handleOpen, key }) => {
-  const { _id } = useSelector((state) => state.user);
+  const { data: user } = useUser();
+
   const handleConversationSelection = useConversationSelection();
   return (
     <React.Fragment key={key}>
       <ListItem
         onClick={() => {
           handleOpen();
-          handleConversationSelection(conversation, _id);
+          handleConversationSelection(conversation, user._id);
         }}
         disablePadding
         sx={{ marginY: "0.5rem" }}

@@ -4,14 +4,14 @@ import {
   Box,
   Button,
   Card,
+  createTheme,
   Typography,
   useMediaQuery,
-  createTheme,
 } from "@mui/material";
 import React from "react";
-import { useSelector } from "react-redux";
 import female from "../../assets/female.jpg";
 import male from "../../assets/male.jpg";
+import useUser from "../../hooks/useUser";
 import AboutUpdate from "./AboutUpdate";
 
 const theme = createTheme({
@@ -28,7 +28,8 @@ const theme = createTheme({
 
 const ProfileHeader = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const user = useSelector((state) => state.user);
+  const { data: user } = useUser();
+
   const [open, setOpen] = React.useState(false);
 
   const handleOpen = () => setOpen(true);

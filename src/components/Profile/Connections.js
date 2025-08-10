@@ -1,23 +1,27 @@
-import React from "react";
 import { Box, Grid, Typography } from "@mui/material";
-import { useSelector } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
-import useConnections from "../../hooks/useConnections";
-import UserList from "./UserList";
-import LoadingFriends from "./LoadingFriends";
 import axiosInstance from "../../axiosInstance";
+import useConnections from "../../hooks/useConnections";
+import useUser from "../../hooks/useUser";
+import LoadingFriends from "./LoadingFriends";
+import UserList from "./UserList";
 
 const Connections = ({ path }) => {
   const queryClient = useQueryClient();
-  const userId = useSelector((state) => state.user.userId);
+  const { data: user } = useUser();
+
   const isFollowersView = path === "/profile/followers";
   const type = isFollowersView ? "followers" : "following";
 
-  const { data: users = [], isLoading, isError } = useConnections(userId, type);
+  const {
+    data: users = [],
+    isLoading,
+    isError,
+  } = useConnections(user._id, type);
 
   const handleRemoveConnection = async (userIdToRemove) => {
     try {
-      queryClient.setQueryData(["connections", userId, type], (oldData) =>
+      queryClient.setQueryData(["connections", user._id, type], (oldData) =>
         (oldData || []).filter((user) => user._id !== userIdToRemove)
       );
 
@@ -27,7 +31,7 @@ const Connections = ({ path }) => {
           : `/user/unfollow/${userIdToRemove}`
       );
     } catch (error) {
-      queryClient.invalidateQueries(["connections", userId, type]);
+      queryClient.invalidateQueries(["connections", user._id, type]);
       console.error("Failed to remove connection:", error);
     }
   };

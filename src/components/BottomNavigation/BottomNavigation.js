@@ -1,22 +1,22 @@
-import HomeIcon from "@mui/icons-material/Home";
-import ForumRoundedIcon from "@mui/icons-material/ForumRounded";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
+import ForumRoundedIcon from "@mui/icons-material/ForumRounded";
+import HomeIcon from "@mui/icons-material/Home";
 import TheaterComedyRoundedIcon from "@mui/icons-material/TheaterComedyRounded";
+import { Badge } from "@mui/material";
 import BottomNavigation from "@mui/material/BottomNavigation";
 import BottomNavigationAction from "@mui/material/BottomNavigationAction";
 import Paper from "@mui/material/Paper";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import UploadPost from "../uploadPost/UploadPost";
-import { useSelector } from "react-redux";
 import useConversationList from "../../hooks/useConversationList";
-import { Badge } from "@mui/material";
+import UploadPost from "../uploadPost/UploadPost";
+import useUser from "../../hooks/useUser";
 
 export default function FixedBottomNavigation() {
+  const { data: user } = useUser();
   const [value, setValue] = useState(0);
   const [open, setOpen] = useState(false);
-  const { userId } = useSelector((state) => state.user);
-  const { data: conversations = [] } = useConversationList(userId);
+  const { data: conversations = [] } = useConversationList(user._id);
   const hasUnread = conversations.some((c) => c.unread);
 
   const handleClose = () => setOpen(false);
@@ -24,7 +24,6 @@ export default function FixedBottomNavigation() {
 
   const navigate = useNavigate();
 
-  // Define icon color logic
   const getIconColor = (index) => (value === index ? "#a259ff" : "#b0b0b0");
 
   return (

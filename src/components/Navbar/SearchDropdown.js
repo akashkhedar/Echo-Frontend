@@ -86,10 +86,10 @@ const SearchDropdown = ({
           No results found
         </Typography>
       ) : (
-        results.map((user) => (
+        results.map((res) => (
           <SearchList
-            key={user._id}
-            user={user}
+            key={res._id}
+            res={res}
             handleFollow={handleFollow}
             handleMessage={handleMessage}
             handleUnfollow={handleUnfollow}

@@ -4,11 +4,11 @@ import { useTheme } from "@mui/material/styles";
 import { QueryClient, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import useConversationList from "../hooks/useConversationList";
 import useConversationSelection from "../hooks/useConversationSelection";
-import { clearChat } from "../redux/slices/ChatSlice/ChatSlice";
+import useSelectedChatUser from "../hooks/useSelectedChatUser";
+import useUser from "../hooks/useUser";
 import socket from "../utils/socket";
 import SimpleBottomNavigation from "./BottomNavigation/BottomNavigation";
 import LGSidebar from "./LeftSidebar/LGSidebar";
@@ -20,6 +20,12 @@ import LGQuickChat from "./RightSidebar/LGQuickChat";
 import MDQuickChat from "./RightSidebar/MDQuickChat";
 
 const HomeLayout = ({ children }) => {
+  const { data: user } = useUser();
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+  });
   const queryClient = useQueryClient();
   const theme = useTheme();
 
@@ -31,16 +37,13 @@ const HomeLayout = ({ children }) => {
   const location = useLocation();
   const isChatPage = location.pathname === "/chat";
 
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const selectConversation = useConversationSelection();
 
-  const chats = useSelector((state) => state.chat.chat);
-  const userId = useSelector((state) => state.user.userId);
-  const currentOpenedChat = useSelector((state) => state.chat.chatId);
+  const { conversation, clearConversation } = useSelectedChatUser();
 
-  const { data: conversations } = useConversationList(userId);
+  const { data: conversations } = useConversationList(user._id);
 
   const [verified, setVerified] = useState(false);
 
@@ -49,7 +52,7 @@ const HomeLayout = ({ children }) => {
   useEffect(() => {
     const joinRooms = async () => {
       try {
-        socket.emit("joinChat", userId);
+        socket.emit("joinChat", user._id);
 
         const rooms = conversations?.map((convo) => convo.roomId) || [];
         socket.emit("joinAllRooms", rooms);
@@ -66,13 +69,13 @@ const HomeLayout = ({ children }) => {
     }
 
     return () => {
-      dispatch(clearChat());
+      clearConversation();
     };
-  }, [conversations, dispatch, navigate, userId]);
+  }, [clearConversation, conversations, navigate, user._id]);
 
   useEffect(() => {
     socket.on("userOnline", (id) => {
-      queryClient.setQueryData(["conversations", userId], (old) =>
+      queryClient.setQueryData(["conversations", user._id], (old) =>
         old?.map((convo) =>
           convo.user._id === id
             ? { ...convo, user: { ...convo.user, isOnline: true } }
@@ -82,7 +85,7 @@ const HomeLayout = ({ children }) => {
     });
 
     socket.on("userOffline", (id) => {
-      queryClient.setQueryData(["conversations", userId], (old) =>
+      queryClient.setQueryData(["conversations", user._id], (old) =>
         old?.map((convo) =>
           convo.user._id === id
             ? { ...convo, user: { ...convo.user, isOnline: false } }
@@ -95,13 +98,13 @@ const HomeLayout = ({ children }) => {
       socket.off("userOnline");
       socket.off("userOffline");
     };
-  }, [queryClient, userId]);
+  }, [queryClient, user._id]);
 
   useEffect(() => {
     const handler = (message, username) => {
-      if (message.conversationId === currentOpenedChat) {
+      if (message.conversationId === conversation?._id) {
         queryClient.setQueryData(
-          ["messages", currentOpenedChat],
+          ["messages", conversation?._id],
           (oldMessages) => {
             if (!oldMessages) return [message];
 
@@ -112,23 +115,22 @@ const HomeLayout = ({ children }) => {
         );
       }
 
-      const key = enqueueSnackbar("", {
-        persist: true,
-        content: (key) => (
-          <NotifyMessage
-            username={username}
-            closeSnackbar={closeSnackbar}
-            snackbarKey={key}
-          />
-        ),
-      });
+      if (message.conversationId !== conversation?._id) {
+        const key = enqueueSnackbar("", {
+          persist: true,
+          content: (key) => (
+            <NotifyMessage
+              username={username}
+              closeSnackbar={closeSnackbar}
+              snackbarKey={key}
+            />
+          ),
+        });
 
-      setTimeout(() => {
-        closeSnackbar(key);
-      }, 1500);
-
-      if (message.conversationId !== currentOpenedChat) {
-        queryClient.setQueryData(["conversations", userId], (old) => {
+        setTimeout(() => {
+          closeSnackbar(key);
+        }, 1500);
+        queryClient.setQueryData(["conversations", user._id], (old) => {
           if (!old) return [];
           return old.map((convo) =>
             convo._id === message.conversationId
@@ -142,11 +144,14 @@ const HomeLayout = ({ children }) => {
     };
 
     socket.on("receiveMsg", handler);
+
     const handleReceiverRead = (msgId) => {
       queryClient.setQueriesData(
         { predicate: (query) => query.queryKey[0] === "messages" },
         (old) => {
-          old.map((msg) => (msg._id === msgId ? { ...msg, read: true } : msg));
+          return old.map((msg) =>
+            msg._id === msgId ? { ...msg, read: true } : msg
+          );
         }
       );
     };
@@ -161,17 +166,17 @@ const HomeLayout = ({ children }) => {
 
     socket.on("redirectConvo", (id) => {
       const selectedConvo = conversations.find((c) => c._id === id);
-      selectConversation(selectedConvo, userId);
+      selectConversation(selectedConvo, user._id);
       navigate("/chat");
     });
 
     socket.on("newConvo", (newConvo) => {
-      QueryClient.setQueryData(["conversations", userId], (old = []) => {
+      QueryClient.setQueryData(["conversations", user._id], (old = []) => {
         const exists = old.some((c) => c._id === newConvo._id);
         return exists ? old : [newConvo, ...old];
       });
 
-      selectConversation(newConvo, userId);
+      selectConversation(newConvo, user._id);
       navigate("/chat");
     });
 
@@ -255,10 +260,8 @@ const HomeLayout = ({ children }) => {
       socket.off("cancelledCall", cancelCallHandler);
     };
   }, [
-    currentOpenedChat,
-    userId,
-    dispatch,
-    chats,
+    conversation?._id,
+    user?._id,
     selectConversation,
     navigate,
     enqueueSnackbar,
