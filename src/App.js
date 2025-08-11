@@ -19,7 +19,6 @@ function App() {
   const { data: user, isLoading } = useUser();
 
   useEffect(() => {
-    console.log(user);
     if (!user) return;
     socket.emit("online", user._id);
 

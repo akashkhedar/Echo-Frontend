@@ -9,14 +9,18 @@ import ChatSection from "./ChatSection";
 
 const ChatPage = () => {
   const { conversation, clearConversation } = useSelectedChatUser();
+
+  console.log("Current conversation:", conversation); // Add this
+
   const isTablet = useMediaQuery("(min-width:750px)");
 
-  useEffect(() => {
-    return () => {
-      clearConversation();
-    };
-    // eslint-disable-next-line
-  }, []);
+  // useEffect(() => {
+  //   console.log("ChatPage mounted");
+  //   return () => {
+  //     console.log("ChatPage unmounted - clearing conversation");
+  //     clearConversation();
+  //   };
+  // }, [clearConversation]); // Add dependency
 
   return (
     <Box

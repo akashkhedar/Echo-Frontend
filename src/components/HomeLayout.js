@@ -68,9 +68,9 @@ const HomeLayout = ({ children }) => {
       joinRooms();
     }
 
-    return () => {
-      clearConversation();
-    };
+    // return () => {
+    //   clearConversation();
+    // };
   }, [clearConversation, conversations, navigate, user._id]);
 
   useEffect(() => {
