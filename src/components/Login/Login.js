@@ -12,7 +12,7 @@ import { useFormik } from "formik";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import * as yup from "yup";
-import LoginImg from "../../assets/Login.jpg";
+import LoginImg from "../../assets/Login.jpeg";
 import axiosInstance from "../../axiosInstance";
 
 const validationSchema = yup.object({
@@ -57,8 +57,19 @@ const LogInPage = () => {
     <Box
       sx={{
         height: "100vh",
-        backgroundImage:
-          "linear-gradient(to left top, #5f604a, #4f5a48, #425347, #384b46, #314343, #2c3e41, #293a3f, #26353c, #22323c, #202f3d, #1f2c3d, #20283c)",
+        background: `linear-gradient(
+          180deg,
+          #0b0d2a 0%,
+          #1c1d4a 10%,
+          #3b2a6f 20%,
+          #6b3d8f 30%,
+          #a44b91 40%,
+          #e16973 50%,
+          #f39a5b 60%,
+          #fbc47a 70%,
+          #f9d9b0 80%,
+          #2b1e3d 100%
+        )`,
         backgroundSize: "cover",
         display: "flex",
         alignItems: "center",

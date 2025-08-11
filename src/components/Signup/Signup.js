@@ -778,10 +778,16 @@ const SignUpPage = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundImage: `
-      linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-      linear-gradient(to left top, #7731a8ff, #454fae, #0060ae, #025480ff, #015d79ff, #006c8a, #006680, #004c5fff, #023a51ff, #123150ff, #202449, #2d0f45ff)
-    `,
+        background: `radial-gradient(
+          circle at 70% 50%,
+          #ff7c33 0%,
+          #ff3c6d 15%,
+          #6b23e1 30%,
+          #00d4ff 45%,
+          #003e69 60%,
+          #000814 80%,
+          #000000 100%
+        )`,
         backgroundBlendMode: "darken",
         backgroundSize: "cover",
         color: "white",

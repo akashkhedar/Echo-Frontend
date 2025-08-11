@@ -95,7 +95,7 @@ const Navbar = () => {
           justifyContent: "space-between",
           alignItems: "center",
           height: { xs: "3.6rem", sm: "3.6rem", md: "3.7rem" },
-          backgroundImage: "linear-gradient(#1E1E2F, #121212)",
+          backgroundImage: "#121212",
         }}
       >
         {/* Logo and Icon */}
