@@ -1,11 +1,10 @@
 import SearchIcon from "@mui/icons-material/Search";
 import { Box, InputAdornment, styled, TextField } from "@mui/material";
 import React, { useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../axiosInstance";
-import ChatSearchDropdown from "./ChatSearchDropdown";
 import useUser from "../../hooks/useUser";
+import ChatSearchDropdown from "./ChatSearchDropdown";
 
 const SearchInput = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
@@ -125,7 +124,6 @@ const ListSearch = () => {
         results={searchResults}
         navigate={navigate}
         isOpen={openDropdown}
-        selector={useSelector}
         setOpenDropdown={setOpenDropdown}
       />
     </Box>

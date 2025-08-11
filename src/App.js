@@ -16,7 +16,7 @@ import useUser from "./hooks/useUser";
 import socket from "./utils/socket";
 
 function App() {
-  const { data: user, isLoading } = useUser();
+  const { data: user } = useUser();
 
   useEffect(() => {
     if (!user) return;
@@ -33,10 +33,6 @@ function App() {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [user]);
-
-  if (isLoading) {
-    return;
-  }
 
   return (
     <SnackbarProvider

@@ -2,13 +2,7 @@ import { Box, Typography, Avatar } from "@mui/material";
 import socket from "../../utils/socket";
 import useUser from "../../hooks/useUser";
 
-const ChatSearchDropdown = ({
-  results,
-  navigate,
-  isOpen,
-  selector,
-  setOpenDropdown,
-}) => {
+const ChatSearchDropdown = ({ results, isOpen, setOpenDropdown }) => {
   const { data: user } = useUser();
   if (!isOpen) return null;
 

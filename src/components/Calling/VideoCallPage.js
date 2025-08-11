@@ -4,8 +4,9 @@ import MicOffIcon from "@mui/icons-material/MicOff";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 import { Box, Grid, IconButton, Paper, Stack } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import debounce from "lodash/debounce";
 import useUser from "../../hooks/useUser";
 import socket from "../../utils/socket";
 import {
@@ -100,6 +101,8 @@ const VideoCallPage = () => {
       socket.off("getIceCandidate");
       socket.off("getNewOffer");
       socket.off("getNewAnswer");
+      debouncedMicToggle.cancel();
+      debouncedCameraToggle.cancel();
       closeConnection(calleeId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -110,32 +113,38 @@ const VideoCallPage = () => {
     navigate("/chat");
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedMicToggle = useCallback(
+    debounce(async (userId, receiver) => {
+      await toggleMic({
+        sender: userId,
+        receiver: receiver,
+      });
+    }, 300),
+    []
+  );
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedCameraToggle = useCallback(
+    debounce(async (userId, receiver) => {
+      await toggleCamera({
+        sender: userId,
+        receiver: receiver,
+      });
+    }, 300),
+    []
+  );
+
   const handleMic = async () => {
-    let receiver;
+    let receiver = user._id !== calleeId ? calleeId : callerId;
     setMicOn((prev) => !prev);
-    if (user._id !== calleeId) {
-      receiver = calleeId;
-    } else {
-      receiver = callerId;
-    }
-    await toggleMic({
-      sender: user._id,
-      receiver: receiver,
-    });
+    debouncedMicToggle(user._id, receiver);
   };
 
   const handleCamera = async () => {
-    let receiver;
+    let receiver = user._id !== calleeId ? calleeId : callerId;
     setCameraOn((prev) => !prev);
-    if (user._id !== calleeId) {
-      receiver = calleeId;
-    } else {
-      receiver = callerId;
-    }
-    await toggleCamera({
-      sender: user._id,
-      receiver: receiver,
-    });
+    debouncedCameraToggle(user._id, receiver);
   };
 
   return (

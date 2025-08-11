@@ -2,10 +2,8 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { IconButton } from "@mui/material";
 import { Box } from "@mui/system";
 import React from "react";
-import { useSelector } from "react-redux";
 
 const BoxHead = ({ handleClose }) => {
-  const prevURL = useSelector((state) => state.upload);
   return (
     <Box
       sx={{
@@ -28,7 +26,6 @@ const BoxHead = ({ handleClose }) => {
           },
         }}
         onClick={() => {
-          URL.revokeObjectURL(prevURL);
           handleClose();
         }}
       >

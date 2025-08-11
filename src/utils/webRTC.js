@@ -13,6 +13,7 @@ let peerConnection;
 let candidateQueue = [];
 let isRemoteDescriptionSet = false;
 let isLocalDescriptionSet = false;
+let isNegotiating = false;
 
 let videoCall = {
   video: true,
@@ -75,6 +76,40 @@ const initPeerConnection = async (
       });
     }
   };
+
+  peerConnection.addEventListener("negotiationneeded", async () => {
+    try {
+      if (isNegotiating) {
+        console.log("Skipping nested negotiations");
+        return;
+      }
+      isNegotiating = true;
+
+      if (peerConnection.signalingState !== "stable") {
+        console.log("Signaling state not stable, waiting...");
+        await new Promise((resolve) => {
+          peerConnection.addEventListener("signalingstatechange", resolve, {
+            once: true,
+          });
+        });
+      }
+    } catch (e) {
+      console.error("Negotiation failed:", e);
+    } finally {
+      isNegotiating = false;
+    }
+  });
+
+  peerConnection.addEventListener("iceconnectionstatechange", () => {
+    if (peerConnection.iceConnectionState === "failed") {
+      console.log("ICE connection failed, attempting restart");
+      peerConnection.restartIce();
+    }
+  });
+
+  peerConnection.addEventListener("signalingstatechange", () => {
+    console.log("Signaling state changed to:", peerConnection.signalingState);
+  });
 };
 
 export const makeCall = async (
@@ -190,7 +225,13 @@ export const setRemoteDsp = async (answer) => {
 };
 
 export const peerNegotiation = async (sender, receiver) => {
+  if (isNegotiating || peerConnection.signalingState !== "stable") {
+    console.log("Skipping negotiation - already in progress");
+    return;
+  }
+
   try {
+    isNegotiating = true;
     const newOffer = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(newOffer);
 
@@ -201,6 +242,8 @@ export const peerNegotiation = async (sender, receiver) => {
     });
   } catch (e) {
     console.error("Renegotiation failed:", e);
+  } finally {
+    isNegotiating = false;
   }
 };
 
@@ -210,17 +253,28 @@ export const toggleMic = async ({ sender, receiver }) => {
   if (audioTracks.length > 0) {
     const audioTrack = audioTracks[0];
     audioTrack.stop();
-    localStream.removeTrack(audioTrack);
 
+    // Give time for track cleanup
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    localStream.removeTrack(audioTrack);
     const senderToRemove = peerConnection
       .getSenders()
       .find((s) => s.track === audioTrack);
     if (senderToRemove) {
-      peerConnection.removeTrack(senderToRemove);
+      await peerConnection.removeTrack(senderToRemove);
+    }
+
+    // Wait for signaling state to stabilize
+    if (peerConnection.signalingState !== "stable") {
+      await new Promise((resolve) => {
+        peerConnection.addEventListener("signalingstatechange", resolve, {
+          once: true,
+        });
+      });
     }
 
     await peerNegotiation(sender, receiver);
-
     return;
   }
 
@@ -230,13 +284,21 @@ export const toggleMic = async ({ sender, receiver }) => {
     });
     const newAudioTrack = newStream.getAudioTracks()[0];
 
-    localStream.addTrack(newAudioTrack);
+    // Wait for signaling state to stabilize before adding new track
+    if (peerConnection.signalingState !== "stable") {
+      await new Promise((resolve) => {
+        peerConnection.addEventListener("signalingstatechange", resolve, {
+          once: true,
+        });
+      });
+    }
 
+    localStream.addTrack(newAudioTrack);
     peerConnection.addTrack(newAudioTrack, localStream);
 
     await peerNegotiation(sender, receiver);
   } catch (err) {
-    console.error("Error turning on camera:", err);
+    console.error("Error turning on microphone:", err);
   }
 };
 
@@ -247,20 +309,27 @@ export const toggleCamera = async ({ sender, receiver }) => {
     const videoTrack = videoTracks[0];
     videoTrack.stop();
 
+    // Give time for track cleanup
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    localStream.removeTrack(videoTrack);
     const senderToRemove = peerConnection
       .getSenders()
       .find((s) => s.track === videoTrack);
     if (senderToRemove) {
-      peerConnection.removeTrack(senderToRemove);
+      await peerConnection.removeTrack(senderToRemove);
     }
 
-    localStream.removeTrack(videoTrack);
+    // Wait for signaling state to stabilize
+    if (peerConnection.signalingState !== "stable") {
+      await new Promise((resolve) => {
+        peerConnection.addEventListener("signalingstatechange", resolve, {
+          once: true,
+        });
+      });
+    }
 
-    // Set a timeout to allow browser to release the camera hardware
-    setTimeout(async () => {
-      await peerNegotiation(sender, receiver);
-    }, 200); // 200ms delay before renegotiation
-
+    await peerNegotiation(sender, receiver);
     return;
   }
 
@@ -269,6 +338,15 @@ export const toggleCamera = async ({ sender, receiver }) => {
       video: true,
     });
     const newVideoTrack = newStream.getVideoTracks()[0];
+
+    // Wait for signaling state to stabilize before adding new track
+    if (peerConnection.signalingState !== "stable") {
+      await new Promise((resolve) => {
+        peerConnection.addEventListener("signalingstatechange", resolve, {
+          once: true,
+        });
+      });
+    }
 
     localStream.addTrack(newVideoTrack);
     peerConnection.addTrack(newVideoTrack, localStream);

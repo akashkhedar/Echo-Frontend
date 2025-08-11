@@ -20,12 +20,18 @@ import LGQuickChat from "./RightSidebar/LGQuickChat";
 import MDQuickChat from "./RightSidebar/MDQuickChat";
 
 const HomeLayout = ({ children }) => {
-  const { data: user } = useUser();
+  const { data: user, isError } = useUser();
   useEffect(() => {
     if (!user) {
       return;
     }
   });
+
+  const navigate = useNavigate();
+
+  if (isError) {
+    navigate("/login");
+  }
   const queryClient = useQueryClient();
   const theme = useTheme();
 
@@ -37,13 +43,11 @@ const HomeLayout = ({ children }) => {
   const location = useLocation();
   const isChatPage = location.pathname === "/chat";
 
-  const navigate = useNavigate();
-
   const selectConversation = useConversationSelection();
 
   const { conversation, clearConversation } = useSelectedChatUser();
 
-  const { data: conversations } = useConversationList(user._id);
+  const { data: conversations } = useConversationList(user?._id);
 
   const [verified, setVerified] = useState(false);
 
@@ -52,7 +56,7 @@ const HomeLayout = ({ children }) => {
   useEffect(() => {
     const joinRooms = async () => {
       try {
-        socket.emit("joinChat", user._id);
+        socket.emit("joinChat", user?._id);
 
         const rooms = conversations?.map((convo) => convo.roomId) || [];
         socket.emit("joinAllRooms", rooms);
@@ -71,13 +75,13 @@ const HomeLayout = ({ children }) => {
     // return () => {
     //   clearConversation();
     // };
-  }, [clearConversation, conversations, navigate, user._id]);
+  }, [clearConversation, conversations, navigate, user?._id]);
 
   useEffect(() => {
     socket.on("userOnline", (id) => {
-      queryClient.setQueryData(["conversations", user._id], (old) =>
+      queryClient.setQueryData(["conversations", user?._id], (old) =>
         old?.map((convo) =>
-          convo.user._id === id
+          convo?.user?._id === id
             ? { ...convo, user: { ...convo.user, isOnline: true } }
             : convo
         )
@@ -85,9 +89,9 @@ const HomeLayout = ({ children }) => {
     });
 
     socket.on("userOffline", (id) => {
-      queryClient.setQueryData(["conversations", user._id], (old) =>
+      queryClient.setQueryData(["conversations", user?._id], (old) =>
         old?.map((convo) =>
-          convo.user._id === id
+          convo.user?._id === id
             ? { ...convo, user: { ...convo.user, isOnline: false } }
             : convo
         )
@@ -98,7 +102,7 @@ const HomeLayout = ({ children }) => {
       socket.off("userOnline");
       socket.off("userOffline");
     };
-  }, [queryClient, user._id]);
+  }, [queryClient, user?._id]);
 
   useEffect(() => {
     const handler = (message, username) => {
@@ -108,7 +112,7 @@ const HomeLayout = ({ children }) => {
           (oldMessages) => {
             if (!oldMessages) return [message];
 
-            if (oldMessages.some((m) => m._id === message._id))
+            if (oldMessages.some((m) => m?._id === message?._id))
               return oldMessages;
             return [...oldMessages, message];
           }
@@ -130,10 +134,10 @@ const HomeLayout = ({ children }) => {
         setTimeout(() => {
           closeSnackbar(key);
         }, 1500);
-        queryClient.setQueryData(["conversations", user._id], (old) => {
+        queryClient.setQueryData(["conversations", user?._id], (old) => {
           if (!old) return [];
           return old.map((convo) =>
-            convo._id === message.conversationId
+            convo?._id === message.conversationId
               ? { ...convo, unread: true }
               : convo
           );
@@ -150,7 +154,7 @@ const HomeLayout = ({ children }) => {
         { predicate: (query) => query.queryKey[0] === "messages" },
         (old) => {
           return old.map((msg) =>
-            msg._id === msgId ? { ...msg, read: true } : msg
+            msg?._id === msgId ? { ...msg, read: true } : msg
           );
         }
       );
@@ -165,18 +169,18 @@ const HomeLayout = ({ children }) => {
     });
 
     socket.on("redirectConvo", (id) => {
-      const selectedConvo = conversations.find((c) => c._id === id);
-      selectConversation(selectedConvo, user._id);
+      const selectedConvo = conversations.find((c) => c?._id === id);
+      selectConversation(selectedConvo, user?._id);
       navigate("/chat");
     });
 
     socket.on("newConvo", (newConvo) => {
-      QueryClient.setQueryData(["conversations", user._id], (old = []) => {
-        const exists = old.some((c) => c._id === newConvo._id);
+      QueryClient.setQueryData(["conversations", user?._id], (old = []) => {
+        const exists = old.some((c) => c?._id === newConvo?._id);
         return exists ? old : [newConvo, ...old];
       });
 
-      selectConversation(newConvo, user._id);
+      selectConversation(newConvo, user?._id);
       navigate("/chat");
     });
 

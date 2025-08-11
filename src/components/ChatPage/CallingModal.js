@@ -18,8 +18,14 @@ const CallingModal = ({ calleeImage, open, onClose, callerId, calleeId }) => {
   return (
     <Modal
       open={open}
-      onClose={handleClose}
+      // Ignore default backdrop click close
+      onClose={(event, reason) => {
+        if (reason !== "backdropClick") {
+          handleClose();
+        }
+      }}
       closeAfterTransition
+      disableEscapeKeyDown
       slots={{ backdrop: Backdrop }}
       slotProps={{
         backdrop: {
@@ -39,7 +45,7 @@ const CallingModal = ({ calleeImage, open, onClose, callerId, calleeId }) => {
       >
         <Box
           sx={{
-            backgroundColor: "#121212", // Dark background for modal card
+            backgroundColor: "#121212",
             padding: 4,
             borderRadius: 4,
             display: "flex",
