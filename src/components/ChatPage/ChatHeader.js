@@ -62,7 +62,7 @@ const ChatHeader = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        backgroundColor: "#1E1E2F",
+        backgroundColor: "black",
         color: "whitesmoke",
         height: "2.6rem",
       }}

@@ -47,7 +47,18 @@ const Controls = ({
             variant="contained"
             color="primary"
             fullWidth
-            sx={{ minWidth: "unset" }}
+            sx={{
+              minWidth: "unset",
+              backgroundColor: "#2000c1ff",
+              color: "white",
+              "&:hover": {
+                backgroundColor: "#0a0763ff",
+              },
+              "&.Mui-disabled": {
+                backgroundColor: "#0a0763ff", // darker blue when loading
+                color: "#fff",
+              },
+            }}
             component="span"
             startIcon={<PhotoSizeSelectActualRoundedIcon />}
           >
@@ -97,15 +108,16 @@ const Controls = ({
           fullWidth
           startIcon={<CheckCircleRoundedIcon />}
           sx={{
-            backgroundColor: "#ad19d2ff",
+            backgroundColor: "#2000c1ff",
             color: "white",
             "&:hover": {
-              backgroundColor: "#82109eff",
+              backgroundColor: "#0a0763ff",
             },
             "&.Mui-disabled": {
-              backgroundColor: "rgba(102, 14, 125, 1)",
+              backgroundColor: "#0a0763ff", // darker blue when loading
               color: "#fff",
             },
+
             minWidth: "unset",
           }}
         >

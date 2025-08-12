@@ -30,7 +30,7 @@ const ConversationsList = ({ conversation, selectedChat }) => {
         fontSize: { xs: "0.8rem", sm: "1rem" },
         borderRadius: 2,
         backgroundColor:
-          selectedChat === conversation._id ? "#2E2E48" : "transparent",
+          selectedChat === conversation._id ? "#181826ff" : "transparent",
         cursor: "pointer",
         justifyContent: "space-between",
         "&:hover": {

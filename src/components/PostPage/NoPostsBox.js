@@ -6,9 +6,10 @@ const NoPostsBox = () => {
     <Box
       sx={{
         width: "100%",
-        height: "85%", // Enough to center vertically without taking full height
+        height: "100%", // Enough to center vertically without taking full height
         px: { xs: 2, sm: 4 }, // Horizontal padding for small screens
-        bgcolor: "#121212",
+        bgcolor: "black",
+        mt: 1,
         borderRadius: 3,
         display: "flex",
         flexDirection: "column",

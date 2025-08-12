@@ -20,7 +20,7 @@ const LoadingChats = () => {
               gap: 1.5,
               padding: "8px",
               borderRadius: "12px",
-              // backgroundColor: "rgba(255, 255, 255, 0.05)",
+              backgroundColor: "#29272fff",
             }}
           >
             <Skeleton variant="circular" width={40} height={40} />

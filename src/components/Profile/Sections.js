@@ -17,17 +17,17 @@ const Sections = () => {
     "/profile/post": 3,
   };
 
-  const initialPath = pathMap[path] ?? 0;
+  const [value, setValue] = React.useState(pathMap[path] ?? 0);
 
-  const [value, setValue] = React.useState(initialPath);
-  const handleChange = (newValue) => setValue(newValue);
+  // 🔹 Update selected tab whenever path changes
+  React.useEffect(() => {
+    setValue(pathMap[path] ?? 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [path]);
 
   const { data: user } = useUser();
-
   const { data: followers = [] } = useConnections(user._id, "followers");
-  console.log(followers);
   const { data: following = [] } = useConnections(user._id, "following");
-  console.log(following);
 
   const theme = useTheme();
 
@@ -38,17 +38,16 @@ const Sections = () => {
     py: 1,
     borderRadius: 10,
     whiteSpace: "nowrap",
-    color: "whitesmoke",
     "&.Mui-selected": {
       backgroundColor:
-        theme.palette.mode === "dark" ? "rgba(166, 0, 255, 0.15)" : "#f3e5ff",
+        theme.palette.mode === "dark" ? "rgba(166, 0, 255, 0.15)" : "#ffffff29",
     },
   };
 
   const labelStyle = {
     fontWeight: 600,
     fontSize: 14,
-    color: "black",
+    color: "#d900ffff",
     display: "flex",
     alignItems: "center",
   };
@@ -65,31 +64,22 @@ const Sections = () => {
   return (
     <Box
       sx={{
-        maxWidth: {
-          xs: "95vw",
-          sm: 400,
-          md: 500,
-          lg: 600,
-          xl: 700,
-        },
+        maxWidth: { xs: "95vw", sm: 400, md: 500, lg: 600, xl: 700 },
         borderRadius: 10,
         my: 2,
-        bgcolor: "#590d74ff",
+        bgcolor: "black",
+        border: "1px solid #d900ffff",
       }}
     >
       <Tabs
         value={value}
-        onChange={(_, newValue) => handleChange(newValue)}
+        onChange={(_, newValue) => setValue(newValue)}
         variant="scrollable"
         scrollButtons={false}
         aria-label="scrollable tabs"
         sx={{
-          "& .MuiTabs-flexContainer": {
-            gap: 1,
-          },
-          "& .MuiTabs-indicator": {
-            display: "none",
-          },
+          "& .MuiTabs-flexContainer": { gap: 1 },
+          "& .MuiTabs-indicator": { display: "none" },
           borderRadius: 10,
         }}
       >

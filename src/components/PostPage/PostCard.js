@@ -3,7 +3,6 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import ShareIcon from "@mui/icons-material/Share";
 import { Alert, Menu, MenuItem } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -30,7 +29,6 @@ import useUser from "../../hooks/useUser";
 import socket from "../../utils/socket";
 import HoverCard from "../Profile/HoverCard";
 import CommentSection from "./CommentSection";
-import ShareModal from "./ShareModal";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -88,10 +86,6 @@ const PostCard = ({ post, setPosts = null }) => {
     variant: "popover",
     popupId: "demoPopover",
   });
-
-  const [openShare, setOpenShare] = React.useState(false);
-  const openShareModal = () => setOpenShare(true);
-  const closeShareModal = () => setOpenShare(false);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -167,7 +161,7 @@ const PostCard = ({ post, setPosts = null }) => {
             xl: "40%",
           },
           marginBottom: 2,
-          background: "#1E1E2F",
+          background: "black",
           border: "1px slate 200",
           borderRadius: "10px",
           boxShadow: "0px 2px 4px #000000",
@@ -331,13 +325,6 @@ const PostCard = ({ post, setPosts = null }) => {
           </Box>
           {/* Right Actions */}
           <Box display={"flex"} alignItems={"center"}>
-            <IconButton
-              aria-label="share"
-              onClick={openShareModal}
-              sx={{ color: "whitesmoke" }}
-            >
-              <ShareIcon />
-            </IconButton>
             <ExpandMore
               expand={expanded}
               onClick={handleExpandClick}
@@ -352,11 +339,6 @@ const PostCard = ({ post, setPosts = null }) => {
             </ExpandMore>
           </Box>
         </CardActions>
-        <ShareModal
-          closeShareModal={closeShareModal}
-          postId={post._id}
-          openShare={openShare}
-        />
 
         <CardContent
           sx={{ marginBottom: -1.5, marginTop: -2.6, fontFamily: "Roboto" }}

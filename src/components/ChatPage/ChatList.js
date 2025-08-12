@@ -49,7 +49,6 @@ const ChatList = () => {
 
   useEffect(() => {
     socket.on("userOnline", (id) => {
-      console.log(id);
       queryClient.setQueryData(["conversations", user._id], (old) =>
         old?.map((convo) =>
           convo.user._id === id
@@ -86,7 +85,7 @@ const ChatList = () => {
       sx={{
         width: listWidth,
         borderRight: { sm: "2px solid rgb(51, 51, 71)" },
-        backgroundColor: "#1E1E2F",
+        backgroundColor: "black",
         display: "flex",
         flexDirection: "column",
         color: "whitesmoke",
@@ -100,7 +99,6 @@ const ChatList = () => {
           alignItems: "center",
           position: "sticky",
           top: 0,
-          backgroundColor: "#1E1E2F",
           zIndex: 1,
         }}
       >
@@ -109,7 +107,7 @@ const ChatList = () => {
             <ArrowBackIosRoundedIcon sx={{ color: "white", mr: 3, ml: -0.5 }} />
           </IconButton>
         )}
-        <Typography variant="h5" fontWeight="bold" ml={1}>
+        <Typography variant="h5" color="#d900ffff" fontWeight="bold" ml={1}>
           Chats
         </Typography>
       </Box>

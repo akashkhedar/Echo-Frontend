@@ -29,14 +29,13 @@ const AddComment = ({ postId, setComments, setCommentCount }) => {
         alignItems: "center",
         gap: 2,
         p: 1,
-        borderRadius: "8px",
-        background: "rgb(21, 21, 43)",
+
         paddingY: 1.5,
       }}
     >
       {/* Profile Image */}
       <Avatar
-        src={user.userProfile}
+        src={user.profileImage}
         alt="User Avatar"
         sx={{ width: 40, height: 40 }}
       />
@@ -50,9 +49,20 @@ const AddComment = ({ postId, setComments, setCommentCount }) => {
         sx={{
           flex: 1,
           "& .MuiOutlinedInput-root": {
-            borderRadius: "16px",
-            background: "#323232",
-            color: "whitesmoke",
+            borderRadius: "25px",
+            backgroundColor: "#0f0f17ff",
+            color: "white",
+            height: "2.5rem",
+            paddingLeft: 1,
+            border: "1px solid #3c3b3bff",
+            transition: "border 0.2s ease",
+            "&:hover": {
+              borderColor: "#d900ff92",
+            },
+          },
+          input: {
+            color: "white",
+            padding: "0 10px",
           },
         }}
       />
@@ -65,6 +75,17 @@ const AddComment = ({ postId, setComments, setCommentCount }) => {
         sx={{
           textTransform: "none",
           borderRadius: "10px",
+          backgroundColor: "#2000c1ff",
+          color: "white",
+          "&:hover": {
+            backgroundColor: "#0a0763ff",
+          },
+          "&.Mui-disabled": {
+            backgroundColor: "#0a0763ff", // darker blue when loading
+            color: "#fff",
+          },
+
+          background: "#070022ff",
         }}
       >
         Post

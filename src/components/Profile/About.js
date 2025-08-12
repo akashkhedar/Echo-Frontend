@@ -27,11 +27,12 @@ const About = () => {
         px: isMobile ? 2 : 4,
         py: 3,
         width: "90%",
-        backgroundColor: "#1E1E2F",
+        backgroundColor: "black",
         color: "whitesmoke",
         borderRadius: 2,
         mb: isMobile ? 2 : 4, // leaves space for bottom nav if present
         boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
+        border: "1px solid #1f1f1fff",
       }}
     >
       {/* Section Header */}

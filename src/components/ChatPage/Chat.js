@@ -1,5 +1,6 @@
 import { Box, useMediaQuery } from "@mui/material";
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import ChatBG from "../../assets/ChatBG.jpeg";
 import useSelectedChatUser from "../../hooks/useSelectedChatUser";
 import ChatHeader from "./ChatHeader";
@@ -9,18 +10,18 @@ import ChatSection from "./ChatSection";
 
 const ChatPage = () => {
   const { conversation, clearConversation } = useSelectedChatUser();
-
-  console.log("Current conversation:", conversation); // Add this
-
+  const location = useLocation();
   const isTablet = useMediaQuery("(min-width:750px)");
 
-  // useEffect(() => {
-  //   console.log("ChatPage mounted");
-  //   return () => {
-  //     console.log("ChatPage unmounted - clearing conversation");
-  //     clearConversation();
-  //   };
-  // }, [clearConversation]); // Add dependency
+  useEffect(() => {
+    // This will run when component unmounts or location changes
+    return () => {
+      // Only clear if we're actually leaving the chat page
+      if (!location.pathname.includes("/chat")) {
+        clearConversation();
+      }
+    };
+  }, [location.pathname, clearConversation]);
 
   return (
     <Box
@@ -28,9 +29,13 @@ const ChatPage = () => {
         display: "flex",
         background: `url(${ChatBG}) no-repeat center center/cover`,
         backgroundSize: "cover",
-        height: "90.8vh", // adjust if your navbar takes different space
+        borderTopLeftRadius: 8,
+        borderTop: "1.5px solid #1f1f1fff",
+        borderLeft: "1.5px solid #1f1f1fff",
+        height: "90.9vh",
         width: "100%",
         overflow: "hidden",
+        mt: 0.2,
       }}
     >
       {/* Sidebar (Chat List) */}
@@ -51,10 +56,9 @@ const ChatPage = () => {
           {conversation?.["_id"] && (
             <Box
               sx={{
-                position: "sticky",
+                position: "static",
                 top: 0,
                 zIndex: 10,
-                backgroundColor: "#1e1e2f",
               }}
             >
               <ChatHeader />

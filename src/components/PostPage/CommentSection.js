@@ -53,6 +53,7 @@ const CommentSection = ({ postId, setCommentCount }) => {
             borderColor: "whitesmoke",
             marginX: 1,
           },
+          color: "#d900ffff",
         }}
         textAlign="left"
       >

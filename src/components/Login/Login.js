@@ -12,7 +12,7 @@ import { useFormik } from "formik";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import * as yup from "yup";
-import LoginImg from "../../assets/Login.jpeg";
+import LoginImg from "../../assets/Login.jpg";
 import axiosInstance from "../../axiosInstance";
 
 const validationSchema = yup.object({
@@ -57,24 +57,29 @@ const LogInPage = () => {
     <Box
       sx={{
         height: "100vh",
-        background: `linear-gradient(
-          180deg,
-          #0b0d2a 0%,
-          #1c1d4a 10%,
-          #3b2a6f 20%,
-          #6b3d8f 30%,
-          #a44b91 40%,
-          #e16973 50%,
-          #f39a5b 60%,
-          #fbc47a 70%,
-          #f9d9b0 80%,
-          #2b1e3d 100%
-        )`,
+        background: `radial-gradient(
+    circle at 80% 50%, 
+    rgba(255, 120, 255, 0.25) 0%,    /* soft magenta glow from tree blossoms */
+    rgba(0, 180, 255, 0.25) 20%,     /* light blue from space glow */
+    transparent 50%
+),
+linear-gradient(
+    270deg,
+    rgba(5, 5, 15, 0.95) 0%,         /* almost black for left side */
+    rgba(20, 10, 40, 0.9) 20%,       /* deep purple shadow */
+    rgba(40, 15, 80, 0.85) 40%,      /* cosmic violet */
+    rgba(80, 40, 130, 0.85) 60%,     /* space purple-blue blend */
+    rgba(0, 110, 200, 0.85) 75%,     /* deep blue glow */
+    rgba(180, 80, 200, 0.8) 90%,     /* magenta highlight */
+    rgba(255, 140, 255, 0.85) 100%   /* bright pink edge from blossoms */
+)`,
+        backgroundBlendMode: "screen, overlay",
         backgroundSize: "cover",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         color: "white",
+        filter: "brightness(0.9)",
       }}
     >
       <Grid
@@ -106,7 +111,7 @@ const LogInPage = () => {
           xs={12}
           md={6}
           sx={{
-            background: "#191919",
+            background: "#151515ff",
             padding: { xs: 4, sm: 6 },
             display: "flex",
             flexDirection: "column",
@@ -124,7 +129,7 @@ const LogInPage = () => {
                 variant="h4"
                 fontWeight="bold"
                 gutterBottom
-                color="secondary"
+                color="#d900ffff"
               >
                 Back!
               </Typography>
@@ -239,13 +244,13 @@ const LogInPage = () => {
                     sx={{
                       textTransform: "none",
                       marginBottom: 2,
-                      backgroundColor: "#ad19d2ff",
+                      backgroundColor: "#2000c1ff",
                       color: "white",
                       "&:hover": {
-                        backgroundColor: "#82109eff",
+                        backgroundColor: "#0a0763ff",
                       },
                       "&.Mui-disabled": {
-                        backgroundColor: "rgba(102, 14, 125, 1)", // darker blue when loading
+                        backgroundColor: "#0a0763ff", // darker blue when loading
                         color: "#fff",
                       },
                     }}

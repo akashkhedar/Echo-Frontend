@@ -190,12 +190,12 @@ const LoggedNewPass = () => {
           bgcolor: !formik.isValid || !formik.dirty ? "gray" : "violet",
           color: "white",
           fontWeight: "bold",
-          backgroundColor: "#ad19d2ff",
+          backgroundColor: "#2000c1ff",
           "&:hover": {
-            backgroundColor: "#82109eff",
+            backgroundColor: "#0a0763ff",
           },
           "&.Mui-disabled": {
-            backgroundColor: "rgba(102, 14, 125, 1)",
+            backgroundColor: "#0a0763ff", // darker blue when loading
             color: "#fff",
           },
 

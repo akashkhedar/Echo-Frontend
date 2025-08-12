@@ -8,7 +8,8 @@ const NewPassword = ({ open, handleClose }) => {
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: { xs: "90%", sm: 400 },
-    bgcolor: "#121212",
+    border: "1.5px solid #1f1f1fff",
+    bgcolor: "#0f0f17ff",
     borderRadius: 3,
     boxShadow: 24,
     p: { xs: 3, sm: 4 },
@@ -38,7 +39,7 @@ const NewPassword = ({ open, handleClose }) => {
                 id="reset-password-title"
                 variant="h4"
                 fontWeight="bold"
-                color="violet"
+                color="#d900ffff"
                 gutterBottom
               >
                 Change Password

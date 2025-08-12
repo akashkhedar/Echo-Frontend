@@ -28,8 +28,6 @@ const UploadPost = ({ open, handleClose }) => {
           sx={{
             height: "100dvh",
             width: "100dvh",
-            backdropFilter: "blur(10px)",
-            WebkitBackdropFilter: "blur(10px)",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",

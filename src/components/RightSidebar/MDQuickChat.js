@@ -6,7 +6,7 @@ import List from "@mui/material/List";
 import * as React from "react";
 import useConversationList from "../../hooks/useConversationList";
 import useUser from "../../hooks/useUser";
-import EmptyChatList from "./EmptyChatList";
+import EmptyChatListMini from "./EmptyChatListMini";
 import ListLoading from "./ListLoading";
 import QuickMessages from "./QuickMessages";
 import UserTabs from "./UserTabs";
@@ -32,13 +32,22 @@ const MDQuickChat = () => {
           width: "4rem",
           borderTopLeftRadius: "8px",
           borderBottomLeftRadius: "8px",
-          borderTop: "1.5px solid #333",
-          borderLeft: "1.5px solid #333",
-          borderBottom: "1.5px solid #333",
-          backgroundColor: "#1E1E2F",
+          borderBottom: "1.5px solid #1f1f1fff",
+          borderTop: "1.5px solid #1f1f1fff",
+          borderLeft: "1.5px solid #1f1f1fff",
+          backgroundColor: "black",
           display: "flex",
           flexDirection: "column",
           overflowX: "hidden",
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+
+          // Hide scrollbar in Firefox
+          scrollbarWidth: "none",
+
+          // Hide scrollbar in IE/Edge
+          msOverflowStyle: "none",
         },
       }}
     >
@@ -79,6 +88,9 @@ const MDQuickChat = () => {
             "&::-webkit-scrollbar": {
               display: "none",
             },
+
+            // Hide scrollbar in IE/Edge
+            msOverflowStyle: "none",
           }}
         >
           {Array.isArray(conversations) ? (
@@ -93,7 +105,7 @@ const MDQuickChat = () => {
                   />
                 ))
             ) : (
-              <EmptyChatList />
+              <EmptyChatListMini />
             )
           ) : (
             <ListLoading />

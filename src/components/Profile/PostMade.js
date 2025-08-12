@@ -41,7 +41,6 @@ const PostMade = () => {
         width: "100%",
         height: "100%",
         overflowY: "auto",
-        background: "#121212",
         marginTop: -0.6,
       }}
     >
@@ -58,7 +57,7 @@ const PostMade = () => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            bgcolor: "#1e1e2f",
+            bgcolor: "black",
             borderRadius: 2,
           }}
         >

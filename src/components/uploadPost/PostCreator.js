@@ -6,9 +6,6 @@ export default function PostCreator({ about, setAbout }) {
       sx={{
         width: "100%",
         height: "100%",
-        backgroundColor: "rgb(25, 24, 24)",
-        border: "1px solid rgb(62, 46, 62)",
-        borderRadius: 2,
         p: { xs: 2, sm: 3 },
         color: "whitesmoke",
         overflowY: "auto",
@@ -42,7 +39,7 @@ export default function PostCreator({ about, setAbout }) {
             },
           }}
           sx={{
-            backgroundColor: "#292929",
+            backgroundColor: "#121010ff",
             borderRadius: "8px",
             mb: 2,
             "& .MuiOutlinedInput-root": {

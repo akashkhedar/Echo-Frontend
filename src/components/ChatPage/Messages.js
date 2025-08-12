@@ -14,6 +14,8 @@ const MessageContainer = styled(Box)({
   flexDirection: "column",
   width: "100%",
   gap: "4px",
+  paddingTop: "8px", // space for first message
+  paddingBottom: "8px", // space for last message
 });
 
 const StyledBox = styled(Box)({
@@ -23,20 +25,17 @@ const StyledBox = styled(Box)({
   flexGrow: 1,
   display: "flex",
   flexDirection: "column",
+
+  // Hide scrollbar in WebKit browsers (Chrome, Safari)
   "&::-webkit-scrollbar": {
-    width: "8px",
+    display: "none",
   },
-  "&::-webkit-scrollbar-track": {
-    background: "rgba(0, 0, 0, 0.1)",
-    borderRadius: "4px",
-  },
-  "&::-webkit-scrollbar-thumb": {
-    background: "rgba(255, 255, 255, 0.2)",
-    borderRadius: "4px",
-    "&:hover": {
-      background: "rgba(255, 255, 255, 0.3)",
-    },
-  },
+
+  // Hide scrollbar in Firefox
+  scrollbarWidth: "none",
+
+  // Hide scrollbar in IE/Edge
+  msOverflowStyle: "none",
 });
 
 const Messages = () => {

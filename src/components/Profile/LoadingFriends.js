@@ -10,7 +10,7 @@ const LoadingFriends = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              backgroundColor: "#2a2a40",
+              backgroundColor: "#070022ff",
               borderRadius: 3,
               padding: 2,
               height: 80,

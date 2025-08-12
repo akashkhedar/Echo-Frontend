@@ -7,19 +7,42 @@ const NotifyMessage = forwardRef(function NotifyMessage(
   ref
 ) {
   return (
-    <Card ref={ref} sx={{ minWidth: 250, p: 2 }} {...props}>
+    <Card
+      ref={ref}
+      elevation={3}
+      sx={{
+        minWidth: 240,
+        bgcolor: "#4c3b90ff",
+        borderRadius: 2,
+        px: 1.5,
+        py: 0.5,
+      }}
+      {...props}
+    >
       <CardContent
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          paddingBottom: "8px !important",
+          py: "4px !important",
+          px: "4px !important",
         }}
       >
-        <Typography variant="subtitle1">
-          📩 Message from {username || "Someone"}
+        <Typography
+          variant="body2"
+          sx={{ fontWeight: 500, color: "white", mr: 1 }}
+        >
+          {username || "Someone"} sent you a message
         </Typography>
-        <IconButton onClick={closeSnackbar} size="small">
+
+        <IconButton
+          onClick={closeSnackbar}
+          size="small"
+          sx={{
+            color: "text.secondary",
+            "&:hover": { color: "text.primary" },
+          }}
+        >
           <CloseIcon fontSize="small" />
         </IconButton>
       </CardContent>

@@ -1,15 +1,13 @@
-import { Avatar, Box, CardHeader, IconButton, Typography } from "@mui/material";
-import React from "react";
+import { Avatar, CardHeader, Typography } from "@mui/material";
 import {
   bindHover,
   bindPopover,
   usePopupState,
 } from "material-ui-popup-state/hooks";
-import HoverCard from "../Profile/HoverCard";
-import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import HoverPopover from "material-ui-popup-state/HoverPopover";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
+import HoverCard from "../Profile/HoverCard";
 
 const Comment = ({ comment }) => {
   const navigate = useNavigate();
@@ -18,12 +16,6 @@ const Comment = ({ comment }) => {
     variant: "popover",
     popupId: "demoPopover",
   });
-
-  const [like, setLike] = React.useState(false);
-
-  const handleLike = () => {
-    setLike(!like);
-  };
 
   return (
     <CardHeader
@@ -47,10 +39,7 @@ const Comment = ({ comment }) => {
               horizontal: "center",
             }}
           >
-            <HoverCard
-              username={comment.user.username}
-              userProfilePhoto={comment.user.profileImage}
-            />
+            <HoverCard id={comment.user._id} />
           </HoverPopover>
         </>
       }
@@ -59,41 +48,12 @@ const Comment = ({ comment }) => {
           variant="body2"
           sx={{ cursor: "pointer" }}
           onClick={() => navigate(`/${comment.user.username}`)}
+          color="#d900ffff"
         >
           {comment.user.username}
         </Typography>
       }
       subheader={<Typography variant="body2">{comment.comment}</Typography>}
-      action={
-        <Box
-          display={"flex"}
-          alignItems={"center"}
-          justifyContent={"center"}
-          flexDirection={"column"}
-        >
-          <IconButton
-            sx={{
-              "&:hover": {
-                background: "none",
-              },
-            }}
-            onClick={handleLike}
-          >
-            {like === true ? (
-              <FavoriteRoundedIcon
-                sx={{ fontSize: "1rem", color: "red", padding: 0.7 }}
-              />
-            ) : (
-              <FavoriteBorderOutlinedIcon
-                sx={{ fontSize: "1rem", color: "whitesmoke", padding: 0.7 }}
-              />
-            )}
-          </IconButton>
-          <Typography variant="caption" mt={-2}>
-            {like === true ? comment.likes + 1 : comment.likes}
-          </Typography>
-        </Box>
-      }
     />
   );
 };

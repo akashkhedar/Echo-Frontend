@@ -310,13 +310,13 @@ const SignUpPage = () => {
                 sx={{
                   textTransform: "none",
                   marginBottom: 2,
-                  backgroundColor: "#ad19d2ff",
+                  backgroundColor: "#2000c1ff",
                   color: "white",
                   "&:hover": {
-                    backgroundColor: "#82109eff",
+                    backgroundColor: "#0a0763ff",
                   },
                   "&.Mui-disabled": {
-                    backgroundColor: "rgba(102, 14, 125, 1)", // darker blue when loading
+                    backgroundColor: "#0a0763ff", // darker blue when loading
                     color: "#fff",
                   },
                 }}
@@ -395,13 +395,13 @@ const SignUpPage = () => {
                     sx={{
                       textTransform: "none",
                       marginBottom: 2,
-                      backgroundColor: "#ad19d2ff",
+                      backgroundColor: "#2000c1ff",
                       color: "white",
                       "&:hover": {
-                        backgroundColor: "#82109eff",
+                        backgroundColor: "#0a0763ff",
                       },
                       "&.Mui-disabled": {
-                        backgroundColor: "rgba(102, 14, 125, 1)", // darker blue when loading
+                        backgroundColor: "#0a0763ff", // darker blue when loading
                         color: "#fff",
                       },
                     }}
@@ -667,13 +667,13 @@ const SignUpPage = () => {
                   component="label"
                   sx={{
                     textTransform: "none",
-                    backgroundColor: "#7f19d2ff",
+                    backgroundColor: "#2000c1ff",
                     color: "white",
                     "&:hover": {
-                      backgroundColor: "#65109eff",
+                      backgroundColor: "#0a0763ff",
                     },
                     "&.Mui-disabled": {
-                      backgroundColor: "#580e7dff", // darker blue when loading
+                      backgroundColor: "#0a0763ff", // darker blue when loading
                       color: "#fff",
                     },
                   }}
@@ -746,13 +746,13 @@ const SignUpPage = () => {
                 fullWidth
                 sx={{
                   textTransform: "none",
-                  backgroundColor: "#ad19d2ff",
+                  backgroundColor: "#2000c1ff",
                   color: "white",
                   "&:hover": {
-                    backgroundColor: "#82109eff",
+                    backgroundColor: "#0a0763ff",
                   },
                   "&.Mui-disabled": {
-                    backgroundColor: "rgba(102, 14, 125, 1)", // darker blue when loading
+                    backgroundColor: "#0a0763ff", // darker blue when loading
                     color: "#fff",
                   },
                 }}
@@ -779,18 +779,19 @@ const SignUpPage = () => {
         alignItems: "center",
         justifyContent: "center",
         background: `radial-gradient(
-          circle at 70% 50%,
-          #ff7c33 0%,
-          #ff3c6d 15%,
-          #6b23e1 30%,
-          #00d4ff 45%,
-          #003e69 60%,
-          #000814 80%,
-          #000000 100%
-        )`,
+    circle at 68% 48%,
+    #ff7c33 0%,
+    #ff3c6d 15%,
+    #6b23e1 30%,
+    #00d4ff 45%,
+    #003e69 60%,
+    #000814 80%,
+    #000000 100%
+  )`,
         backgroundBlendMode: "darken",
         backgroundSize: "cover",
         color: "white",
+        filter: "brightness(0.9)",
       }}
     >
       <Grid
@@ -810,7 +811,7 @@ const SignUpPage = () => {
           xs={12}
           md={6}
           sx={{
-            background: "#191919",
+            background: "#111111ff",
             padding: { xs: 4, sm: 6 },
             display: "flex",
             alignItems: "stretch",
@@ -823,7 +824,7 @@ const SignUpPage = () => {
             <Typography
               variant="h4"
               fontWeight="bold"
-              color="violet"
+              color="#d900ffff"
               gutterBottom
             >
               Hi there!

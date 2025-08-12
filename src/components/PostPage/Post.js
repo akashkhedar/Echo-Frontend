@@ -42,8 +42,7 @@ const Post = () => {
         flexDirection: "column",
         alignItems: "center",
         width: "100%",
-        background: "#121212",
-        mt: -0.6,
+        mt: -0.9,
         px: { sm: "0.5rem", md: "1.5rem" },
         height: "100%",
       }}

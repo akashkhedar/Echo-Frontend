@@ -1,6 +1,6 @@
 import { Box, Grid, Slide, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
-import SideImg from "../../assets/ForgetPassword.jpeg";
+import SideImg from "../../assets/ForgetPassword.jpg";
 import EmailStep from "./Steps/EmailStep";
 
 const ForgetPassword = () => {
@@ -12,15 +12,21 @@ const ForgetPassword = () => {
         alignItems: "center",
         justifyContent: "center",
         background: `radial-gradient(
-          circle at 50% 60%,
-          #fcd67d 0%,
-          #f6b14a 10%,
-          #b16aff 25%,
-          #5d3aa1 45%,
-          #2a1a4d 70%,
-          #0d0b1a 90%,
-          #000000 100%
-        )`,
+    circle at 30% 50%, 
+    rgba(255, 150, 120, 0.25) 0%,    /* warm sunset orange glow */
+    rgba(255, 180, 200, 0.25) 20%,   /* soft pink clouds */
+    transparent 50%
+),
+linear-gradient(
+    270deg,
+    rgba(255, 150, 120, 0.9) 0%,     /* sunset orange */
+    rgba(255, 180, 200, 0.85) 15%,   /* soft warm pink */
+    rgba(180, 80, 150, 0.85) 35%,    /* transition purple-pink */
+    rgba(80, 40, 130, 0.85) 55%,     /* deep purple */
+    rgba(40, 20, 90, 0.9) 75%,       /* dark violet night sky */
+    rgba(10, 10, 40, 0.95) 100%      /* nearly black starfield */
+)`,
+        backgroundBlendMode: "screen, overlay",
         backgroundSize: "cover",
         color: "white",
       }}
@@ -41,7 +47,7 @@ const ForgetPassword = () => {
           xs={12}
           md={6}
           sx={{
-            background: "#191919",
+            background: "#100f0fff",
             padding: { xs: 4, sm: 6 },
             display: "flex",
             alignItems: "stretch",
@@ -51,9 +57,20 @@ const ForgetPassword = () => {
           }}
         >
           <Box>
-            <Typography variant="h4" fontWeight="bold" gutterBottom>
-              Forgot Password
-            </Typography>
+            <Box sx={{ display: "flex", flexDirection: "row", gap: 1 }}>
+              <Typography variant="h4" fontWeight="bold" gutterBottom>
+                Forgot
+              </Typography>
+
+              <Typography
+                variant="h4"
+                fontWeight="bold"
+                gutterBottom
+                color="#d900ffff"
+              >
+                Password??
+              </Typography>
+            </Box>
             <Typography variant="subtitle1" gutterBottom>
               Reset your credentials to continue using Echo
             </Typography>

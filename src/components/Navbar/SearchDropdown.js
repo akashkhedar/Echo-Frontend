@@ -55,12 +55,21 @@ const SearchDropdown = ({
   };
 
   const handleMessage = (id) => {
-    socket.emit("redirectConvo", {
-      sender: userId,
-      receiver: id,
-    });
-    setOpenDropdown(false);
-    setSearchInput("");
+    try {
+      socket.emit("redirectConvo", {
+        sender: userId,
+        receiver: id,
+      });
+
+      // Close the dropdown and clear search
+      setOpenDropdown(false);
+      setSearchInput("");
+
+      // Update the cache to ensure the conversation appears immediately
+      queryClient.invalidateQueries(["conversations", userId]);
+    } catch (error) {
+      console.error("Error initiating conversation:", error);
+    }
   };
 
   return (

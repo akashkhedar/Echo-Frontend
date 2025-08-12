@@ -1,124 +1,152 @@
 import PersonAddRoundedIcon from "@mui/icons-material/PersonAddRounded";
 import SendIcon from "@mui/icons-material/Send";
-import { Button, ButtonGroup } from "@mui/material";
-import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import Typography from "@mui/material/Typography";
-import { useNavigate } from "react-router-dom";
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+} from "@mui/material";
+import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import axiosInstance from "../../axiosInstance";
 import useUser from "../../hooks/useUser";
 import socket from "../../utils/socket";
 
-export default function HoverCard({
-  id,
-  username,
-  profilePhoto,
-  follower,
-  following,
-}) {
-  const navigate = useNavigate();
-  const { data: user } = useUser();
+export default function HoverCard({ id }) {
+  const { data: currentUser } = useUser();
+  const queryClient = useQueryClient();
+  const [targetUser, setTargetUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axiosInstance.get(`/user/basic/${id}`);
+        setTargetUser(res.data);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+    if (id) fetchUser();
+  }, [id]);
+
+  const handleMessageClick = () => {
+    try {
+      socket.emit("redirectConvo", {
+        sender: currentUser._id,
+        receiver: id,
+      });
+
+      // Invalidate the conversations query to ensure immediate update
+      queryClient.invalidateQueries(["conversations", currentUser._id]);
+    } catch (error) {
+      console.error("Error initiating conversation:", error);
+    }
+  };
+
+  if (!targetUser) return null; // Avoid rendering before data is loaded
 
   return (
     <Card
       sx={{
         display: "flex",
-        zIndex: 100,
-        background: "#1E1E2F",
+        alignItems: "stretch",
+        background: "#11111b",
+        color: "whitesmoke",
+        borderRadius: 3,
+        overflow: "hidden",
+        boxShadow: 4,
       }}
     >
+      {/* Info Section */}
       <Box
         sx={{
           display: "flex",
           flexDirection: "column",
-          paddingBottom: 2,
-          paddingX: 1,
-          border: "1px solid slate",
+          p: 2,
+          flex: 1,
+          justifyContent: "space-between",
+          borderRight: "1px solid rgba(255,255,255,0.08)",
         }}
       >
-        <CardContent sx={{ flex: "1 0 auto", color: "whitesmoke" }}>
+        <CardContent sx={{ p: 0 }}>
           <Box
             sx={{
               display: "flex",
-              flexDirection: "row",
-              alignItems: "space-between",
               justifyContent: "center",
-              gap: 2,
+              gap: 4,
             }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                flexDirection: "column",
-              }}
-            >
-              <Typography sx={{ fontWeight: "900" }}>Followers</Typography>
-              <Typography sx={{ fontWeight: "900" }}>{follower}</Typography>
+            {/* Followers */}
+            <Box textAlign="center">
+              <Typography variant="subtitle2" fontWeight={700}>
+                Followers
+              </Typography>
+              <Typography variant="h6" fontWeight={900}>
+                {targetUser.follower.length}
+              </Typography>
             </Box>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                flexDirection: "column",
-              }}
-            >
-              <Typography sx={{ fontWeight: "900" }}>Following</Typography>
-              <Typography sx={{ fontWeight: "900" }}>{following}</Typography>
+
+            {/* Following */}
+            <Box textAlign="center">
+              <Typography variant="subtitle2" fontWeight={700}>
+                Following
+              </Typography>
+              <Typography variant="h6" fontWeight={900}>
+                {targetUser.following.length}
+              </Typography>
             </Box>
           </Box>
         </CardContent>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          <ButtonGroup size="large" aria-label="Small button group">
+
+        {/* Buttons */}
+        <Box display="flex" justifyContent="center" mt={2}>
+          <ButtonGroup size="small" variant="outlined">
             <Button
               endIcon={<SendIcon />}
+              onClick={handleMessageClick}
               sx={{
                 "&:hover": {
-                  background: "blue",
-                  color: "white",
-                  borderColor: "blue",
+                  backgroundColor: "primary.main",
+                  color: "#fff",
+                  borderColor: "primary.main",
                 },
               }}
-              onClick={() => {
-                socket.emit("redirectConvo", {
-                  sender: user._id,
-                  receiver: id,
-                });
-              }}
             >
-              <Typography variant="body2">Message</Typography>
+              Message
             </Button>
             <Button
               endIcon={<PersonAddRoundedIcon />}
               sx={{
                 "&:hover": {
-                  background: "green",
-                  color: "white",
-                  borderColor: "green",
+                  backgroundColor: "success.main",
+                  color: "#fff",
+                  borderColor: "success.main",
                 },
               }}
             >
-              <Typography variant="body2">Follow</Typography>
+              Follow
             </Button>
           </ButtonGroup>
         </Box>
       </Box>
+
+      {/* Profile Photo */}
       <CardMedia
         component="img"
-        sx={{ width: 151, cursor: "pointer" }}
-        image={profilePhoto}
-        alt={username}
-        onClick={() => navigate(`/${username}`)}
+        sx={{
+          width: 140,
+          cursor: "pointer",
+          objectFit: "cover",
+          transition: "transform 0.3s ease",
+          "&:hover": {
+            transform: "scale(1.05)",
+          },
+        }}
+        image={targetUser.profileImage}
+        alt={targetUser.username}
       />
     </Card>
   );

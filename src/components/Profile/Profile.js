@@ -16,7 +16,8 @@ const Profile = () => {
         flexDirection: "column",
         alignItems: "center",
         width: "100%",
-        background: "#121212",
+        overflowY: "auto",
+        pt: 1,
         marginTop: -0.6,
       }}
     >

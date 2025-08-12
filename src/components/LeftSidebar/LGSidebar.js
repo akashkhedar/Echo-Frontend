@@ -62,13 +62,15 @@ const LGSidebar = () => {
       sx={{
         flexShrink: 0,
         [`& .MuiDrawer-paper`]: {
-          height: "calc(100vh - 4rem)",
+          height: "calc(100vh - 4.5rem)",
           marginTop: "4rem",
           width: "13rem",
           borderTopRightRadius: "8px",
-          borderTop: "1.5px solid #333",
-          borderRight: "1.5px solid #333",
-          backgroundColor: "#1E1E2F",
+          borderBottomRightRadius: "8px",
+          borderTop: "1.5px solid #1f1f1fff",
+          borderRight: "1.5px solid #1f1f1fff",
+          borderBottom: "1.5px solid #1f1f1fff",
+          backgroundColor: "black",
           overflow: "hidden",
         },
       }}
@@ -79,6 +81,7 @@ const LGSidebar = () => {
           flexDirection: "column",
           height: "100%",
           justifyContent: "space-between",
+          paddingBottom: "0.5rem",
         }}
       >
         {/* Profile Section */}
@@ -93,7 +96,8 @@ const LGSidebar = () => {
               gap: 1,
               borderBottom: "1px solid #323232",
               cursor: "pointer",
-              color: "whitesmoke",
+              color: "#d900ffff",
+
               "&:hover": {
                 backgroundColor: "rgb(18, 25, 34)",
               },

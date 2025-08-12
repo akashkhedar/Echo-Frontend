@@ -72,41 +72,53 @@ const profileValidationSchema = yup.object({
   website: yup.string(),
   dob: yup.date().required("DOB is required").typeError("Invalid date format"),
   gender: yup.string().required("Choose a value"),
-  file: yup
+  profileFile: yup
     .mixed()
     .nullable()
     .test("fileType", "Unsupported file format", (value) => {
-      if (!value) {
-        return true;
-      } else {
-        return (
-          value &&
-          [
-            "image/jpeg",
-            "image/png",
-            "image/jpg",
-            "image/tiff",
-            "image/webp",
-            "image/svg",
-            "image/bmp",
-            "image/heif",
-          ].includes(value.type)
-        );
-      }
+      if (!value) return true;
+      return (
+        value &&
+        ["image/jpeg", "image/png", "image/jpg", "image/gif"].includes(
+          value.type
+        )
+      );
+    }),
+  coverFile: yup
+    .mixed()
+    .nullable()
+    .test("fileType", "Unsupported file format", (value) => {
+      if (!value) return true;
+      return (
+        value &&
+        ["image/jpeg", "image/png", "image/jpg", "image/gif"].includes(
+          value.type
+        )
+      );
     }),
 });
 
 const AboutUpdate = ({ open, handleClose, user }) => {
   const [profileImage, setProfileImage] = useState(user.profileImage);
-  // eslint-disable-next-line no-unused-vars
+  const [coverImage, setCoverImage] = useState(user.coverImage);
   const [error, setError] = useState(false);
   const queryClient = useQueryClient();
 
-  const handleFileChange = (event) => {
-    const selectedFile = event.target.files[0];
-    if (selectedFile) {
-      setProfileImage(URL.createObjectURL(selectedFile));
-      formikProfile.setFieldValue("file", selectedFile);
+  const handleProfileFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      formikProfile.setFieldValue("profileFile", file);
+      const imageUrl = URL.createObjectURL(file);
+      setProfileImage(imageUrl);
+    }
+  };
+
+  const handleCoverFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      formikProfile.setFieldValue("coverFile", file);
+      const imageUrl = URL.createObjectURL(file);
+      setCoverImage(imageUrl);
     }
   };
 
@@ -119,32 +131,57 @@ const AboutUpdate = ({ open, handleClose, user }) => {
       website: user.website,
       dob: user.dob,
       gender: user.gender,
-      file: null,
+      profileFile: null,
+      coverFile: null,
     },
     validationSchema: profileValidationSchema,
     onSubmit: async (values) => {
-      const options = {
-        maxSizeMB: 1,
-        useWebWorker: true,
-      };
+      setLoading(true);
       try {
         const updatedFields = {};
 
-        if (values.file) {
-          const compressImg = await imageCompression(values.file, options);
+        // Handle profile image
+        if (values.profileFile) {
+          const options = {
+            maxSizeMB: 1,
+            useWebWorker: true,
+          };
+          const compressImg = await imageCompression(
+            values.profileFile,
+            options
+          );
           const response = await axios.post(
             "https://api.cloudinary.com/v1_1/dty9upcat/image/upload",
             { file: compressImg, upload_preset: "preset_echo" },
             {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
+              headers: { "Content-Type": "multipart/form-data" },
             }
           );
-          if (response?.data?.secure_url)
+          if (response?.data?.secure_url) {
             updatedFields.profileImage = response.data.secure_url;
+          }
         }
 
+        // Handle cover image
+        if (values.coverFile) {
+          const options = {
+            maxSizeMB: 1,
+            useWebWorker: true,
+          };
+          const compressImg = await imageCompression(values.coverFile, options);
+          const response = await axios.post(
+            "https://api.cloudinary.com/v1_1/dty9upcat/image/upload",
+            { file: compressImg, upload_preset: "preset_echo" },
+            {
+              headers: { "Content-Type": "multipart/form-data" },
+            }
+          );
+          if (response?.data?.secure_url) {
+            updatedFields.coverImage = response.data.secure_url;
+          }
+        }
+
+        // Add other fields if they've changed
         if (values.username !== user.username)
           updatedFields.username = values.username;
         if (values.fullname !== user.fullname)
@@ -161,15 +198,22 @@ const AboutUpdate = ({ open, handleClose, user }) => {
           "/user/update/profile",
           updatedFields
         );
+
         if (res.status === 200) {
-          queryClient.setQueryData(["userDetails"], res.data.user);
+          queryClient.setQueryData(["user"], res.data.user);
+          setLoading(false);
           handleClose();
         }
       } catch (err) {
-        setError(true);
-        setTimeout(() => {
-          setError(false);
-        }, 2000);
+        setLoading(false);
+        if (err.response?.status === 409) {
+          formikProfile.setFieldError("username", "Username already taken");
+        } else {
+          setError(true);
+          setTimeout(() => {
+            setError(false);
+          }, 2000);
+        }
       }
     },
   });
@@ -178,7 +222,6 @@ const AboutUpdate = ({ open, handleClose, user }) => {
   const [loading, setLoading] = useState(false);
   const openDelModal = () => setDelModal(true);
   const closeDelModal = () => setDelModal(false);
-  const handleLoading = () => setLoading(!loading);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -208,17 +251,26 @@ const AboutUpdate = ({ open, handleClose, user }) => {
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              bgcolor: "#1e1e2f",
-              border: "2px solid #000",
+              bgcolor: "#0b0909ff",
+              border: "2px solid #4a4646ff",
               boxShadow: 24,
               borderRadius: 2,
               px: isMobile ? 2 : 4,
               py: 2,
               "&::-webkit-scrollbar": {
-                display: "none",
+                width: "8px",
               },
-              "-ms-overflow-style": "none",
-              "scrollbar-width": "none",
+              "&::-webkit-scrollbar-track": {
+                background: "#1e1e1e",
+                borderRadius: "4px",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                background: "#4a4646ff",
+                borderRadius: "4px",
+                "&:hover": {
+                  background: "#666",
+                },
+              },
             }}
           >
             <Box
@@ -233,7 +285,7 @@ const AboutUpdate = ({ open, handleClose, user }) => {
                 id="transition-modal-title"
                 variant="h6"
                 fontWeight={700}
-                color="secondary.light"
+                color="#d900ffff"
                 sx={{
                   flexGrow: 1,
                   whiteSpace: "nowrap",
@@ -246,7 +298,7 @@ const AboutUpdate = ({ open, handleClose, user }) => {
               <IconButton
                 onClick={handleClose}
                 sx={{
-                  color: "secondary.light",
+                  color: "#878181ff",
                   ml: 1,
                   p: 0.5,
                   "&:hover": {
@@ -262,9 +314,61 @@ const AboutUpdate = ({ open, handleClose, user }) => {
               onSubmit={(e) => {
                 e.preventDefault();
                 formikProfile.handleSubmit();
-                handleLoading();
               }}
             >
+              {/* Cover Image Upload */}
+              <Box
+                sx={{
+                  textAlign: "center",
+                  padding: 2,
+                  border: "1px dashed white",
+                  borderRadius: "8px",
+                  marginBottom: 2,
+                  color: "white",
+                }}
+              >
+                <Typography variant="subtitle1" gutterBottom>
+                  Cover Image
+                </Typography>
+                <Box
+                  sx={{
+                    width: "100%",
+                    height: 120,
+                    borderRadius: 2,
+                    overflow: "hidden",
+                    position: "relative",
+                    mb: 2,
+                  }}
+                >
+                  <img
+                    src={coverImage}
+                    alt="Cover"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleCoverFileChange}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      opacity: 0,
+                      cursor: "pointer",
+                    }}
+                  />
+                </Box>
+                <Typography variant="caption" color="gray">
+                  Click to change cover image
+                </Typography>
+              </Box>
+
               {/* Profile Picture Selector */}
               <Box
                 sx={{
@@ -281,10 +385,14 @@ const AboutUpdate = ({ open, handleClose, user }) => {
                   component="label"
                   sx={{
                     textTransform: "none",
-                    backgroundColor: " #1976d2",
+                    backgroundColor: "#2000c1ff",
                     color: "white",
                     "&:hover": {
-                      backgroundColor: " #1565c0",
+                      backgroundColor: "#0a0763ff",
+                    },
+                    "&.Mui-disabled": {
+                      backgroundColor: "#0a0763ff", // darker blue when loading
+                      color: "#fff",
                     },
                   }}
                 >
@@ -293,10 +401,10 @@ const AboutUpdate = ({ open, handleClose, user }) => {
                     : "Choose Another"}
                   <input
                     type="file"
-                    id="file"
-                    name="file"
+                    id="profileFile"
+                    name="profileFile"
                     hidden
-                    onChange={handleFileChange}
+                    onChange={handleProfileFileChange}
                   />
                 </Button>
                 {formikProfile.touched.file && formikProfile.errors.file && (
@@ -649,13 +757,13 @@ const AboutUpdate = ({ open, handleClose, user }) => {
                 fullWidth
                 sx={{
                   textTransform: "none",
-                  backgroundColor: "#ad19d2ff",
+                  backgroundColor: "#2000c1ff",
                   color: "white",
                   "&:hover": {
-                    backgroundColor: "#82109eff",
+                    backgroundColor: "#0a0763ff",
                   },
                   "&.Mui-disabled": {
-                    backgroundColor: "rgba(102, 14, 125, 1)", // darker blue when loading
+                    backgroundColor: "#0a0763ff", // darker blue when loading
                     color: "#fff",
                   },
                 }}

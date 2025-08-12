@@ -32,10 +32,10 @@ const LGQuickChat = () => {
           width: "13rem",
           borderTopLeftRadius: "8px",
           borderBottomLeftRadius: "8px",
-          borderTop: "1.5px solid #333",
-          borderLeft: "1.5px solid #333",
-          borderBottom: "1.5px solid #333",
-          backgroundColor: "#1E1E2F",
+          borderBottom: "1.5px solid #1f1f1fff",
+          borderTop: "1.5px solid #1f1f1fff",
+          borderLeft: "1.5px solid #1f1f1fff",
+          backgroundColor: "black",
           display: "flex",
           flexDirection: "column",
           overflowX: "hidden",
@@ -64,7 +64,7 @@ const LGQuickChat = () => {
         <Typography
           variant="h5"
           sx={{
-            color: "whitesmoke",
+            color: "#d900ffff",
             fontWeight: "bold",
             textAlign: "center",
             display: { xs: "none", lg: "block" },

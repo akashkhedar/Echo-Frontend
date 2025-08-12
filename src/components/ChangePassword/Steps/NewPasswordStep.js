@@ -116,14 +116,14 @@ const NewPasswordStep = ({ setError }) => {
           bgcolor: !formik.isValid || !formik.dirty ? "gray" : "violet",
           "&.Mui-disabled": {
             bgcolor: "gray",
+            backgroundColor: "#2000c1ff",
             color: "white",
-            "&.Mui-disabled": {
-              backgroundColor: "rgba(102, 14, 125, 1)", // darker blue when loading
-              color: "#fff",
-            },
-            backgroundColor: "#ad19d2ff",
             "&:hover": {
-              backgroundColor: "#82109eff",
+              backgroundColor: "#0a0763ff",
+            },
+            "&.Mui-disabled": {
+              backgroundColor: "#0a0763ff", // darker blue when loading
+              color: "#fff",
             },
           },
         }}

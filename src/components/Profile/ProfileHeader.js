@@ -39,7 +39,7 @@ const ProfileHeader = () => {
     <Card
       sx={{
         boxShadow: 2,
-        bgcolor: "#1E1E2F",
+        bgcolor: "black",
         color: "whitesmoke",
         width: "100%",
       }}
@@ -48,8 +48,7 @@ const ProfileHeader = () => {
       <Box
         sx={{
           height: isMobile ? 160 : 240,
-          backgroundImage:
-            "url(https://static.vecteezy.com/system/resources/thumbnails/024/692/112/small_2x/ai-generated-ai-generative-beautiful-rhododendron-flowers-over-sunset-mountains-field-landscape-graphic-art-photo.jpg)",
+          backgroundImage: `url(${user.coverImage})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -73,7 +72,7 @@ const ProfileHeader = () => {
           sx={{
             width: isMobile ? 72 : 100,
             height: isMobile ? 72 : 100,
-            border: "3px solid white",
+            border: "3px solid #d900ffff",
             bgcolor: "#1e1e2f",
             position: "absolute",
             top: isMobile ? -36 : -50,

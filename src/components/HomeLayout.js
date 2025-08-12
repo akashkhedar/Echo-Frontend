@@ -1,7 +1,7 @@
 import { useMediaQuery } from "@mui/material";
 import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material/styles";
-import { QueryClient, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -175,7 +175,7 @@ const HomeLayout = ({ children }) => {
     });
 
     socket.on("newConvo", (newConvo) => {
-      QueryClient.setQueryData(["conversations", user?._id], (old = []) => {
+      queryClient.setQueryData(["conversations", user?._id], (old = []) => {
         const exists = old.some((c) => c?._id === newConvo?._id);
         return exists ? old : [newConvo, ...old];
       });
@@ -227,10 +227,6 @@ const HomeLayout = ({ children }) => {
       if (currentCallSnackbarKey) {
         closeSnackbar(currentCallSnackbarKey);
       }
-
-      enqueueSnackbar(`📴 Call cancelled by the caller`, {
-        variant: "info",
-      });
     };
 
     socket.on("cancelledCall", cancelCallHandler);
@@ -282,7 +278,7 @@ const HomeLayout = ({ children }) => {
         gridTemplateRows: "4rem auto",
         height: "100vh",
         width: "100vw",
-        background: "#181818",
+        background: "#0f0f17ff",
         overflowX: "hidden",
         "&::-webkit-scrollbar": {
           display: "none",
@@ -296,7 +292,6 @@ const HomeLayout = ({ children }) => {
       <Box
         sx={{
           gridRow: "1 / 2",
-          gridColumn: "1 / 2",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -305,60 +300,60 @@ const HomeLayout = ({ children }) => {
         <Navbar />
       </Box>
 
-      {/* Sidebar and Post Section */}
+      {/* Content Row */}
       <Box
         sx={{
           gridRow: "2 / 3",
-          gridColumn: "1 / 2",
-          display: "flex",
-          flexDirection: "row",
-          height: "100%",
+          display: "grid",
+          gap: 2,
+          gridTemplateColumns: !isMobile
+            ? isChatPage
+              ? { sm: "5rem minmax(0, 1fr)", lg: "14rem minmax(0, 1fr)" }
+              : {
+                  sm: "5rem minmax(0, 1fr) 5rem",
+                  lg: "14rem minmax(0, 1fr) 14rem",
+                }
+            : "minmax(0, 1fr)",
+          maxWidth: "100%",
         }}
       >
-        {/* Sidebar */}
-        {!isMobile ? (
-          <Box
-            sx={{
-              width: {
-                sm: "5rem",
-                lg: "14rem",
-              },
-              background: "#181818",
-            }}
-          >
+        {/* Left Sidebar */}
+        {!isMobile && (
+          <Box sx={{ width: isTablet ? "5rem" : "14rem", flexShrink: 0 }}>
             {isTablet ? <MDSidebar /> : <LGSidebar />}
           </Box>
-        ) : null}
+        )}
 
         {/* Main Content */}
-
         <Box
           component="main"
           sx={{
-            flex: 1,
-            background: "#181818",
-            minHeight: "100v%",
+            height: "100%",
             width: "100%",
-            mx: "auto",
-            pb: isMobile && "56px",
+            maxWidth: "100%",
+
+            pb: isMobile ? "56px" : 0,
           }}
         >
           {children}
         </Box>
 
-        {!isChatPage && !isMobile ? (
+        {/* Right Sidebar */}
+        {!isChatPage && !isMobile && (
           <Box
             sx={{
-              width: { sm: "5rem", lg: "14rem" },
-              background: "#181818",
               display: "flex",
               flexDirection: "column",
+              width: isTablet ? "5rem" : "14rem",
+              flexShrink: 0,
             }}
           >
             {isTablet ? <MDQuickChat /> : <LGQuickChat />}
           </Box>
-        ) : null}
+        )}
       </Box>
+
+      {/* Bottom Navigation (Mobile) */}
       {isMobile && <SimpleBottomNavigation />}
     </Box>
   ) : null;

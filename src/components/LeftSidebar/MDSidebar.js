@@ -62,13 +62,15 @@ const MDSidebar = () => {
       sx={{
         flexShrink: 0,
         [`& .MuiDrawer-paper`]: {
-          height: "calc(100vh - 4rem)",
+          height: "calc(100vh - 4.5rem)",
           marginTop: "4rem",
           width: "4rem",
           borderTopRightRadius: "8px",
-          borderTop: "1.5px solid #333",
-          borderRight: "1.5px solid #333",
-          backgroundColor: "#1E1E2F",
+          borderBottomRightRadius: "8px",
+          borderTop: "1.5px solid #1f1f1fff",
+          borderRight: "1.5px solid #1f1f1fff",
+          borderBottom: "1.5px solid #1f1f1fff",
+          backgroundColor: "black",
           overflow: "hidden",
         },
       }}
@@ -116,8 +118,7 @@ const MDSidebar = () => {
             </Item>
 
             <Divider
-              variant="middle"
-              sx={{ bgcolor: "secondary.light", margin: "10px 0 0 7px" }}
+              sx={{ margin: "0px 0", width: "100%", background: "#323232 " }}
             />
 
             <Item onClick={() => navigate("/chat")}>

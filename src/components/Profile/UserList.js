@@ -11,11 +11,13 @@ import {
 } from "material-ui-popup-state/hooks";
 import HoverPopover from "material-ui-popup-state/HoverPopover";
 import { useNavigate } from "react-router-dom";
+import socket from "../../utils/socket";
+import useUser from "../../hooks/useUser";
 import HoverCard from "./HoverCard";
 
 const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: "rgb(21, 21, 35)",
-  border: "1px solid rgb(64, 44, 71)",
+  backgroundColor: "black",
+  border: "1px solid #4a4646ff",
   padding: theme.spacing(2),
   color: theme.palette.text.secondary,
   borderRadius: 30,
@@ -29,6 +31,7 @@ const Item = styled(Paper)(({ theme }) => ({
 
 const UserList = ({ user, onRemove }) => {
   const navigate = useNavigate();
+  const { data: currentUser } = useUser();
   const popupState = usePopupState({
     variant: "popover",
     popupId: "user-hover-popover",
@@ -120,7 +123,12 @@ const UserList = ({ user, onRemove }) => {
       >
         <IconButton
           size="small"
-          onClick={() => navigate(`/messages/${user._id}`)}
+          onClick={() => {
+            socket.emit("redirectConvo", {
+              sender: currentUser?._id,
+              receiver: user._id,
+            });
+          }}
         >
           <MessageIcon
             sx={{

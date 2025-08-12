@@ -35,7 +35,7 @@ const NewMessage = () => {
           No messages yet.
         </Typography>
         <Typography variant="body1" sx={{ opacity: 0.7, mt: 1 }}>
-          Say hello! 👋
+          Say hello! And start the a conversation
         </Typography>
       </Box>
     </Box>

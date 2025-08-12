@@ -95,7 +95,8 @@ const Navbar = () => {
           justifyContent: "space-between",
           alignItems: "center",
           height: { xs: "3.6rem", sm: "3.6rem", md: "3.7rem" },
-          backgroundImage: "#121212",
+          background: "black",
+          borderBottom: "1px solid #1f1f1fff",
         }}
       >
         {/* Logo and Icon */}
@@ -162,18 +163,18 @@ const Navbar = () => {
             sx={{
               "& .MuiOutlinedInput-root": {
                 borderRadius: "25px",
-                backgroundColor: "#1E1E2F",
+                backgroundColor: "#0f0f17ff",
                 color: "white",
                 height: "2.5rem",
                 paddingLeft: 1,
-                border: "1px solid #2c2c2c",
+                border: "1px solid #3c3b3bff",
                 transition: "border 0.2s ease",
                 "&:hover": {
-                  borderColor: "#3f3f3f",
+                  borderColor: "#d900ff92",
                 },
-                "&.Mui-focused": {
-                  borderColor: "#0078FF",
-                  boxShadow: "0 0 0 2px rgba(0, 120, 255, 0.2)",
+                "&.Mui-focused, &:active": {
+                  borderColor: "#d900ff92",
+                  boxShadow: "0 0 0 1px #d900ffff", // so it matches focus
                 },
               },
               input: {
@@ -218,7 +219,7 @@ const Navbar = () => {
                   display: { xs: "none", sm: "block" },
                   width: { sm: "2.3rem", md: "2.4rem", lg: "2.5rem" },
                   height: { sm: "2.3rem", md: "2.4rem", lg: "2.5rem" },
-                  border: "2px solid #0078FF",
+                  border: "3px solid #d900ffff",
                 }}
                 onClick={() => navigate("/profile/about")}
                 src={user.profileImage}

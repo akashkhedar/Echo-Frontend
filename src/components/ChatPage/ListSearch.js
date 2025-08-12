@@ -9,7 +9,7 @@ import ChatSearchDropdown from "./ChatSearchDropdown";
 const SearchInput = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
     borderRadius: 25,
-    backgroundColor: "#2E2E48",
+    backgroundColor: "#13131eff",
     color: "whitesmoke",
     height: "3rem",
     border: "1px solid #323232",

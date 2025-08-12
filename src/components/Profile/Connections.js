@@ -40,12 +40,16 @@ const Connections = ({ path }) => {
     <Box
       sx={{
         flexGrow: 1,
-        minHeight: "calc(100vh - 12rem)",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         textAlign: "center",
+        bgcolor: "black",
+        mt: 2,
+        borderRadius: "8px",
+        border: "1px solid #1f1f1fff",
         width: "100%",
+        minHeight: "60vh", // 👈 pushes it nicely to center in view
       }}
     >
       <Typography variant="h6" fontWeight={600} color="whitesmoke">
@@ -77,8 +81,9 @@ const Connections = ({ path }) => {
         flexGrow: 1,
         display: "flex",
         flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center", // 👈 ensures vertical center
         width: "100%",
-        minHeight: "calc(100vh - 50rem)",
         mb: 2,
       }}
     >
