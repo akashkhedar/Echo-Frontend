@@ -331,8 +331,6 @@ const HomeLayout = ({ children }) => {
             height: "100%",
             width: "100%",
             maxWidth: "100%",
-
-            pb: isMobile ? "56px" : 0,
           }}
         >
           {children}

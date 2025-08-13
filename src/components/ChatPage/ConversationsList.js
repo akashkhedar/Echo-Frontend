@@ -5,11 +5,10 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
-  Typography,
 } from "@mui/material";
 import useConversationSelection from "../../hooks/useConversationSelection";
-import useUser from "../../hooks/useUser";
 import useSelectedChatUser from "../../hooks/useSelectedChatUser";
+import useUser from "../../hooks/useUser";
 
 const ConversationsList = ({ conversation, selectedChat }) => {
   const { data: user } = useUser();
@@ -50,11 +49,6 @@ const ConversationsList = ({ conversation, selectedChat }) => {
         {/* {!isCollpased && ( */}
         <ListItemText
           primary={`${conversation.user.fullname}`}
-          secondary={
-            <Typography variant="body2" color="rgba(255, 255, 255, 0.6)">
-              {conversation._id === 0 ? "Are you here?" : "Last message..."}
-            </Typography>
-          }
           sx={{ color: "whitesmoke" }}
         />
         {/* )} */}

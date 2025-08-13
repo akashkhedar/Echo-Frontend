@@ -1,5 +1,6 @@
 // components/PostPage/Post.js
 import Box from "@mui/material/Box";
+import { useMediaQuery, useTheme } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useFeedPosts } from "../../hooks/useFeedPosts";
@@ -11,6 +12,10 @@ import PostLoading from "./PostLoading";
 
 const Post = () => {
   const { data: user } = useUser();
+
+  const theme = useTheme();
+
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const queryClient = useQueryClient();
   const { data: posts, isLoading } = useFeedPosts(user._id);
@@ -41,10 +46,9 @@ const Post = () => {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        width: "100%",
         mt: -0.9,
         px: { sm: "0.5rem", md: "1.5rem" },
-        height: "100%",
+        height: isMobile ? "calc(100vh - 56px - 4rem)" : "100%",
       }}
     >
       {isLoading ? (

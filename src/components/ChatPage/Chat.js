@@ -1,4 +1,4 @@
-import { Box, useMediaQuery } from "@mui/material";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import ChatBG from "../../assets/ChatBG.jpeg";
@@ -10,6 +10,9 @@ import ChatSection from "./ChatSection";
 
 const ChatPage = () => {
   const { conversation, clearConversation } = useSelectedChatUser();
+  const theme = useTheme();
+
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const location = useLocation();
   const isTablet = useMediaQuery("(min-width:750px)");
 
@@ -32,7 +35,7 @@ const ChatPage = () => {
         borderTopLeftRadius: 8,
         borderTop: "1.5px solid #1f1f1fff",
         borderLeft: "1.5px solid #1f1f1fff",
-        height: "90.9vh",
+        height: isMobile ? "calc(100vh - 56px - 4rem)" : "100%",
         width: "100%",
         overflow: "hidden",
         mt: 0.2,

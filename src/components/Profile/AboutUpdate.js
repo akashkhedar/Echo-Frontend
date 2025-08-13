@@ -101,7 +101,6 @@ const profileValidationSchema = yup.object({
 const AboutUpdate = ({ open, handleClose, user }) => {
   const [profileImage, setProfileImage] = useState(user.profileImage);
   const [coverImage, setCoverImage] = useState(user.coverImage);
-  const [error, setError] = useState(false);
   const queryClient = useQueryClient();
 
   const handleProfileFileChange = (event) => {
@@ -208,11 +207,6 @@ const AboutUpdate = ({ open, handleClose, user }) => {
         setLoading(false);
         if (err.response?.status === 409) {
           formikProfile.setFieldError("username", "Username already taken");
-        } else {
-          setError(true);
-          setTimeout(() => {
-            setError(false);
-          }, 2000);
         }
       }
     },

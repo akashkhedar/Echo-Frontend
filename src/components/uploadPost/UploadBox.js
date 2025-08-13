@@ -73,7 +73,7 @@ const UploadBox = ({ handleClose }) => {
     <Box
       sx={{
         width: {
-          xs: "80%",
+          xs: "90%",
           sm: "65%",
           md: "65%",
           lg: "80%",

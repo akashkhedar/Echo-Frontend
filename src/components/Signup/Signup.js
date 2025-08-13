@@ -108,6 +108,24 @@ const SignUpPage = () => {
 
   const navigate = useNavigate();
 
+  const [loadingEmail, setLoadingEmail] = useState(false);
+
+  const handleEmailSubmit = () => {
+    setLoadingEmail(true);
+  };
+
+  const [loadingCode, setLoadingCode] = useState(false);
+
+  const handleCodeSubmit = () => {
+    setLoadingCode(true);
+  };
+
+  const [loadingProfile, setLoadingProfile] = useState(false);
+
+  const handleProfileSubmit = () => {
+    setLoadingProfile(true);
+  };
+
   const formikEmail = useFormik({
     initialValues: {
       email: "",
@@ -120,8 +138,10 @@ const SignUpPage = () => {
         });
         if (res.status === 200) {
           handleNext();
+          setLoadingEmail(false);
         }
       } catch (error) {
+        setLoadingEmail(false);
         if (error.status === 401) {
           setActiveStep((prev) => prev + 2);
         }
@@ -145,8 +165,10 @@ const SignUpPage = () => {
         await axiosInstance.post("/auth/verify", {
           code: values.code,
         });
+        setLoadingCode(false);
         handleNext();
       } catch (error) {
+        setLoadingCode(false);
         setError(true);
         setTimeout(() => {
           setError(false);
@@ -191,6 +213,7 @@ const SignUpPage = () => {
           gender: values.gender,
           pic_url: response.data.secure_url,
         });
+        setLoadingProfile(false);
         if (res.status === 409) {
           formikProfile.setFieldError("username", "Username already taken");
         }
@@ -199,6 +222,7 @@ const SignUpPage = () => {
           navigate("/");
         }
       } catch (error) {
+        setLoadingProfile(false);
         setError(true);
         setTimeout(() => {
           setError(false);
@@ -226,24 +250,6 @@ const SignUpPage = () => {
     handleEmailSubmit();
     setDirection("right");
     setActiveStep((prev) => prev - 1);
-  };
-
-  const [loadingEmail, setLoadingEmail] = useState(false);
-
-  const handleEmailSubmit = () => {
-    setLoadingEmail(!loadingEmail);
-  };
-
-  const [loadingCode, setLoadingCode] = useState(false);
-
-  const handleCodeSubmit = () => {
-    setLoadingCode(true);
-  };
-
-  const [loadingProfile, setLoadingProfile] = useState(false);
-
-  const handleProfileSubmit = () => {
-    setLoadingProfile(true);
   };
 
   const renderForm = () => {

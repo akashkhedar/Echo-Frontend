@@ -41,6 +41,7 @@ const LogInPage = () => {
           });
           if (res.status === 200) {
             queryClient.setQueryData(["userDetails"], res.data.user);
+            setLoadingLogin(false);
             navigate("/");
           }
         } catch (error) {

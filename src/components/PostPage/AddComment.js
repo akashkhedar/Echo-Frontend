@@ -1,4 +1,10 @@
-import { Avatar, Box, Button, TextField } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Button,
+  TextField,
+  CircularProgress,
+} from "@mui/material";
 import { useState } from "react";
 import axiosInstance from "../../axiosInstance";
 import useUser from "../../hooks/useUser";
@@ -7,8 +13,12 @@ const AddComment = ({ postId, setComments, setCommentCount }) => {
   const { data: user } = useUser();
 
   const [comment, setComment] = useState("");
+  const [loading, setLoading] = useState(false); // Loading state
 
   const handleSubmit = async () => {
+    if (!comment.trim()) return;
+
+    setLoading(true);
     try {
       const res = await axiosInstance.post(`/post/comment/${postId}`, {
         comment: comment,
@@ -16,9 +26,12 @@ const AddComment = ({ postId, setComments, setCommentCount }) => {
       if (res) {
         setComments((prev) => [res.data, ...prev]);
         setCommentCount((prev) => prev + 1);
+        setComment(""); // Clear input after posting
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -29,7 +42,6 @@ const AddComment = ({ postId, setComments, setCommentCount }) => {
         alignItems: "center",
         gap: 2,
         p: 1,
-
         paddingY: 1.5,
       }}
     >
@@ -39,6 +51,7 @@ const AddComment = ({ postId, setComments, setCommentCount }) => {
         alt="User Avatar"
         sx={{ width: 40, height: 40 }}
       />
+
       {/* Comment Input */}
       <TextField
         value={comment}
@@ -66,12 +79,13 @@ const AddComment = ({ postId, setComments, setCommentCount }) => {
           },
         }}
       />
+
       {/* Submit Button */}
       <Button
         onClick={handleSubmit}
         variant="contained"
         size="medium"
-        disabled={!comment.trim()}
+        disabled={!comment.trim() || loading}
         sx={{
           textTransform: "none",
           borderRadius: "10px",
@@ -81,14 +95,19 @@ const AddComment = ({ postId, setComments, setCommentCount }) => {
             backgroundColor: "#0a0763ff",
           },
           "&.Mui-disabled": {
-            backgroundColor: "#0a0763ff", // darker blue when loading
+            backgroundColor: "#0a0763ff",
             color: "#fff",
           },
-
-          background: "#070022ff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        Post
+        {loading ? (
+          <CircularProgress size={20} sx={{ color: "white" }} />
+        ) : (
+          "Post"
+        )}
       </Button>
     </Box>
   );

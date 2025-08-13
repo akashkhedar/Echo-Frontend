@@ -115,12 +115,6 @@ const About = () => {
           </Typography>
         </Grid>
       </Grid>
-
-      <Divider sx={{ my: 3, bgcolor: "rgb(136, 79, 144)" }} />
-
-      <Typography variant="caption" color="whitesmoke">
-        * Details are based on the information provided by the user.
-      </Typography>
     </Box>
   );
 };
