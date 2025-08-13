@@ -139,9 +139,11 @@ linear-gradient(
               Login to Continue
             </Typography>
           </Box>
-          <Box sx={{ height: "1vh" }}>
-            {error && <Alert severity="error">Wrong Email/Password</Alert>}
-          </Box>
+          {error && (
+            <Box sx={{ mb: 2 }}>
+              <Alert severity="error">Wrong Email/Password</Alert>
+            </Box>
+          )}
           <Box
             sx={{
               overflowY: "auto",

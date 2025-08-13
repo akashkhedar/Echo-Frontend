@@ -680,7 +680,7 @@ const AboutUpdate = ({ open, handleClose, user }) => {
                 </Grid>
 
                 {/* Gender Selection */}
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={6} sx={{ marginTop: 2 }}>
                   <FormControl
                     fullWidth
                     sx={{
