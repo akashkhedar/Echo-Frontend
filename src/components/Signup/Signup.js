@@ -195,15 +195,17 @@ const SignUpPage = () => {
 
       try {
         const compressImg = await imageCompression(values.file, options);
+        const formData = new FormData();
+        formData.append("file", compressImg);
+        formData.append("upload_preset", "preset_echo");
+
         const response = await axios.post(
-          "https://api.cloudinary.com/v1_1/dty9upcat/image/upload",
-          { file: compressImg, upload_preset: "preset_echo" },
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
+         "https://api.cloudinary.com/v1_1/dty9upcat/image/upload",
+          formData,
+         {
+             headers: { "Content-Type": "multipart/form-data" },
           }
-        );
+      );
 
         const res = await axiosInstance.post("/user/profile", {
           password: values.password,
@@ -214,13 +216,12 @@ const SignUpPage = () => {
           pic_url: response.data.secure_url,
         });
         setLoadingProfile(false);
-        if (res.status === 409) {
-          formikProfile.setFieldError("username", "Username already taken");
-        }
-        if (res.status === 200) {
-          queryClient.setQueryData(["userDetails"], res.data.user);
-          navigate("/");
-        }
+       if (res.status === 409) {
+           formikProfile.setFieldError("username", "Username already taken");
+       } else if (res.status >= 200 && res.status < 300) {
+           queryClient.setQueryData(["userDetails"], res.data.user);
+           navigate("/");
+      }
       } catch (error) {
         setLoadingProfile(false);
         setError(true);
