@@ -9,9 +9,11 @@ import {
 import useConversationSelection from "../../hooks/useConversationSelection";
 import useSelectedChatUser from "../../hooks/useSelectedChatUser";
 import useUser from "../../hooks/useUser";
-
+import { useNavigate } from "react-router-dom";
 const ConversationsList = ({ conversation, selectedChat }) => {
   const { data: user } = useUser();
+
+  const navigate = useNavigate();
 
   const selectConversation = useConversationSelection();
   const { saveConversation } = useSelectedChatUser();
@@ -21,6 +23,7 @@ const ConversationsList = ({ conversation, selectedChat }) => {
       onClick={async () => {
         saveConversation(conversation);
         await selectConversation(conversation, user._id);
+        navigate("/chat");
       }}
       sx={{
         display: "flex",

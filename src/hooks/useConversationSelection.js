@@ -1,11 +1,9 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
 import axiosInstance from "../axiosInstance";
 import socket from "../utils/socket";
 
 const useConversationSelection = () => {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
 
   const selectConversation = async (convo, id) => {
     try {
@@ -23,8 +21,6 @@ const useConversationSelection = () => {
             .then((res) => res.data),
         staleTime: 1000 * 60,
       });
-
-      navigate("/chat");
     } catch (error) {
       console.error("Error selecting conversation:", error);
     }
